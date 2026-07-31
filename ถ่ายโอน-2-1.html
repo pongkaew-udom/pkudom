@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: การเปรียบเทียบกลไกการถ่ายโอนความร้อน</title>
+  <!-- Chart.js สำหรับพล็อตราฟ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #0f172a;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+
+    /* Description Grid */
+    .desc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .desc-card {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 15px;
+      border-top: 4px solid #cbd5e1;
+      transition: transform 0.2s;
+    }
+
+    .desc-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .desc-card.card-a { border-top-color: #94a3b8; }
+    .desc-card.card-b { border-top-color: #3b82f6; }
+    .desc-card.card-c { border-top-color: #eab308; }
+    .desc-card.card-d { border-top-color: #ef4444; }
+
+    .desc-card h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .desc-card p {
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    /* Main Content Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .panel-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    /* Visual Bottles */
+    .bottles-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 180px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 15px 5px;
+      margin-bottom: 20px;
+    }
+
+    .bottle-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 22%;
+    }
+
+    .bottle-box {
+      width: 42px;
+      height: 75px;
+      border: 2px solid #475569;
+      border-radius: 6px 6px 4px 4px;
+      position: relative;
+      background: #e2e8f0;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .water-fill {
+      width: 100%;
+      height: 85%;
+      background: #ef4444;
+      transition: background 0.3s;
+    }
+
+    .temp-display {
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 6px;
+      color: #0f172a;
+    }
+
+    .bottle-label {
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 2px;
+      color: #64748b;
+    }
+
+    /* Controls */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-start { background-color: #10b981; color: white; }
+    .btn-start:hover { background-color: #059669; }
+    .btn-start:disabled { background-color: #a7f3d0; cursor: not-allowed; }
+
+    .btn-reset { background-color: #f43f5e; color: white; }
+    .btn-reset:hover { background-color: #e11d48; }
+
+    /* Table */
+    .table-box {
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    th, td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: #475569;
+      position: sticky;
+      top: 0;
+      font-weight: bold;
+    }
+
+    /* Medical Section */
+    .medical-card {
+      background: #f0f9ff;
+      border-left: 5px solid #0284c7;
+      padding: 20px;
+      border-radius: 0 12px 12px 0;
+      margin-top: 10px;
+    }
+
+    .medical-card h2 {
+      font-size: 18px;
+      color: #0369a1;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .medical-card p, .medical-card li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #334155;
+    }
+
+    .medical-card ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .medical-card strong {
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: การเปรียบเทียบประสิทธิภาพของกลไกการถ่ายโอนความร้อน</h1>
+  <p class="subtitle">ศึกษาการลดลงของอุณหภูมิตามเวลา (Newton's Law of Cooling) และกลไกการระบายความร้อนของร่างกาย</p>
+
+  <!-- คำบรรยายชุดการทดลองทั้ง 4 -->
+  <div class="desc-grid">
+    <div class="desc-card card-a">
+      <h3>ขวด A: ชุดควบคุม <span>📄</span></h3>
+      <p><strong>ตั้งไว้บนโต๊ะเฉยๆ</strong><br>ถ่ายโอนความร้อนผ่านการพาความร้อนตามธรรมชาติ (Natural Convection) ของอากาศรอบๆ และการแผ่รังสีความร้อน (Radiation) ถือเป็นสภาวะอ้างอิงฐาน</p>
+    </div>
+    <div class="desc-card card-b">
+      <h3>ขวด B: การนำความร้อน <span>🧊</span></h3>
+      <p><strong>วางบนถาดโลหะเย็น</strong><br>เกิดการนำความร้อน (Conduction) จากก้นขวดไปยังถาดโลหะที่มีค่าการนำความร้อนสูง โมเลกุลสัมผัสกันโดยตรงจึงถ่ายโอนความร้อนได้เร็วกว่าขวด A</p>
+    </div>
+    <div class="desc-card card-c">
+      <h3>ขวด C: การพาความร้อน <span>ลม</span></h3>
+      <p><strong>เปิดพัดลมเป่าตรงไปที่ขวด</strong><br>เกิดการพาความร้อนแบบบังคับ (Forced Convection) กระแสลมช่วยพามวลอากาศร้อนรอบขวดออกไปอย่างรวดเร็ว ทำให้ความร้อนระบายได้ไวขึ้น</p>
+    </div>
+    <div class="desc-card card-d">
+      <h3>ขวด D: การระเหย <span>💦</span></h3>
+      <p><strong>หุ้มผ้าเปียก + เปิดพัดลมเป่า</strong><br>เกิดการระเหยของน้ำ (Evaporation) ร่วมกับการพาความร้อน น้ำต้องดึงพลังงานความร้อนแฝงในการกลายเป็นไอไปใช้ ทำให้อุณหภูมิลดลงเร็วที่สุด (จำลองการออกเหงื่อ)</p>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- ฝั่งจำลองและตาราง -->
+    <div class="panel">
+      <div class="panel-title">ภาพการทดลองจำลอง & ตารางบันทึกผล</div>
+      
+      <div class="bottles-container">
+        <div class="bottle-wrapper">
+          <div class="bottle-box"><div id="water-A" class="water-fill"></div></div>
+          <div class="temp-display" id="temp-A">60.0°C</div>
+          <div class="bottle-label">ขวด A</div>
+        </div>
+        <div class="bottle-wrapper">
+          <div class="bottle-box"><div id="water-B" class="water-fill"></div></div>
+          <div class="temp-display" id="temp-B">60.0°C</div>
+          <div class="bottle-label">ขวด B</div>
+        </div>
+        <div class="bottle-wrapper">
+          <div class="bottle-box"><div id="water-C" class="water-fill"></div></div>
+          <div class="temp-display" id="temp-C">60.0°C</div>
+          <div class="bottle-label">ขวด C</div>
+        </div>
+        <div class="bottle-wrapper">
+          <div class="bottle-box"><div id="water-D" class="water-fill"></div></div>
+          <div class="temp-display" id="temp-D">60.0°C</div>
+          <div class="bottle-label">ขวด D</div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-start" id="startBtn" onclick="startLab()">เริ่มการทดลอง (15 นาที)</button>
+        <button class="btn btn-reset" onclick="resetLab()">รีเซ็ต</button>
+      </div>
+
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>เวลา (นาที)</th>
+              <th>ขวด A (°C)</th>
+              <th>ขวด B (°C)</th>
+              <th>ขวด C (°C)</th>
+              <th>ขวด D (°C)</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ฝั่งกราฟ -->
+    <div class="panel">
+      <div class="panel-title">กราฟอุณหภูมิ T (°C) กับ เวลา t (นาที)</div>
+      <div style="height: 380px; position: relative;">
+        <canvas id="tempChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- การเชื่อมโยงทางการแพทย์ -->
+  <div class="medical-card">
+    <h2>🩺 การเชื่อมโยงทางการแพทย์ (Medical Connection)</h2>
+    <p><strong>ผลการทดลอง:</strong> ขวด D มีอัตราการลดลงของอุณหภูมิรวดเร็วที่สุดอย่างชัดเจน เนื่องจากน้ำที่ผ้าเปียกดึงพลังงานความร้อนแฝงของการกลายเป็นไอ (Latent Heat of Vaporization ≈ 2,427 J/g) ไปใช้ในการเปลี่ยนสถานะกลายเป็นไอ</p>
+    <br>
+    <p><strong>ทำไม "เหงื่อ (Sweat Evaporation)" จึงเป็นกลไกหลักเมื่ออุณหภูมิสิ่งแวดล้อมสูงกว่าอุณหภูมิร่างกาย ?</strong></p>
+    <ul>
+      <li><strong>ข้อจำกัดของการนำ พา และแผ่รังสี:</strong> โดยปกติ ร่างกายจะพาความร้อนและแผ่รังสีออกเมื่ออุณหภูมิร่างกายสูงกว่าอากาศ  แต่เมื่ออุณหภูมิสิ่งแวดล้อมสูงกว่าร่างกาย (เช่น วันที่อากาศร้อน  ความร้อนตามธรรมชาติจะ **ไหลเข้าสู่ร่างกายแทน** ทำให้ไม่สามารถระบายความร้อนด้วยการนำ การพา หรือการแผ่รังสีได้</li>
+      <li><strong>การระเหยคือทางออกเดียว (Primary Cooling Mechanism):</strong> ในภาวะดังกล่าว การระเหยของเหงื่อกลายเป็นกลไกเดียวที่สามารถดึงความร้อนออกจากร่างกายได้ เพราะการระเหยไม่ได้ขึ้นกับความต่างของอุณหภูมิ แต่ใช้อัตราส่วนความชื้นสัมพัทธ์ ร่างกายจึงสามารถขับความร้อนส่วนเกินเพื่อรักษาอุณหภูมิแกนกลาง (Core Body Temperature) ไม่ให้เกิดภาวะโรคลมแดด (Heat Stroke) ได้</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  const T_ambient = 28.0; // อุณหภูมิสิ่งแวดล้อม
+  const T_initial = 60.0; // อุณหภูมิเริ่มต้น
+  
+  // สัมประสิทธิ์การเย็นตัว (Cooling Rates)
+  const kA = 0.028; // Control
+  const kB = 0.080; // Conduction
+  const kC = 0.065; // Convection
+  const kD = 0.145; // Evaporation
+
+  let currentTime = 0;
+  let timer = null;
+  let chart;
+
+  let labelsData = [0];
+  let dataA = [T_initial];
+  let dataB = [T_initial];
+  let dataC = [T_initial];
+  let dataD = [T_initial];
+
+  function initChart() {
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labelsData,
+        datasets: [
+          { label: 'ขวด A (Control)', data: dataA, borderColor: '#94a3b8', backgroundColor: '#94a3b8', tension: 0.2 },
+          { label: 'ขวด B (Conduction)', data: dataB, borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.2 },
+          { label: 'ขวด C (Convection)', data: dataC, borderColor: '#eab308', backgroundColor: '#eab308', tension: 0.2 },
+          { label: 'ขวด D (Evaporation)', data: dataD, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.2, borderWidth: 3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: 'เวลา (นาที)' } },
+          y: { title: { display: true, text: 'อุณหภูมิ (°C)' }, min: 20, max: 65 }
+        }
+      }
+    });
+  }
+
+  function calculateTemp(k, time) {
+    let t = T_ambient + (T_initial - T_ambient) * Math.exp(-k * time);
+    return parseFloat(t.toFixed(1));
+  }
+
+  function updateVisuals(tA, tB, tC, tD) {
+    document.getElementById('temp-A').innerText = tA + "°C";
+    document.getElementById('temp-B').innerText = tB + "°C";
+    document.getElementById('temp-C').innerText = tC + "°C";
+    document.getElementById('temp-D').innerText = tD + "°C";
+
+    const setWaterStyle = (id, temp) => {
+      const el = document.getElementById(id);
+      let ratio = (temp - T_ambient) / (T_initial - T_ambient);
+      let red = Math.floor(239 * ratio + 59 * (1 - ratio));
+      let blue = Math.floor(68 * ratio + 246 * (1 - ratio));
+      el.style.background = `rgb(${red}, 100, ${blue})`;
+    };
+
+    setWaterStyle('water-A', tA);
+    setWaterStyle('water-B', tB);
+    setWaterStyle('water-C', tC);
+    setWaterStyle('water-D', tD);
+  }
+
+  function addTableRow(time, tA, tB, tC, tD) {
+    const tbody = document.getElementById('dataTableBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${time}</td>
+      <td>${tA}</td>
+      <td>${tB}</td>
+      <td>${tC}</td>
+      <td style="color:#ef4444; font-weight:bold;">${tD}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function startLab() {
+    if (timer) return;
+    document.getElementById('startBtn').disabled = true;
+
+    timer = setInterval(() => {
+      currentTime++;
+      labelsData.push(currentTime);
+
+      let tA = calculateTemp(kA, currentTime);
+      let tB = calculateTemp(kB, currentTime);
+      let tC = calculateTemp(kC, currentTime);
+      let tD = calculateTemp(kD, currentTime);
+
+      dataA.push(tA);
+      dataB.push(tB);
+      dataC.push(tC);
+      dataD.push(tD);
+
+      updateVisuals(tA, tB, tC, tD);
+      addTableRow(currentTime, tA, tB, tC, tD);
+      chart.update();
+
+      if (currentTime >= 15) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }, 600);
+  }
+
+  function resetLab() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+    currentTime = 0;
+    labelsData = [0];
+    dataA = [T_initial];
+    dataB = [T_initial];
+    dataC = [T_initial];
+    dataD = [T_initial];
+
+    document.getElementById('dataTableBody').innerHTML = '';
+    document.getElementById('startBtn').disabled = false;
+
+    updateVisuals(T_initial, T_initial, T_initial, T_initial);
+    addTableRow(0, T_initial, T_initial, T_initial, T_initial);
+
+    chart.data.labels = labelsData;
+    chart.data.datasets[0].data = dataA;
+    chart.data.datasets[1].data = dataB;
+    chart.data.datasets[2].data = dataC;
+    chart.data.datasets[3].data = dataD;
+    chart.update();
+  }
+
+  window.onload = () => {
+    initChart();
+    addTableRow(0, T_initial, T_initial, T_initial, T_initial);
+  };
+</script>
+
+</body>
+</html>

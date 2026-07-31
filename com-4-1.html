@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: Relativistic Compton Effect (Head-on & Angular Collision)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1150px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    p.subtitle { text-align: center; color: #94a3b8; margin-bottom: 20px; font-size: 14px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 850px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 18px; }
+    .card-title { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+
+    canvas { width: 100%; height: 260px; background: #020617; border-radius: 8px; }
+
+    .controls { display: flex; flex-direction: column; gap: 10px; font-size: 13px; margin-top: 12px; }
+    .control-row { display: flex; justify-content: space-between; align-items: center; }
+    input[type="range"] { background: #1e293b; border: 1px solid #475569; color: #fff; padding: 5px; border-radius: 6px; }
+
+    .output-group { background: #0f2942; border: 1px solid #0369a1; padding: 10px 12px; border-radius: 6px; font-size: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .output-item { display: flex; justify-content: space-between; }
+    .output-item span { color: #94a3b8; }
+    .output-item b { color: #38bdf8; }
+
+    .btn-action { background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+    .btn-action:hover { background: #0369a1; }
+    .btn-reset { background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; }
+    .btn-reset:hover { background: #dc2626; }
+
+    .table-container { max-height: 280px; overflow-y: auto; margin-top: 10px; border: 1px solid #334155; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+    th, td { border-bottom: 1px solid #334155; padding: 8px 2px; }
+    th { background-color: #1e293b; color: #38bdf8; position: sticky; top: 0; }
+
+    .info-box { background: #0f2942; border: 1px solid #0369a1; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0; margin-top: 15px; }
+    .info-box h4 { color: #38bdf8; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: Relativistic Compton Effect</h1>
+  <p class="subtitle"></p>
+
+  <div class="grid-2">
+    <!-- กล่อง 1: ชุดจำลองการชนแบบยืดหยุ่น -->
+    <div class="card">
+      <div class="card-title">1. ปรับตัวแปรต้น (Input Variables)</div>
+      <canvas id="expCanvas" width="320" height="260"></canvas>
+      
+      <div class="controls">
+        <div class="control-row">
+          <label>ความยาวคลื่นเริ่มต้น ($\lambda$):</label>
+          <div>
+            <input type="range" id="waveRange" min="2" max="50" value="10" step="1" oninput="updateSim()">
+            <span id="waveVal" style="display:inline-block; width:55px; text-align:right;">10 pm</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label>มุมกระเจิงโฟตอน (theta):</label>
+          <div>
+            <input type="range" id="angleRange" min="0" max="180" value="180" step="5" oninput="updateSim()">
+            <span id="angleVal" style="display:inline-block; width:55px; text-align:right;">180° (Head-on)</span>
+          </div>
+        </div>
+
+        <!-- ค่าทางฟิสิกส์ที่ถูกคำนวณและล็อกไว้โดยอัตโนมัติ -->
+        <div class="output-group">
+          <div class="output-item"><span>มุม e⁻ ($\phi$ คำนวณ):</span> <b id="phiVal">0.0°</b></div>
+          <div class="output-item"><span>$\Delta\lambda$ (คำนวณ):</span> <b id="dLambdaVal">0.000 pm</b></div>
+          <div class="output-item"><span>Lorentz ($\gamma$):</span> <b id="gammaVal">1.000</b></div>
+          <div class="output-item"><span>ความเร็ว e⁻ ($v/c$):</span> <b id="vRatioVal" style="color:#4ade80;">0.000</b></div>
+        </div>
+
+        <button class="btn-action" onclick="triggerCollision()">💥 ยิงโฟตอน / บันทึกผลการทดลอง</button>
+        <button class="btn-reset" onclick="resetLab()">🔄 เริ่มต้นใหม่ทั้งหมด (Reset All)</button>
+      </div>
+    </div>
+
+    <!-- กล่อง 2: ตารางบันทึกผลการทดลอง -->
+    <div class="card">
+      <div class="card-title">2. ตารางบันทึกผลการทดลอง (Relativistic Compton Data)</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ครั้งที่</th>
+              <th>$\lambda$ (pm)</th>
+              <th>$\theta$ (deg)</th>
+              <th>$\Delta\lambda$ (pm)</th>
+              <th>$\phi$ e⁻ (deg)</th>
+              <th>$E_k$ (keV)</th>
+              <th>$\gamma$</th>
+              <th>$v/c$</th>
+            </tr>
+          </thead>
+          <tbody id="resultTable">
+            <!-- ข้อมูลเติมด้วย JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        <h4>🎯 กรณีการชนตรงหน้า (Head-on Collision:</h4>
+        <p>• โฟตอนจะสะท้อนกลับทางเดิม  ส่งผลให้ **มุมกระดอนของอิเล็กตรอนพุ่งไปข้างหน้าตรงๆ</p>
+        <p></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const expCanvas = document.getElementById('expCanvas');
+  const expCtx = expCanvas.getContext('2d');
+
+  const lambda_c = 2.42631; // pm (Compton wavelength h/m0*c)
+  const hc_keV_pm = 1239.84; // hc in keV·pm
+  const m0_c2_keV = 510.998; // m0 * c^2 = 511 keV
+
+  let recordCount = 0;
+  let animId;
+  let animProgress = 0;
+  let isAnimating = false;
+
+  function calculatePhysics() {
+    const lambda = parseFloat(document.getElementById('waveRange').value);
+    const theta_deg = parseFloat(document.getElementById('angleRange').value);
+    const theta_rad = (theta_deg * Math.PI) / 180;
+
+    // 1. Compton Formula: Δλ = λc * (1 - cos θ)
+    const delta_lambda = lambda_c * (1 - Math.cos(theta_rad));
+    const lambda_prime = lambda + delta_lambda;
+
+    // 2. คำนวณมุมกระดอนของอิเล็กตรอน (phi) จากสัมพัทธภาพอย่างแม่นยำ
+    let phi_deg = 0;
+    let phi_rad = 0;
+
+    if (theta_deg === 180) {
+      // Head-on Collision: e⁻ พุ่งไปข้างหน้าตรงๆ เสมอ
+      phi_deg = 0;
+      phi_rad = 0;
+    } else if (theta_deg === 0) {
+      // ไม่เกิดการชน
+      phi_deg = 90;
+      phi_rad = Math.PI / 2;
+    } else {
+      // cot(φ) = (1 + λc/λ) * tan(θ/2)
+      let cot_phi = (1 + (lambda_c / lambda)) * Math.tan(theta_rad / 2);
+      phi_rad = Math.atan(1 / cot_phi);
+      phi_deg = (phi_rad * 180) / Math.PI;
+    }
+
+    // 3. Relativistic Energy Calculations
+    const E_in = hc_keV_pm / lambda;
+    const E_out = hc_keV_pm / lambda_prime;
+    const Ek_e = E_in - E_out;
+
+    // 4. Lorentz Factor (γ) & Velocity Ratio (v/c)
+    const gamma = 1 + (Ek_e / m0_c2_keV);
+    const v_ratio = Math.sqrt(Math.max(0, 1 - (1 / (gamma * gamma))));
+
+    return { lambda, theta_deg, theta_rad, delta_lambda, lambda_prime, phi_rad, phi_deg, Ek_e, gamma, v_ratio };
+  }
+
+  function updateSim() {
+    const p = calculatePhysics();
+    document.getElementById('waveVal').innerText = p.lambda + ' pm';
+    
+    let labelTheta = p.theta_deg + '°';
+    if (p.theta_deg === 180) labelTheta += ' (Head-on)';
+    document.getElementById('angleVal').innerText = labelTheta;
+
+    document.getElementById('phiVal').innerText = p.phi_deg.toFixed(1) + '°';
+    document.getElementById('dLambdaVal').innerText = p.delta_lambda.toFixed(3) + ' pm';
+    document.getElementById('gammaVal').innerText = p.gamma.toFixed(4);
+    document.getElementById('vRatioVal').innerText = p.v_ratio.toFixed(3) + ' c';
+    
+    if (!isAnimating) drawCanvas(0);
+  }
+
+  function drawWave(startX, startY, length, angle, waveLenPixels, color) {
+    expCtx.save();
+    expCtx.translate(startX, startY);
+    expCtx.rotate(angle);
+
+    expCtx.strokeStyle = color;
+    expCtx.lineWidth = 2;
+    expCtx.beginPath();
+    for (let x = 0; x < length; x++) {
+      let y = Math.sin((x / waveLenPixels) * Math.PI * 2) * 8;
+      if (x === 0) expCtx.moveTo(x, y);
+      else expCtx.lineTo(x, y);
+    }
+    expCtx.stroke();
+    expCtx.restore();
+  }
+
+  function drawCanvas(progress) {
+    expCtx.clearRect(0, 0, expCanvas.width, expCanvas.height);
+    const p = calculatePhysics();
+
+    const targetX = 140;
+    const targetY = 130;
+
+    // 1. วาดอิเล็กตรอน
+    let eX = targetX;
+    let eY = targetY;
+
+    if (progress > 0.5) {
+      let eDist = (progress - 0.5) * 180 * (0.5 + p.v_ratio * 0.8);
+      eX = targetX + Math.cos(p.phi_rad) * eDist;
+      eY = targetY + Math.sin(p.phi_rad) * eDist;
+    }
+
+    expCtx.fillStyle = '#38bdf8';
+    expCtx.beginPath();
+    expCtx.arc(eX, eY, 8, 0, Math.PI * 2);
+    expCtx.fill();
+    expCtx.fillStyle = '#0f172a';
+    expCtx.font = 'bold 10px sans-serif';
+    expCtx.fillText('e⁻', eX - 4, eY + 3);
+
+    // 2. วาดโฟตอนเข้าชน (ซ้ายไปขวา)
+    let wavePixelIn = Math.max(3, p.lambda * 0.4);
+    if (progress <= 0.5) {
+      let pDist = progress * 2 * targetX;
+      drawWave(pDist - 80, targetY, 70, 0, wavePixelIn, '#facc15');
+    }
+
+    // 3. วาดโฟตอนกระเจิงออก
+    if (progress > 0.5) {
+      let wavePixelOut = Math.max(3, p.lambda_prime * 0.4);
+      let pDist = (progress - 0.5) * 200;
+      let scatterAngle = -p.theta_rad;
+      
+      drawWave(targetX, targetY, pDist, scatterAngle, wavePixelOut, '#ef4444');
+    }
+
+    // 4. เส้นแสดงทิศทางกระเด็นของอนุภาค
+    if (!isAnimating) {
+      expCtx.setLineDash([3, 3]);
+      
+      // ทิศโฟตอนกระเจิง (-theta)
+      expCtx.strokeStyle = '#ef4444';
+      expCtx.beginPath();
+      expCtx.moveTo(targetX, targetY);
+      expCtx.lineTo(targetX + Math.cos(-p.theta_rad) * 75, targetY + Math.sin(-p.theta_rad) * 75);
+      expCtx.stroke();
+
+      // ทิศอิเล็กตรอนกระดอน (+phi)
+      expCtx.strokeStyle = '#38bdf8';
+      expCtx.beginPath();
+      expCtx.moveTo(targetX, targetY);
+      expCtx.lineTo(targetX + Math.cos(p.phi_rad) * 75, targetY + Math.sin(p.phi_rad) * 75);
+      expCtx.stroke();
+
+      expCtx.setLineDash([]);
+    }
+
+    // ข้อความแสดงสถานะบน Canvas
+    expCtx.fillStyle = '#f8fafc';
+    expCtx.font = '12px sans-serif';
+    expCtx.fillText(`λ = ${p.lambda} pm`, 15, 25);
+    expCtx.fillText(`θ = ${p.theta_deg}° ${p.theta_deg === 180 ? '(Head-on)' : ''}`, 15, 45);
+    
+    expCtx.fillStyle = '#ef4444';
+    expCtx.fillText(`λ' = ${p.lambda_prime.toFixed(3)} pm`, 175, 25);
+    expCtx.fillStyle = '#38bdf8';
+    expCtx.fillText(`มุม e⁻ (ϕ) = ${p.phi_deg.toFixed(1)}°`, 175, 45);
+  }
+
+  function triggerCollision() {
+    if (isAnimating) return;
+    isAnimating = true;
+    animProgress = 0;
+
+    function animate() {
+      animProgress += 0.02;
+      drawCanvas(animProgress);
+
+      if (animProgress < 1.0) {
+        animId = requestAnimationFrame(animate);
+      } else {
+        isAnimating = false;
+        recordData();
+        drawCanvas(0);
+      }
+    }
+    animate();
+  }
+
+  function recordData() {
+    const p = calculatePhysics();
+    recordCount++;
+
+    const tbody = document.getElementById('resultTable');
+    let row = `
+      <tr>
+        <td>${recordCount}</td>
+        <td>${p.lambda}</td>
+        <td>${p.theta_deg}°</td>
+        <td style="color: #38bdf8; font-weight:bold;">${p.delta_lambda.toFixed(3)}</td>
+        <td style="color: #38bdf8; font-weight:bold;">${p.phi_deg.toFixed(1)}°</td>
+        <td style="color: #facc15;">${p.Ek_e.toFixed(1)}</td>
+        <td>${p.gamma.toFixed(3)}</td>
+        <td style="color: #4ade80; font-weight:bold;">${p.v_ratio.toFixed(3)}c</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+
+    const container = document.querySelector('.table-container');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function resetLab() {
+    cancelAnimationFrame(animId);
+    isAnimating = false;
+    recordCount = 0;
+    
+    document.getElementById('resultTable').innerHTML = '';
+    document.getElementById('waveRange').value = '10';
+    document.getElementById('angleRange').value = '180';
+
+    updateSim();
+  }
+
+  window.onload = () => {
+    updateSim();
+  };
+</script>
+
+</body>
+</html>

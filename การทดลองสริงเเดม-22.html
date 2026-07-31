@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การทดลอง การเคลื่อนที่แบบฮาร์โมนิก-2</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Sukhumvit Set', sans-serif;
+    }
+
+    body {
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      background: white;
+      width: 950px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .header-title {
+      background-color: #dbeafe;
+      color: #1e3a8a;
+      padding: 12px 20px;
+      font-size: 26px;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .main-content {
+      display: flex;
+      gap: 30px;
+    }
+
+    /* ฝั่งซ้าย: ตารางและคอนโทรล */
+    .left-panel {
+      flex: 1.2;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-bottom: 15px;
+    }
+
+    .data-table th {
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    .data-table th.bg-mass { background-color: #dbeafe; }
+    .data-table th.bg-time { background-color: #fef08a; }
+    .data-table th.bg-period { background-color: #fef08a; }
+
+    .data-table td {
+      text-align: center;
+      padding: 6px;
+    }
+
+    .data-table input {
+      width: 90%;
+      padding: 6px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #fef3c7;
+      font-weight: bold;
+    }
+
+    .info-box {
+      background-color: #fef08a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: inline-block;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .control-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-start { background-color: #bbf7d0; color: #166534; }
+    .btn-start:hover { background-color: #86efac; }
+    .btn-reset { background-color: #fecaca; color: #991b1b; }
+    .btn-reset:hover { background-color: #fca5a5; }
+
+    .start-pos-container {
+      margin-top: 15px;
+      background-color: #dbeafe;
+      padding: 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .start-pos-container input {
+      width: 100px;
+      padding: 6px;
+      text-align: center;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background-color: #fef3c7;
+    }
+
+    /* ฝั่งขวา: การตั้งค่าสปริงและภาพจำลอง */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .params-group {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .param-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .param-row input {
+      width: 80px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background-color: #fef3c7;
+    }
+
+    /* Simulation Canvas Container */
+    .sim-container {
+      position: relative;
+      width: 300px;
+      height: 380px;
+      border: 1px dashed #ccc;
+      background-color: #fafafa;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .status-badge {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #1e40af;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="header-title">การทดลอง การเคลื่อนที่แบบฮาร์โมนิก-2</div>
+
+  <div class="main-content">
+    <!-- ฝั่งซ้าย -->
+    <div class="left-panel">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="bg-mass">มวล (g)</th>
+            <th class="bg-time">เวลากรอบ 10 รอบ</th>
+            <th class="bg-period">คาบ (s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>5 g</td><td><input type="text" id="t-0" readonly></td><td><input type="text" id="T-0" readonly></td></tr>
+          <tr><td>10 g</td><td><input type="text" id="t-1" readonly></td><td><input type="text" id="T-1" readonly></td></tr>
+          <tr><td>15 g</td><td><input type="text" id="t-2" readonly></td><td><input type="text" id="T-2" readonly></td></tr>
+          <tr><td>20 g</td><td><input type="text" id="t-3" readonly></td><td><input type="text" id="T-3" readonly></td></tr>
+          <tr><td>25 g</td><td><input type="text" id="t-4" readonly></td><td><input type="text" id="T-4" readonly></td></tr>
+        </tbody>
+      </table>
+
+      <div>
+        <div class="info-box">ค่า g เท่ากับ 9.8 m/s²</div><br>
+        <div class="info-box">ที่แขวนมวล หนัก 10 g</div>
+      </div>
+
+      <div class="control-buttons">
+        <button class="btn btn-start" id="startBtn" onclick="runAllExperiments()">เริ่มทดลอง</button>
+        <button class="btn btn-reset" onclick="resetExperiment()">รีเซ็ต</button>
+      </div>
+
+      <div class="start-pos-container">
+        <label>ตำแหน่งเริ่มต้นบนสเกล</label>
+        <input type="text" id="startPosInput" readonly value="2.0 cm">
+      </div>
+    </div>
+
+    <!-- ฝั่งขวา -->
+    <div class="right-panel">
+      <div class="params-group">
+        <div class="param-row">
+          <label>ค่าคงตัวสปริง k (N/m)</label>
+          <input type="number" id="kInput" value="5.0" step="0.1" min="0.1">
+        </div>
+        <div class="param-row">
+          <label>สัมประสิทธิ์ความเสียดทาน b (N·s/m)</label>
+          <input type="number" id="bInput" value="0.05" step="0.01" min="0">
+        </div>
+      </div>
+
+      <div class="sim-container">
+        <canvas id="simCanvas" width="300" height="380"></canvas>
+      </div>
+
+      <div class="status-badge" id="statusText">พร้อมเริ่มการทดลอง</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // ค่าคงที่ทางฟิสิกส์
+  const g = 9.8; // m/s^2
+  const m_holder = 0.010; // มวลที่แขวน 10 กรัม = 0.010 kg
+  const testMasses = [0.005, 0.010, 0.015, 0.020, 0.025]; // มวลทดลอง 5g - 25g
+
+  let isRunning = false;
+  let animId = null;
+
+  // วาดสเกลและชุดสปริง
+  function drawSystem(displacementCm = 0, currentMassG = 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. วาดสเกลด้านซ้าย (0 ถึง 7 cm)
+    const scaleX = 80;
+    const scaleTopY = 80;
+    const cmPixels = 30; // 1 cm = 30 pixels
+
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(scaleX, scaleTopY);
+    ctx.lineTo(scaleX, scaleTopY + 7 * cmPixels);
+    ctx.stroke();
+
+    ctx.font = '12px Sarabun';
+    ctx.fillStyle = '#000';
+    for (let i = 0; i <= 7; i++) {
+      let y = scaleTopY + i * cmPixels;
+      ctx.beginPath();
+      ctx.moveTo(scaleX - 10, y);
+      ctx.lineTo(scaleX, y);
+      ctx.stroke();
+      ctx.fillText(i === 0 ? "0" : `${i} cm`, scaleX - 45, y + 4);
+    }
+
+    // 2. ขาตั้งและจุดยึดสปริง
+    const springTopX = 200;
+    const springTopY = 40;
+    ctx.fillStyle = '#1d4ed8';
+    ctx.fillRect(springTopX - 40, 10, 80, 10);
+    ctx.fillRect(springTopX - 5, 20, 10, 20);
+
+    // ตำแหน่งสมดุลพื้นฐาน (ให้ขีดเข็มชี้อยู่ที่ 2 cm เป็นตำแหน่งสมดุล)
+    const equilibriumY = scaleTopY + 2 * cmPixels;
+    const currentY = equilibriumY + (displacementCm * cmPixels);
+
+    // 3. วาดสปริง
+    ctx.beginPath();
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 2;
+    let coils = 12;
+    let springLength = currentY - 50 - springTopY;
+    ctx.moveTo(springTopX, springTopY);
+    for (let i = 0; i <= coils; i++) {
+      let y = springTopY + (springLength / coils) * i;
+      let x = springTopX + (i % 2 === 0 ? 12 : -12);
+      if (i === 0 || i === coils) x = springTopX;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // 4. เข็มชี้สเกล (Pointer)
+    ctx.fillStyle = '#1d4ed8';
+    ctx.beginPath();
+    ctx.moveTo(scaleX + 2, currentY);
+    ctx.lineTo(springTopX - 20, currentY - 5);
+    ctx.lineTo(springTopX - 20, currentY + 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // 5. ตัวแขวนมวล + ก้อนมวล
+    ctx.fillStyle = '#333';
+    ctx.fillRect(springTopX - 15, currentY - 5, 30, 40); // ที่แขวนมวล
+    
+    if (currentMassG > 0) {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(springTopX - 20, currentY + 15, 40, 20); // ก้อนมวลที่เพิ่ม
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px Sarabun';
+      ctx.fillText(`${currentMassG}g`, springTopX - 10, currentY + 29);
+    }
+
+    // ฐานด้านล่าง
+    ctx.fillStyle = '#1d4ed8';
+    ctx.fillRect(50, 340, 200, 30);
+  }
+
+  // ฟังก์ชั่นจำลองการแกว่ง 1 ชุดมวล (แบบ Damped Oscillation)
+  function simulateMassStep(index) {
+    return new Promise((resolve) => {
+      const k = parseFloat(document.getElementById('kInput').value);
+      const b = parseFloat(document.getElementById('bInput').value);
+      const m_added = testMasses[index];
+      const m_total = m_holder + m_added;
+
+      // ตรวจสอบเงื่อนไข Underdamped Oscillation
+      const omega0_sq = k / m_total;
+      const gamma = b / (2 * m_total);
+
+      if (gamma * gamma >= omega0_sq) {
+        alert("ค่าความเสียดทานสูงเกินไป การสั่นกวนไม่เกิดการแกว่งแบบฮาร์โมนิก (Overdamped)");
+        isRunning = false;
+        resolve(false);
+        return;
+      }
+
+      const omega_prime = Math.sqrt(omega0_sq - gamma * gamma);
+      const period = (2 * Math.PI) / omega_prime; // คาบการแกว่งทฤษฎี (s)
+      const totalTime10Cycles = period * 10;
+
+      const startAmpCm = 3.0; // แอมพลิจูดเริ่มต้น 3 cm
+      let startTime = null;
+      
+      document.getElementById('statusText').innerText = `กำลังทดลอง: มวล ${m_added * 1000} g (แกว่ง 10 รอบ)...`;
+
+      function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = (timestamp - startTime) / 1000; // แปลงเป็นวินาที
+
+        // เร่งความเร็วแอนิเมชันให้แสดงผลได้อย่างเหมาะสม (Simulated speed x1.5)
+        let simTime = elapsed * 1.5; 
+
+        if (simTime <= totalTime10Cycles) {
+          // สมการ Damped Oscillation: x(t) = A * e^(-gamma*t) * cos(omega' * t)
+          let displacement = startAmpCm * Math.exp(-gamma * simTime) * Math.cos(omega_prime * simTime);
+          drawSystem(displacement, m_added * 1000);
+          animId = requestAnimationFrame(animate);
+        } else {
+          // แกว่งครบ 10 รอบ
+          drawSystem(0, m_added * 1000);
+          
+          // บันทึกผลลงในตาราง
+          document.getElementById(`t-${index}`).value = totalTime10Cycles.toFixed(2) + " s";
+          document.getElementById(`T-${index}`).value = period.toFixed(3) + " s";
+
+          resolve(true);
+        }
+      }
+
+      animId = requestAnimationFrame(animate);
+    });
+  }
+
+  // รันการทดลองแบบต่อเนื่องทั้ง 5 มวล
+  async function runAllExperiments() {
+    if (isRunning) return;
+    isRunning = true;
+    document.getElementById('startBtn').disabled = true;
+
+    for (let i = 0; i < testMasses.length; i++) {
+      if (!isRunning) break;
+      const success = await simulateMassStep(i);
+      if (!success) break;
+      await new Promise(r => setTimeout(r, 600)); // หยุดพักสั้นๆ ระหว่างเปลี่ยนมวล
+    }
+
+    if (isRunning) {
+      document.getElementById('statusText').innerText = "การทดลองเสร็จสิ้นครบถ้วน!";
+    }
+    isRunning = false;
+    document.getElementById('startBtn').disabled = false;
+  }
+
+  // รีเซ็ตการทดลอง
+  function resetExperiment() {
+    isRunning = false;
+    if (animId) cancelAnimationFrame(animId);
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('statusText').innerText = "พร้อมเริ่มการทดลอง";
+
+    for (let i = 0; i < 5; i++) {
+      document.getElementById(`t-${i}`).value = "";
+      document.getElementById(`T-${i}`).value = "";
+    }
+
+    drawSystem(0, 0);
+  }
+
+  // วาดหน้าจอเริ่มต้น
+  drawSystem(0, 0);
+</script>
+
+</body>
+</html>

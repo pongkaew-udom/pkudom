@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แมวเป็นหรือแมวตายในเชิงควอนตัม | Schrödinger's Cat</title>
+  <style>
+    /* Google Fonts - Noto Sans Thai */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+      background-color: #0f172a; /* พื้นหลังสีเข้มสไตล์วิทยาศาสตร์ */
+      color: #e2e8f0;
+      line-height: 1.8;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
+    }
+
+    /* Top Navigation */
+    .back-nav {
+      margin-bottom: 16px;
+    }
+
+    .back-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .back-link:hover {
+      color: #f8fafc;
+    }
+
+    /* Badge & Header */
+    .badge {
+      display: inline-block;
+      background: #8b5cf6; /* สีม่วงควอนตัม */
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .hero-img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #475569;
+    }
+
+    /* Content & Paragraphs */
+    p {
+      color: #cbd5e1;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+
+    /* Thought Experiment Box (การทดลองทางความคิด) */
+    .experiment-box {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+
+    .experiment-box h3 {
+      color: #c084fc;
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .question-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 12px;
+    }
+
+    .question-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+
+    .question-list li::before {
+      content: "❓";
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    /* Keyword Tags Section */
+    .keywords-section {
+      margin: 28px 0;
+    }
+
+    .keywords-title {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .tags-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    /* Conclusion Highlight Box */
+    .highlight-box {
+      background: #fef9c3;
+      border-left: 4px solid #eab308;
+      color: #713f12;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+      font-weight: 500;
+    }
+
+    /* Footer & Wikipedia Link */
+    .wiki-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .wiki-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wiki-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #8b5cf6;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .wiki-btn:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- ปุ่มย้อนกลับไปหน้าหลัก -->
+    <div class="back-nav">
+      <a href="../index.html" class="back-link">⬅️ กลับหน้าหลัก Virtual Lab</a>
+    </div>
+
+    <span class="badge">⚛️ ฟิสิกส์ควอนตัม</span>
+    <h1>แมวเป็นหรือแมวตายในเชิงควอนตัม?</h1>
+
+    <!-- รูปภาพปกบทความ -->
+    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1000&auto=format&fit=crop&q=80" alt="Schrodinger's Cat" class="hero-img">
+
+    <!-- เกริ่นนำ -->
+    <p>
+      แนวคิดเรื่อง <strong>"แมวเป็นหรือแมวตาย"</strong> ในเชิงควอนตัม ถูกนำเสนอโดยนักฟิสิกส์รางวัลโนเบลชาวออสเตรีย <em>เออร์วิน ชโรดิงเจอร์ (Erwin Schrödinger)</em> หรือที่รู้จักกันในชื่อการทดลองทางความคิด <strong>Schrödinger's Cat</strong>
+    </p>
+
+    <!-- กล่องการทดลองทางความคิด -->
+    <div class="experiment-box">
+      <h3>📦 การทดลองทางความคิด (Thought Experiment)</h3>
+      <p style="margin-bottom: 0;">
+        ลองจินตนาการว่าเรานำ <strong>แมวหนึ่งตัว</strong> และ <strong>ขวดยาพิษ</strong> ไปวางไว้ร่วมกันภายในกล่องที่ปิดทึบอย่างสมบูรณ์ หากเรายังไม่ได้เปิดกล่องออกดู...
+      </p>
+      
+      <ul class="question-list">
+        <li>แมวที่อยู่ในกล่องกำลังอยู่ในสภาพแบบไหน?[cite: 5]</li>
+        <li>มันยังมีชีวิตอยู่ หรือตายไปแล้ว?[cite: 5]</li>
+        <li>หรือมันมีโอกาสเป็น <strong>"ทั้งแมวเป็นและแมวตายซ้อนทับกันอยู่"</strong> กันแน่?[cite: 5]</li>
+      </ul>
+    </div>
+
+    <!-- ส่วนแท็กคำศัพท์สำคัญ -->
+    <div class="keywords-section">
+      <div class="keywords-title">🔑 ศัพท์สำคัญทางฟิสิกส์ควอนตัมที่เกี่ยวข้อง:</div>
+      <div class="tags-wrapper">
+        <span class="tag">Quantum Superposition</span>
+        <span class="tag">Wave Function</span>
+        <span class="tag">Entangled</span>
+        <span class="tag">Paradox</span>
+      </div>
+    </div>
+
+    <!-- สรุปท้ายบทความ -->
+    <div class="highlight-box">
+      💡 <strong>ดูแล้วไม่ง่ายเลยใช่ไหมครับ?</strong> ปรากฏการณ์นี้สะท้อนให้เห็นว่าในกลศาสตร์ควอนตัม อนุภาคสามารถอยู่ในหลายสถานะพร้อมๆ กันได้ จนกว่าจะมีการ "สังเกต" หรือ "เปิดกล่องออกดู" นั่นเอง[cite: 5]
+    </div>
+
+    <!-- ส่วนลิงก์อ่านเพิ่มเติม -->
+    <div class="wiki-section">
+      <div class="wiki-info">
+        <span>📚</span>
+        <div>
+          <strong style="color: #f8fafc; font-size: 0.95rem;">ต้องการศึกษาทฤษฎีฉบับเต็ม?</strong>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">อ่านรายละเอียดการทดลองทางความคิดของชโรดิงเจอร์เพิ่มเติมได้ที่ Wikipedia</p>
+        </div>
+      </div>
+      
+      <a href="https://en.wikipedia.org/wiki/Schr%C3%B6dinger%27s_cat" target="_blank" class="wiki-btn">
+        อ่านบทความบน Wikipedia ↗
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

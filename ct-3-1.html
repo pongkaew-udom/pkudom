@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: CT Scan Simulation (Letters A, B, C, D)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; }
+    h1 { text-align: center; color: #38bdf8; font-size: 22px; margin-bottom: 20px; }
+
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    @media (max-width: 1000px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 15px; }
+    .card-title { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+
+    canvas { width: 100%; height: 200px; background: #020617; border-radius: 8px; }
+    
+    .controls { display: flex; flex-direction: column; gap: 10px; font-size: 13px; margin-top: 10px; }
+    .control-row { display: flex; justify-content: space-between; align-items: center; }
+    select, input { background: #1e293b; border: 1px solid #475569; color: #fff; padding: 5px; border-radius: 4px; }
+    
+    .btn-scan { background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+    .btn-scan:hover { background: #0369a1; }
+
+    .info-box { background: #0f172a; border-left: 4px solid #38bdf8; padding: 15px; border-radius: 6px; font-size: 13.5px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab CT Scan: จำลองการสร้างภาพตัวอักษรด้วย Back Projection</h1>
+
+  <div class="grid-3">
+    <!-- 1. Scanner ตัวอักษร -->
+    <div class="card">
+      <div class="card-title">1. วัตถุเป้าหมาย (Letter Target)</div>
+      <canvas id="scanCanvas" width="300" height="200"></canvas>
+      <div class="controls">
+        <div class="control-row">
+          <label>เลือกตัวอักษรสแกน:</label>
+          <select id="letterSelect" onchange="resetAndScan()">
+            <option value="A">ตัวอักษร A</option>
+            <option value="B">ตัวอักษร B</option>
+            <option value="C">ตัวอักษร C</option>
+            <option value="D">ตัวอักษร D</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>ความหนาแน่นรังสี (μ):</label>
+          <select id="objType" onchange="resetAndScan()">
+            <option value="0.3">เนื้อเยื่อบาง (μ = 0.3)</option>
+            <option value="0.7" selected>ความหนาแน่นปกติ (μ = 0.7)</option>
+            <option value="1.5">กระดูกหนาแน่น (μ = 1.5)</option>
+          </select>
+        </div>
+        <button class="btn-scan" onclick="runFullScan()">▶ สแกนครบ 360° เพื่อสร้างภาพ</button>
+      </div>
+    </div>
+
+    <!-- 2. กราฟ Sinogram Auto-Scale -->
+    <div class="card">
+      <div class="card-title">2. กราฟ Sinogram (Auto Scale ตาม μ)</div>
+      <div style="height: 200px;">
+        <canvas id="chartCanvas"></canvas>
+      </div>
+      <p style="font-size: 11px; color: #94a3b8; margin-top: 8px; text-align: center;">
+        *สเกลแกน Y ปรับระดับอัตโนมัติเพื่อให้เห็นรูปแบบการสแกนได้ชัดเจน
+      </p>
+    </div>
+
+    <!-- 3. ภาพ Reconstruction ชัดเจน -->
+    <div class="card">
+      <div class="card-title">3. ภาพที่คำนวณได้ (CT Reconstruction)</div>
+      <canvas id="reconCanvas" width="300" height="200"></canvas>
+      <p id="statusText" style="font-size: 12px; color: #38bdf8; margin-top: 8px; text-align: center;">
+        กด "สแกนครบ 360°" เพื่อเริ่มสร้างภาพ
+      </p>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>💡 ปรับปรุงภาพสร้างใหม่ (Reconstruction) ให้ชัดขึ้นอย่างไร?</strong><br>
+    • **Auto-Scaling:** เมื่อปรับความหนาแน่นวัสดุ ($\mu$) สเกลแกน Y ของกราฟจะขยายรับความสูงรังสีโดยอัตโนมัติ ทำให้ไม่เกิดปัญหาเส้นกราฟเตี้ยเกินไป[cite: 4]<br>
+    • **Ray Profiling & Additive Blending:** ในกล่องที่ 3 เราคำนวณการดูดกลืนเป็นเส้นขนานย่อยๆ ผ่านตัวอักษรในแต่ละองศา แล้วใช้เทคนิคการซ้อนทับพลังงานแสง (Composite Light Superposition) ทำให้เมื่อหมุนยิงครบ 360 องศา เส้นตัวอักษร 2D จะสว่างคมชัดออกมาจากฉากหลังดำสนิททันทีครับ!
+  </div>
+</div>
+
+<script>
+  const scanCanvas = document.getElementById('scanCanvas');
+  const scanCtx = scanCanvas.getContext('2d');
+  const reconCanvas = document.getElementById('reconCanvas');
+  const reconCtx = reconCanvas.getContext('2d');
+
+  let chart;
+  let offscreenCanvas, offscreenCtx;
+  const numRays = 31; // จำนวนเส้นรังสีขนานย่อยในการสแกน
+
+  function initOffscreen() {
+    offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = 100;
+    offscreenCanvas.height = 100;
+    offscreenCtx = offscreenCanvas.getContext('2d');
+  }
+
+  function drawLetterToOffscreen(letter) {
+    offscreenCtx.clearRect(0, 0, 100, 100);
+    offscreenCtx.fillStyle = '#ffffff';
+    offscreenCtx.font = 'bold 75px sans-serif';
+    offscreenCtx.textAlign = 'center';
+    offscreenCtx.textBaseline = 'middle';
+    offscreenCtx.fillText(letter, 50, 50);
+  }
+
+  // คำนวณ Ray Profile ของลำแสงขนานทุกเส้นที่มุม angleDeg
+  function getRayProfile(angleDeg, mu) {
+    const letter = document.getElementById('letterSelect').value;
+    drawLetterToOffscreen(letter);
+
+    const imgData = offscreenCtx.getImageData(0, 0, 100, 100).data;
+    const rad = (angleDeg * Math.PI) / 180;
+    let profile = [];
+
+    const stepSize = 70 / (numRays - 1);
+    for (let i = 0; i < numRays; i++) {
+      let offset = -35 + i * stepSize;
+      let hits = 0;
+      
+      for (let step = -45; step <= 45; step += 1.5) {
+        let x = Math.round(50 + offset * Math.cos(rad) - step * Math.sin(rad));
+        let y = Math.round(50 + offset * Math.sin(rad) + step * Math.cos(rad));
+
+        if (x >= 0 && x < 100 && y >= 0 && y < 100) {
+          let idx = (y * 100 + x) * 4;
+          if (imgData[idx] > 128) hits++;
+        }
+      }
+      profile.push(hits * 0.04 * mu);
+    }
+    return profile;
+  }
+
+  function getAverageAttenuation(profile) {
+    let sum = profile.reduce((a, b) => a + b, 0);
+    return sum / profile.length;
+  }
+
+  function initChart() {
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 37}, (_, i) => i * 10),
+        datasets: [{
+          label: 'Attenuation ln(I0/I)',
+          data: [],
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.25)',
+          fill: true,
+          pointRadius: 2,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#94a3b8', font: { size: 9 } } },
+          y: { 
+            // *** ปรับเป็น Dynamic Scaling ตามค่ารังสีของวัสดุ ***
+            ticks: { color: '#94a3b8' },
+            title: { display: true, text: 'Attenuation ln(I0/I)', color: '#cbd5e1', font: { size: 10 } }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  function drawScanner(angle) {
+    scanCtx.clearRect(0, 0, scanCanvas.width, scanCanvas.height);
+    const cX = scanCanvas.width / 2;
+    const cY = scanCanvas.height / 2;
+    const letter = document.getElementById('letterSelect').value;
+    const mu = parseFloat(document.getElementById('objType').value);
+
+    // วาดตัวอักษรเป้าหมาย
+    scanCtx.fillStyle = `rgba(56, 189, 248, ${Math.min(mu, 1)})`;
+    scanCtx.font = 'bold 95px sans-serif';
+    scanCtx.textAlign = 'center';
+    scanCtx.textBaseline = 'middle';
+    scanCtx.fillText(letter, cX, cY);
+
+    // วาดล้อลำแสงเลเซอร์หมุนรอบ
+    const rad = (angle * Math.PI) / 180;
+    const x1 = cX - 85 * Math.cos(rad);
+    const y1 = cY - 85 * Math.sin(rad);
+    const x2 = cX + 85 * Math.cos(rad);
+    const y2 = cY + 85 * Math.sin(rad);
+
+    scanCtx.strokeStyle = '#ef4444';
+    scanCtx.lineWidth = 3;
+    scanCtx.beginPath();
+    scanCtx.moveTo(x1, y1);
+    scanCtx.lineTo(x2, y2);
+    scanCtx.stroke();
+  }
+
+  function updateChart() {
+    const mu = parseFloat(document.getElementById('objType').value);
+    let data = [];
+    for (let deg = 0; deg <= 360; deg += 10) {
+      let profile = getRayProfile(deg, mu);
+      data.push(getAverageAttenuation(profile));
+    }
+    chart.data.datasets[0].data = data;
+    chart.update();
+  }
+
+  function resetAndScan() {
+    drawScanner(0);
+    updateChart();
+    reconCtx.fillStyle = '#020617';
+    reconCtx.fillRect(0, 0, reconCanvas.width, reconCanvas.height);
+    document.getElementById('statusText').innerText = "กด 'สแกนครบ 360°' เพื่อเริ่มสร้างภาพ";
+  }
+
+  function runFullScan() {
+    const mu = parseFloat(document.getElementById('objType').value);
+    const status = document.getElementById('statusText');
+    
+    // เคลียร์หน้าจอสแกนขวาสุดเป็นสีดำ
+    reconCtx.fillStyle = '#020617';
+    reconCtx.fillRect(0, 0, reconCanvas.width, reconCanvas.height);
+    
+    let angle = 0;
+    status.innerText = "กำลังหมุนยิงรังสี และ Back Projecting...";
+
+    let interval = setInterval(() => {
+      drawScanner(angle);
+
+      let profile = getRayProfile(angle, mu);
+
+      // Back Projection แบบภาพคมชัด (Additive Blending)
+      const cX = reconCanvas.width / 2;
+      const cY = reconCanvas.height / 2;
+      const rad = (angle * Math.PI) / 180;
+
+      reconCtx.save();
+      reconCtx.translate(cX, cY);
+      reconCtx.rotate(rad);
+      reconCtx.globalCompositeOperation = 'lighter'; // ซ้อนทับสะสมความสว่าง
+
+      const stepSize = 70 / (numRays - 1);
+      for (let i = 0; i < numRays; i++) {
+        let offset = -35 + i * stepSize;
+        let val = profile[i];
+        if (val > 0.02) {
+          // วาดลำแสงสว่างสีฟ้าสะสม
+          reconCtx.fillStyle = `rgba(56, 189, 248, ${val * 0.08})`;
+          reconCtx.fillRect(offset - 1.5, -60, 3, 120);
+        }
+      }
+      reconCtx.restore();
+
+      angle += 5;
+      if (angle > 360) {
+        clearInterval(interval);
+        status.innerText = "สแกนเสร็จสิ้น! ตัวอักษรปรากฏขึ้นคมชัดเจน";
+      }
+    }, 35);
+  }
+
+  window.onload = () => {
+    initOffscreen();
+    initChart();
+    resetAndScan();
+  };
+</script>
+
+</body>
+</html>

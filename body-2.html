@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: การวัดความต้านทานไฟฟ้าของร่างกาย (ค่าจริงตามมาตรฐาน)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    p.subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; font-size: 14px; }
+
+    .sim-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 850px) { .sim-grid { grid-template-columns: 1fr; } }
+
+    .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .card-title { font-size: 16px; font-weight: bold; color: #38bdf8; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; }
+
+    /* Multimeter UI */
+    .multimeter {
+      background-color: #f59e0b;
+      border-radius: 14px;
+      padding: 16px;
+      width: 260px;
+      margin: 0 auto 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      border: 3px solid #d97706;
+    }
+
+    .screen {
+      background: #86efac;
+      border: 3px solid #374151;
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: right;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 26px;
+      font-weight: bold;
+      color: #064e3b;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .unit-text { font-size: 14px; color: #047857; }
+
+    .control-group { margin-bottom: 12px; }
+    .control-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; font-weight: bold; }
+
+    select, input[type="range"] {
+      width: 100%; padding: 8px 10px; background: #1e293b; border: 1px solid #475569; color: #f8fafc; border-radius: 6px; font-size: 13px;
+    }
+
+    .range-val { float: right; color: #38bdf8; font-weight: bold; }
+
+    .btn-action {
+      background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;
+    }
+    .btn-action:hover { background: #0369a1; }
+
+    canvas { width: 100%; height: 210px; background: #020617; border-radius: 8px; border: 1px solid #334155; }
+
+    .table-container { max-height: 200px; overflow-y: auto; margin-top: 10px; border: 1px solid #334155; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+    th, td { border-bottom: 1px solid #334155; padding: 8px 4px; }
+    th { background-color: #1e293b; color: #38bdf8; position: sticky; top: 0; }
+
+    .info-box { background: #0284c715; border: 1px solid #0284c7; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e0f2fe; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: การวัดความต้านทานไฟฟ้าของร่างกาย (อ้างอิงค่าจริง)</h1>
+  <p class="subtitle">ปรับปรุงโมเดลคำนวณตามมาตรฐานชีวฟิสิกส์และความปลอดภัยทางไฟฟ้า (IEC 60479-1)</p>
+
+  <div class="sim-grid">
+    <div class="card">
+      <div class="card-title">1. ดิจิทัลโอมห์มิเตอร์ (Ohmmeter)</div>
+
+      <div class="multimeter">
+        <div class="screen" id="resistanceDisplay">
+          1,500 <span class="unit-text">Ω</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>ตำแหน่งการวัด (Measurement Location):</label>
+        <select id="locationSelect" onchange="updateSim()">
+          <option value="hand_to_hand">มือซ้าย ถึง มือขวา (Hand-to-Hand)</option>
+          <option value="forearm">ท้องแขน / แขนส่วนล่าง (Forearm)</option>
+          <option value="fingertips">ปลายนิ้วมือ (Fingertips)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>
+          ระยะห่างระหว่างขั้ววัด ($L$):
+          <span class="range-val" id="distVal">50 cm</span>
+        </label>
+        <input type="range" id="distRange" min="2" max="150" value="50" step="1" oninput="updateSim()">
+      </div>
+
+      <div class="control-group">
+        <label>สภาพผิวหนัง (Skin Condition):</label>
+        <select id="skinSelect" onchange="updateSim()">
+          <option value="dry">ผิวหนังแห้งปกติ (Dry Skin)</option>
+          <option value="wet">ผิวหนังเปียกน้ำ (Wet Skin)</option>
+          <option value="saline">ผิวหนังเปียกน้ำเกลือ / เหงื่อ (Saline / Sweat)</option>
+        </select>
+      </div>
+
+      <button class="btn-action" onclick="recordData()">📌 บันทึกผลการทดลองลงตาราง</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. แผนภาพจำลองตำแหน่งการวางขั้ววัด</div>
+      <canvas id="bodyCanvas" width="400" height="210"></canvas>
+      
+      <div class="info-box">
+        <strong>💡 อ้างอิงตามมาตรฐาน IEC 60479-1:</strong><br>
+        • ความต้านทานภายในร่างกาย (Internal Resistance) อยู่ที่ประมาณ <strong>300 - 500 Ω</strong> เท่านั้น<br>
+        • ตัวแปรหลักที่ต้านกระแสคือ **ผิวหนังชั้นนอก** ซึ่งมีค่าประมาณ **1,000 - 3,000 Ω** ในสภาวะแห้ง และจะดิ่งลงเหลือ **500 - 1,000 Ω** เมื่อเปียกน้ำเกลือ
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">3. ตารางบันทึกผลการทดลอง (Data Table)</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ครั้งที่</th>
+            <th>ตำแหน่งการวัด</th>
+            <th>ระยะ $L$ (cm)</th>
+            <th>สภาพผิวหนัง</th>
+            <th>ความต้านทาน (Ohm - Ω)</th>
+            <th>ความต้านทาน (kOhm - kΩ)</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('bodyCanvas');
+  const ctx = canvas.getContext('2d');
+  let recordCount = 0;
+
+  function calculateRealResistance() {
+    const location = document.getElementById('locationSelect').value;
+    const distance = parseFloat(document.getElementById('distRange').value);
+    const skin = document.getElementById('skinSelect').value;
+
+    // 1. ความต้านทานผิวหนังสัมผัส 2 จุด (Skin Resistance in Ohms)
+    let rSkinBase = 2000; // ค่าเริ่มต้นผิวแห้ง (2,000 Ohm)
+    if (location === 'fingertips') rSkinBase = 1600; // นิ้วมือมีความชื้นชุ่มกว่าเล็กน้อย
+    if (location === 'forearm') rSkinBase = 2200;
+
+    // ตัวคูณสภาพผิว
+    let skinMultiplier = 1.0;
+    if (skin === 'dry') skinMultiplier = 1.0;
+    else if (skin === 'wet') skinMultiplier = 0.35;    // ลดเหลือ ~700 Ohm
+    else if (skin === 'saline') skinMultiplier = 0.15; // ลดเหลือ ~300 Ohm
+
+    const rSkinTotal = rSkinBase * skinMultiplier;
+
+    // 2. ความต้านทานเนื้อเยื่อภายในตามระยะทาง (Internal Resistance ~ 3-5 Ohm/cm)
+    const rInternalBase = 400; // ความต้านทานพื้นฐานอวัยวะภายใน
+    const rhoInternal = 4.5;   // Ohm ต่อ cm
+    const rInternalTotal = rInternalBase + (rhoInternal * distance);
+
+    // ความต้านทานรวมทั้งหมด (Ohm)
+    const rTotal = Math.round(rSkinTotal + rInternalTotal);
+
+    return { rTotal, distance, location, skin };
+  }
+
+  function updateSim() {
+    const data = calculateRealResistance();
+    document.getElementById('distVal').innerText = data.distance + ' cm';
+
+    const display = document.getElementById('resistanceDisplay');
+    const rKohm = (data.rTotal / 1000).toFixed(2);
+    display.innerHTML = `${data.rTotal.toLocaleString()} <span class="unit-text">Ω (${rKohm} kΩ)</span>`;
+
+    drawVisual(data.location, data.distance);
+  }
+
+  function drawVisual(location, distance) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    let pxDist = Math.min(distance * 1.6, 160);
+    let probe1X = centerX - (pxDist / 2);
+    let probe2X = centerX + (pxDist / 2);
+
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 3;
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px sans-serif';
+
+    if (location === 'hand_to_hand') {
+      ctx.fillText('ภาพจำลอง: วัดจากมือซ้ายไปมือขวา (Hand-to-Hand)', 20, 25);
+      ctx.beginPath();
+      ctx.arc(centerX - 90, centerY, 28, 0, Math.PI * 2);
+      ctx.arc(centerX + 90, centerY, 28, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (location === 'forearm') {
+      ctx.fillText('ภาพจำลอง: วัดบนท้องแขน (Forearm)', 20, 25);
+      ctx.beginPath();
+      ctx.roundRect(centerX - 120, centerY - 18, 240, 36, 10);
+      ctx.stroke();
+    } else {
+      ctx.fillText('ภาพจำลอง: วัดที่ปลายนิ้วมือ (Fingertips)', 20, 25);
+      ctx.beginPath();
+      ctx.roundRect(probe1X - 12, centerY - 35, 24, 70, 12);
+      ctx.roundRect(probe2X - 12, centerY - 35, 24, 70, 12);
+      ctx.stroke();
+    }
+
+    // วาดขั้ววัด
+    ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(probe1X, centerY, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(probe2X, centerY, 5, 0, Math.PI * 2); ctx.fill();
+
+    // วาดสายไฟ
+    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(probe1X, centerY); ctx.lineTo(probe1X, centerY - 50); ctx.stroke();
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(probe2X, centerY); ctx.lineTo(probe2X, centerY - 50); ctx.stroke();
+
+    // ลูกศรระยะทาง
+    ctx.strokeStyle = '#facc15'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(probe1X, centerY + 30); ctx.lineTo(probe2X, centerY + 30); ctx.stroke();
+    ctx.fillStyle = '#facc15'; ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(`ระยะ L = ${distance} cm`, centerX - 35, centerY + 46);
+  }
+
+  function recordData() {
+    const data = calculateRealResistance();
+    recordCount++;
+
+    const locationMap = { 'hand_to_hand': 'มือซ้าย-มือขวา', 'forearm': 'ท้องแขน', 'fingertips': 'ปลายนิ้วมือ' };
+    const skinMap = { 'dry': 'แห้งปกติ', 'wet': 'เปียกน้ำ', 'saline': 'เปียกน้ำเกลือ/เหงื่อ' };
+
+    const tbody = document.getElementById('resultTable');
+    let row = `
+      <tr>
+        <td>${recordCount}</td>
+        <td>${locationMap[data.location]}</td>
+        <td>${data.distance}</td>
+        <td>${skinMap[data.skin]}</td>
+        <td style="color:#38bdf8; font-weight:bold;">${data.rTotal.toLocaleString()} Ω</td>
+        <td style="color:#facc15;">${(data.rTotal / 1000).toFixed(2)} kΩ</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+
+    const container = document.querySelector('.table-container');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  window.onload = () => { updateSim(); };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การทดลอง การเคลื่อนที่แบบฮาร์โมนิก-1</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 1050px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            position: relative;
+        }
+
+        /* Header Title */
+        .main-header {
+            background: linear-gradient(135deg, #cbe3f7 0%, #a4cded 100%);
+            padding: 12px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a4971;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Top Input Controls */
+        .top-inputs {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-badge {
+            background-color: #d6e4f0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #2b4c6f;
+            font-size: 18px;
+        }
+
+        .input-box {
+            width: 100px;
+            height: 38px;
+            background-color: #fff2c4;
+            border: 1px solid #e0c870;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+
+        .unit-label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Main Layout Grid */
+        .experiment-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        /* Left Side Data Panel */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .table-headers {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1.2fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .header-box {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .bg-blue-light { background-color: #d0e4f7; color: #1e4a78; }
+        .bg-yellow-light { background-color: #ffebad; color: #6b5200; }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1.2fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .label-cell {
+            background-color: #dceaf7;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+            color: #23496d;
+            font-weight: bold;
+        }
+
+        .display-box {
+            background-color: #fff4d1;
+            border: 1px solid #e6d396;
+            border-radius: 4px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: bold;
+            color: #4a3d00;
+            transition: all 0.3s ease;
+        }
+
+        .info-badge {
+            background-color: #fce8b3;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            color: #524100;
+        }
+
+        .controls-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            width: 160px;
+        }
+
+        .btn-start {
+            background-color: #a2db9c;
+            color: #1b5e20;
+        }
+        .btn-start:hover { background-color: #8bc34a; }
+
+        .btn-reset {
+            background-color: #ffcdd2;
+            color: #b71c1c;
+        }
+        .btn-reset:hover { background-color: #ef9a9a; }
+
+        .btn:disabled {
+            background-color: #e0e0e0;
+            color: #9e9e9e;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .initial-pos-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .initial-pos-label {
+            background-color: #cde0f7;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a426e;
+        }
+
+        .initial-pos-box {
+            width: 140px;
+            height: 50px;
+            background-color: #fff0b8;
+            border: 2px solid #e0c260;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #3b2d00;
+        }
+
+        /* Right Side Apparatus Graphic */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .apparatus-wrapper {
+            position: relative;
+            width: 380px;
+            height: 520px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Blue Stand */
+        .stand-top {
+            position: absolute;
+            top: 20px;
+            left: 170px;
+            width: 120px;
+            height: 12px;
+            background-color: #2b78c5;
+        }
+
+        .stand-pole {
+            position: absolute;
+            top: 20px;
+            left: 170px;
+            width: 12px;
+            height: 460px;
+            background-color: #2b78c5;
+        }
+
+        .stand-base {
+            position: absolute;
+            bottom: 0px;
+            left: 130px;
+            width: 200px;
+            height: 40px;
+            background-color: #2b78c5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* Scale Meter */
+        .scale-container {
+            position: absolute;
+            top: 100px;
+            left: 50px;
+            width: 100px;
+            height: 350px;
+            border: 2px solid #333;
+            background: #ffffff;
+        }
+
+        .scale-mark {
+            position: absolute;
+            width: 100%;
+            border-top: 1px solid #888;
+            left: 0;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            color: #222;
+        }
+
+        /* Spring SVG */
+        .spring-svg {
+            position: absolute;
+            top: 32px;
+            left: 250px;
+            width: 60px;
+            overflow: visible;
+        }
+
+        /* Hanger Assembly */
+        .hanger-container {
+            position: absolute;
+            left: 220px;
+            top: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pointer-arrow {
+            position: absolute;
+            left: -120px;
+            top: 15px;
+            width: 120px;
+            height: 4px;
+            background-color: #2b78c5;
+        }
+
+        .pointer-arrow::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: -6px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 12px solid #2b78c5;
+        }
+
+        .hanger-hook {
+            width: 6px;
+            height: 30px;
+            background-color: #2b78c5;
+        }
+
+        .hanger-pan {
+            width: 70px;
+            height: 10px;
+            background-color: #2b78c5;
+            border-radius: 2px;
+        }
+
+        .mass-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            position: absolute;
+            bottom: 10px;
+        }
+
+        .mass-block {
+            width: 60px;
+            height: 12px;
+            background-color: #222222;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid #444;
+        }
+
+        .status-badge {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #e3f2fd;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #1565c0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="main-header">
+        การทดลอง การเคลื่อนที่แบบฮาร์โมนิก-1
+    </div>
+
+    <div class="top-inputs">
+        <div class="input-badge">ค่าคงตัวสปริง k</div>
+        <input type="number" id="kInput" class="input-box" value="2.5" step="0.1" min="0.5" max="10.0">
+        <div class="unit-label">N/m</div>
+    </div>
+
+    <div class="experiment-grid">
+        <!-- Left Data Panel -->
+        <div class="left-panel">
+            <div class="table-headers">
+                <div class="header-box bg-blue-light">มวล (g)</div>
+                <div class="header-box bg-yellow-light">ตำแหน่งบนสเกล</div>
+                <div class="header-box bg-yellow-light">ระยะยืด</div>
+            </div>
+
+            <div class="data-row">
+                <div class="label-cell">5 g</div>
+                <div class="display-box" id="pos_5">-</div>
+                <div class="display-box" id="stretch_5">-</div>
+            </div>
+
+            <div class="data-row">
+                <div class="label-cell">10 g</div>
+                <div class="display-box" id="pos_10">-</div>
+                <div class="display-box" id="stretch_10">-</div>
+            </div>
+
+            <div class="data-row">
+                <div class="label-cell">15 g</div>
+                <div class="display-box" id="pos_15">-</div>
+                <div class="display-box" id="stretch_15">-</div>
+            </div>
+
+            <div class="data-row">
+                <div class="label-cell">20 g</div>
+                <div class="display-box" id="pos_20">-</div>
+                <div class="display-box" id="stretch_20">-</div>
+            </div>
+
+            <div class="data-row">
+                <div class="label-cell">25 g</div>
+                <div class="display-box" id="pos_25">-</div>
+                <div class="display-box" id="stretch_25">-</div>
+            </div>
+
+            <div class="info-badge">ค่า g เท่ากับ 9.8 m/s²</div>
+            <div class="info-badge">ที่แขวนมวล หนัก 10 g</div>
+
+            <div class="controls-area">
+                <button class="btn btn-start" id="startBtn" onclick="startSequence()">เริ่มทดลอง</button>
+                <button class="btn btn-reset" id="resetBtn" onclick="resetLab()">รีเซ็ต</button>
+            </div>
+
+            <div class="initial-pos-area">
+                <div class="initial-pos-label">ตำแหน่งเริ่มต้นบนสเกล</div>
+                <div class="initial-pos-box" id="initialPosBox">-</div>
+            </div>
+        </div>
+
+        <!-- Right Visual Panel -->
+        <div class="right-panel">
+            <div class="apparatus-wrapper">
+                <div class="stand-top"></div>
+                <div class="stand-pole"></div>
+                <div class="stand-base">พงษ์แก้ว</div>
+
+                <div class="scale-container" id="scaleMeter"></div>
+
+                <svg class="spring-svg" width="60" height="300" id="springSvg">
+                    <path id="springPath" d="" fill="none" stroke="#666" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <div class="hanger-container" id="hangerAssembly">
+                    <div class="pointer-arrow"></div>
+                    <div class="hanger-hook"></div>
+                    <div class="hanger-pan"></div>
+                    <div class="mass-stack" id="massStack"></div>
+                </div>
+            </div>
+
+            <div class="status-badge" id="statusText">สถานะ: พร้อมเริ่มการทดลอง</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const G = 9.8;
+    const HANGER_MASS_KG = 0.010; // 10g
+    const SCALE_PIXELS_PER_CM = 22; 
+    const SCALE_TOP_Y = 100;      
+    const SPRING_TOP_Y = 32;      
+
+    let animationFrameId = null;
+    let isRunning = false;
+
+    // Create Scale (0 to 12 cm)
+    const scaleContainer = document.getElementById('scaleMeter');
+    for (let cm = 0; cm <= 12; cm++) {
+        const mark = document.createElement('div');
+        mark.className = 'scale-mark';
+        mark.style.top = (cm * SCALE_PIXELS_PER_CM) + 'px';
+        mark.innerText = cm + ' cm';
+        scaleContainer.appendChild(mark);
+    }
+
+    function drawSpring(endY) {
+        const startY = SPRING_TOP_Y;
+        const totalHeight = endY - startY;
+        const coils = 14;
+        const width = 30;
+        const centerX = 30;
+
+        let pathStr = `M ${centerX} ${startY} `;
+        const stepY = totalHeight / (coils * 2);
+
+        for (let i = 0; i < coils * 2; i++) {
+            const currentY = startY + (i + 0.5) * stepY;
+            const x = (i % 2 === 0) ? (centerX + width / 2) : (centerX - width / 2);
+            pathStr += `L ${x} ${currentY} `;
+        }
+        pathStr += `L ${centerX} ${endY}`;
+        document.getElementById('springPath').setAttribute('d', pathStr);
+    }
+
+    function getEquilibriumScaleCm(totalMassKg, k) {
+        const stretchMeters = (totalMassKg * G) / k;
+        return stretchMeters * 100; // convert to cm
+    }
+
+    function resetLab() {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        isRunning = false;
+
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('kInput').disabled = false;
+        document.getElementById('statusText').innerText = 'สถานะ: พร้อมเริ่มการทดลอง';
+
+        [5, 10, 15, 20, 25].forEach(m => {
+            document.getElementById(`pos_${m}`).innerText = '-';
+            document.getElementById(`stretch_${m}`).innerText = '-';
+        });
+        document.getElementById('initialPosBox').innerText = '-';
+        document.getElementById('massStack').innerHTML = '';
+
+        const k = parseFloat(document.getElementById('kInput').value) || 2.5;
+        const initPosCm = getEquilibriumScaleCm(HANGER_MASS_KG, k);
+        updateVisualPosition(initPosCm);
+    }
+
+    function updateVisualPosition(scaleCm) {
+        const targetY = SCALE_TOP_Y + (scaleCm * SCALE_PIXELS_PER_CM);
+        const hangerElem = document.getElementById('hangerAssembly');
+        hangerElem.style.top = targetY + 'px';
+        drawSpring(targetY);
+    }
+
+    function animateOscillationTo(targetScaleCm, addedMassG, stepCallback) {
+        return new Promise((resolve) => {
+            const k = parseFloat(document.getElementById('kInput').value) || 2.5;
+            const currentMassKg = HANGER_MASS_KG + (addedMassG / 1000.0);
+            
+            const c = 0.003; // Damping constant
+            const omega_0 = Math.sqrt(k / currentMassKg);
+            const gamma = c / (2 * currentMassKg);
+            const omega = Math.sqrt(Math.max(0.001, omega_0 * omega_0 - gamma * gamma));
+
+            const hangerElem = document.getElementById('hangerAssembly');
+            const currentPixelY = parseFloat(hangerElem.style.top) || SCALE_TOP_Y;
+            const currentScaleCm = (currentPixelY - SCALE_TOP_Y) / SCALE_PIXELS_PER_CM;
+
+            const initialA = currentScaleCm - targetScaleCm; 
+            const startTime = performance.now();
+            const durationSec = 3.5; 
+
+            function step(now) {
+                const elapsed = (now - startTime) / 1000.0;
+
+                if (elapsed < durationSec) {
+                    const disp = initialA * Math.exp(-gamma * elapsed * 2.5) * Math.cos(omega * elapsed * 1.8);
+                    const instantScaleCm = targetScaleCm + disp;
+
+                    updateVisualPosition(instantScaleCm);
+                    animationFrameId = requestAnimationFrame(step);
+                } else {
+                    updateVisualPosition(targetScaleCm);
+                    if (stepCallback) stepCallback();
+                    resolve();
+                }
+            }
+            animationFrameId = requestAnimationFrame(step);
+        });
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function startSequence() {
+        const k = parseFloat(document.getElementById('kInput').value);
+        if (isNaN(k) || k <= 0) {
+            alert('กรุณากรอกค่าคงตัวสปริง k ให้ถูกต้อง');
+            return;
+        }
+
+        resetLab();
+        isRunning = true;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('kInput').disabled = true;
+
+        const initialPosCm = getEquilibriumScaleCm(HANGER_MASS_KG, k);
+        document.getElementById('initialPosBox').innerText = initialPosCm.toFixed(2) + ' cm';
+        document.getElementById('statusText').innerText = 'กำลังติดตั้งที่แขวนมวล (10g)...';
+
+        await sleep(1500);
+
+        const masses = [5, 10, 15, 20, 25];
+        const massStackElem = document.getElementById('massStack');
+
+        for (let i = 0; i < masses.length; i++) {
+            if (!isRunning) break;
+
+            const addedMass = masses[i];
+            document.getElementById('statusText').innerText = `กำลังเพิ่มมวล +5g (รวมมวลทดลอง ${addedMass}g)...`;
+
+            const block = document.createElement('div');
+            block.className = 'mass-block';
+            massStackElem.appendChild(block);
+
+            const totalMassKg = HANGER_MASS_KG + (addedMass / 1000.0);
+            const targetPosCm = getEquilibriumScaleCm(totalMassKg, k);
+            const stretchCm = targetPosCm - initialPosCm;
+
+            await animateOscillationTo(targetPosCm, addedMass, () => {
+                document.getElementById(`pos_${addedMass}`).innerText = targetPosCm.toFixed(2) + ' cm';
+                document.getElementById(`stretch_${addedMass}`).innerText = stretchCm.toFixed(2) + ' cm';
+            });
+
+            await sleep(2000); // 2 seconds delay for student observation
+        }
+
+        if (isRunning) {
+            document.getElementById('statusText').innerText = 'สถานะ: การทดลองเสร็จสมบูรณ์';
+        }
+    }
+
+    window.onload = resetLab;
+</script>
+
+</body>
+</html>

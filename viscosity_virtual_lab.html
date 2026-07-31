@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การทดลอง การวัดความหนืดของของเหลว</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 1000px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            position: relative;
+        }
+
+        /* Header Title */
+        .main-header {
+            background: linear-gradient(135deg, #cbe3f7 0%, #a4cded 100%);
+            padding: 12px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a4971;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Input Controls Bar */
+        .top-inputs {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-badge {
+            background-color: #d6e4f0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #2b4c6f;
+            font-size: 18px;
+        }
+
+        .input-box {
+            width: 100px;
+            height: 38px;
+            background-color: #fff2c4;
+            border: 1px solid #e0c870;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+
+        .unit-label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Layout Grid */
+        .experiment-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        /* Left Side Panel */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .table-headers {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .header-box {
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .bg-blue-light { background-color: #d0e4f7; color: #1e4a78; }
+        .bg-yellow-light { background-color: #ffebad; color: #6b5200; }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .label-cell {
+            background-color: #dceaf7;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+            color: #23496d;
+            font-weight: 500;
+        }
+
+        .display-box {
+            background-color: #fff4d1;
+            border: 1px solid #e6d396;
+            border-radius: 4px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: bold;
+            color: #4a3d00;
+        }
+
+        .density-info {
+            background-color: #fce8b3;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            color: #524100;
+            margin-top: 5px;
+        }
+
+        .viscosity-result-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .viscosity-label {
+            background-color: #cde0f7;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a426e;
+        }
+
+        .viscosity-box {
+            width: 140px;
+            height: 50px;
+            background-color: #fff0b8;
+            border: 2px solid #e0c260;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #3b2d00;
+        }
+
+        /* Right Side Apparatus */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .apparatus-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            position: relative;
+        }
+
+        .tube-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px;
+            padding-top: 40px;
+            padding-bottom: 10px;
+        }
+
+        .tube-label-item {
+            background-color: #d6e6f5;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #20456c;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tube-wrapper {
+            position: relative;
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sphere-start {
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle at 8px 8px, #666, #000);
+            border-radius: 50%;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: transform 0.1s linear;
+        }
+
+        .glass-tube {
+            width: 150px;
+            height: 400px;
+            background: linear-gradient(to right, rgba(255,236,179,0.8), rgba(255,224,130,0.9), rgba(255,236,179,0.8));
+            border: 3px solid #b0bec5;
+            border-bottom: none;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .tube-section {
+            height: 80px;
+            border-bottom: 2px solid #333;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .tube-base {
+            width: 170px;
+            height: 45px;
+            background-color: #4a90e2;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Animated Steel Ball */
+        .falling-ball {
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 5px 5px, #888, #111);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0px;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Action Buttons */
+        .controls-area {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-start {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-start:hover { background-color: #218838; }
+
+        .btn-reset {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-reset:hover { background-color: #c82333; }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Formula Note Box */
+        .formula-note {
+            margin-top: 25px;
+            background-color: #f8f9fa;
+            border-left: 5px solid #4a90e2;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 15px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header Title -->
+    <div class="main-header">
+        การทดลอง การวัดความหนืดของของเหลว
+    </div>
+
+    <!-- Top Inputs -->
+    <div class="top-inputs">
+        <div class="input-badge">รัศมีของลูกเหล็ก</div>
+        <input type="number" id="radiusInput" class="input-box" value="0.0025" step="0.0005" min="0.0005" max="0.01">
+        <div class="unit-label">m</div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="experiment-grid">
+        
+        <!-- Left Data Panel -->
+        <div class="left-panel">
+            <div class="table-headers">
+                <div class="header-box bg-blue-light">ระยะทาง</div>
+                <div class="header-box bg-yellow-light">เวลา</div>
+                <div class="header-box bg-yellow-light">เวลาในแต่ละช่วง</div>
+            </div>
+
+            <!-- Row 1: 0-20 cm -->
+            <div class="data-row">
+                <div class="label-cell">0-20 cm</div>
+                <div class="display-box" id="t_cum_20">-</div>
+                <div class="display-box" id="t_sec_20">-</div>
+            </div>
+
+            <!-- Row 2: 20-40 cm -->
+            <div class="data-row">
+                <div class="label-cell">20-40 cm</div>
+                <div class="display-box" id="t_cum_40">-</div>
+                <div class="display-box" id="t_sec_40">-</div>
+            </div>
+
+            <!-- Row 3: 40-60 cm -->
+            <div class="data-row">
+                <div class="label-cell">40-60 cm</div>
+                <div class="display-box" id="t_cum_60">-</div>
+                <div class="display-box" id="t_sec_60">-</div>
+            </div>
+
+            <!-- Row 4: 60-80 cm -->
+            <div class="data-row">
+                <div class="label-cell">60-80 cm</div>
+                <div class="display-box" id="t_cum_80">-</div>
+                <div class="display-box" id="t_sec_80">-</div>
+            </div>
+
+            <!-- Row 5: 80-100 cm -->
+            <div class="data-row">
+                <div class="label-cell">80-100 cm</div>
+                <div class="display-box" id="t_cum_100">-</div>
+                <div class="display-box" id="t_sec_100">-</div>
+            </div>
+
+            <!-- Densities Info -->
+            <div class="density-info">
+                ความหนาแน่นของของเหลว 880 kg/m³
+            </div>
+            <div class="density-info">
+                ความหนาแน่นของลูกเหล็ก 7860 kg/m³
+            </div>
+
+            <!-- Inputs for Viscosity Setting & Calculated Output -->
+            <div class="viscosity-result-area">
+                <div class="input-badge" style="font-size: 16px;">กำหนดความหนืด (η):</div>
+                <input type="number" id="viscosityInput" class="input-box" value="0.250" step="0.01" min="0.01" style="width: 90px;">
+                <div class="unit-label" style="font-size: 16px;">Pa·s</div>
+            </div>
+
+            <div class="viscosity-result-area">
+                <div class="viscosity-label">ความหนืดของของเหลว (ที่คำนวณได้)</div>
+                <div class="viscosity-box" id="calcViscosity">-</div>
+                <div class="unit-label">Pa·s</div>
+            </div>
+        </div>
+
+        <!-- Right Apparatus Panel -->
+        <div class="right-panel">
+            <div class="apparatus-container">
+                <!-- Interval Labels -->
+                <div class="tube-labels">
+                    <div class="tube-label-item">0-20 cm</div>
+                    <div class="tube-label-item">20-40 cm</div>
+                    <div class="tube-label-item">40-60 cm</div>
+                    <div class="tube-label-item">60-80 cm</div>
+                    <div class="tube-label-item">80-100 cm</div>
+                </div>
+
+                <!-- Glass Tube Diagram -->
+                <div class="tube-wrapper">
+                    <div class="sphere-start" id="topSphere"></div>
+                    <div class="glass-tube" id="tubeContainer">
+                        <div class="tube-section"></div>
+                        <div class="tube-section"></div>
+                        <div class="tube-section"></div>
+                        <div class="tube-section"></div>
+                        <div class="tube-section"></div>
+                        
+                        <!-- Dynamic Animating Ball -->
+                        <div class="falling-ball" id="animatingBall"></div>
+                    </div>
+                    <div class="tube-base"></div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="controls-area">
+                <button class="btn btn-start" id="startBtn" onclick="startExperiment()">ปล่อยลูกเหล็ก</button>
+                <button class="btn btn-reset" id="resetBtn" onclick="resetExperiment()">รีเซ็ต</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Theory & Calculation Description -->
+    <div class="formula-note">
+        <strong>💡 หมายเหตุการคำนวณตามทฤษฎี (Theoretical Physics Engine):</strong><br>
+        1. <strong>สมการการเคลื่อนที่ช่วงเร่ง:</strong> \( v(t) = v_t \left(1 - e^{-t/	au}ight) \) โดยที่ค่า Time Constant \( 	au = rac{2 ho_s r^2}{9 \eta} \)<br>
+        2. <strong>ความเร็วปลาย:</strong> \( v_t = rac{2 r^2 g (ho_s - ho_f)}{9 \eta} \)<br>
+        3. <strong>การคำนวณกลับหาความหนืด:</strong> คำนวณจากความเร็วปลายเฉลี่ยในช่วง 80-100 cm ด้วยสูตร \( \eta_{calc} = rac{2 r^2 g (ho_s - ho_f)}{9 v_{terminal}} \)
+    </div>
+</div>
+
+<script>
+    // Constants
+    const RHO_F = 880;   // Fluid density (kg/m^3)
+    const RHO_S = 7860;  // Steel ball density (kg/m^3)
+    const G = 9.81;      // Gravity (m/s^2)
+    const TUBE_LENGTH_M = 1.0; // Total length 1 meter = 100 cm
+    const PIXEL_HEIGHT = 400;  // Total tube visual height in pixels
+
+    let animationId = null;
+    let isRunning = false;
+
+    function getInputs() {
+        const r = parseFloat(document.getElementById('radiusInput').value);
+        const eta = parseFloat(document.getElementById('viscosityInput').value);
+        return { r, eta };
+    }
+
+    function resetExperiment() {
+        if (animationId) cancelAnimationFrame(animationId);
+        isRunning = false;
+
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('animatingBall').style.display = 'none';
+        document.getElementById('animatingBall').style.top = '0px';
+        document.getElementById('topSphere').style.visibility = 'visible';
+
+        // Clear display tables
+        const checkPoints = [20, 40, 60, 80, 100];
+        checkPoints.forEach(cp => {
+            document.getElementById(`t_cum_${cp}`).innerText = '-';
+            document.getElementById(`t_sec_${cp}`).innerText = '-';
+        });
+        document.getElementById('calcViscosity').innerText = '-';
+    }
+
+    function startExperiment() {
+        const { r, eta } = getInputs();
+
+        if (isNaN(r) || r <= 0 || isNaN(eta) || eta <= 0) {
+            alert("กรุณากรอกค่ารัศมีและความหนืดให้ถูกต้อง");
+            return;
+        }
+
+        resetExperiment();
+        isRunning = true;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('topSphere').style.visibility = 'hidden';
+
+        const ballElem = document.getElementById('animatingBall');
+        // Visual adjustment for ball size based on radius
+        const ballSizePx = Math.max(10, Math.min(26, r * 4000));
+        ballElem.style.width = ballSizePx + 'px';
+        ballElem.style.height = ballSizePx + 'px';
+        ballElem.style.display = 'block';
+
+        // Physics parameters
+        // Terminal velocity: vt = 2 * r^2 * g * (rho_s - rho_f) / (9 * eta)
+        const vt = (2 * Math.pow(r, 2) * G * (RHO_S - RHO_F)) / (9 * eta);
+        // Time constant tau = 2 * rho_s * r^2 / (9 * eta)
+        const tau = (2 * RHO_S * Math.pow(r, 2)) / (9 * eta);
+
+        // Distance s(t) function: s(t) = vt * [ t - tau * (1 - exp(-t/tau)) ]
+        function getDistanceAtTime(t) {
+            if (t <= 0) return 0;
+            return vt * (t - tau * (1 - Math.exp(-t / tau)));
+        }
+
+        // Solve time t for a given target distance s using Newton-Raphson method
+        function getTimeForDistance(sTarget) {
+            let t = sTarget / vt; // Initial guess assuming constant vt
+            for (let i = 0; i < 20; i++) {
+                let sCurrent = getDistanceAtTime(t);
+                let vCurrent = vt * (1 - Math.exp(-t / tau)); // Derivative ds/dt = v(t)
+                let diff = sCurrent - sTarget;
+                if (Math.abs(diff) < 1e-7) break;
+                t = t - diff / vCurrent;
+            }
+            return t;
+        }
+
+        // Pre-calculate exact theoretical times at each 20cm mark
+        const marksMeters = [0.2, 0.4, 0.6, 0.8, 1.0];
+        const markTimes = marksMeters.map(m => getTimeForDistance(m));
+
+        let startTime = null;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            let elapsedSimSeconds = (timestamp - startTime) / 1000; // Real-time animation speed
+
+            // Calculate current physical position in meters
+            let currentS = getDistanceAtTime(elapsedSimSeconds);
+
+            if (currentS > TUBE_LENGTH_M) {
+                currentS = TUBE_LENGTH_M;
+            }
+
+            // Map meters (0 to 1m) to CSS pixels (0 to 400px)
+            let pixelTop = (currentS / TUBE_LENGTH_M) * (PIXEL_HEIGHT - ballSizePx);
+            ballElem.style.top = pixelTop + 'px';
+
+            // Update recorded values as ball reaches each threshold
+            const checkPoints = [20, 40, 60, 80, 100];
+            checkPoints.forEach((cp, idx) => {
+                let targetM = cp / 100.0;
+                if (currentS >= targetM) {
+                    let exactTime = markTimes[idx];
+                    document.getElementById(`t_cum_${cp}`).innerText = exactTime.toFixed(3) + ' s';
+
+                    let intervalTime = (idx === 0) ? exactTime : (exactTime - markTimes[idx - 1]);
+                    document.getElementById(`t_sec_${cp}`).innerText = intervalTime.toFixed(3) + ' s';
+                }
+            });
+
+            if (currentS < TUBE_LENGTH_M) {
+                animationId = requestAnimationFrame(animate);
+            } else {
+                // Animation Finished - Calculate measured viscosity based on terminal interval (80-100cm)
+                isRunning = false;
+                let t_80_100 = markTimes[4] - markTimes[3];
+                let measured_vt = 0.20 / t_80_100; // v = s / dt for 20cm
+                let calcEta = (2 * Math.pow(r, 2) * G * (RHO_S - RHO_F)) / (9 * measured_vt);
+
+                document.getElementById('calcViscosity').innerText = calcEta.toFixed(3);
+            }
+        }
+
+        animationId = requestAnimationFrame(animate);
+    }
+</script>
+
+</body>
+</html>

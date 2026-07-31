@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ดิจิทัล กับ อนาล็อก | Digital vs Analog</title>
+  <style>
+    /* Google Fonts - Noto Sans Thai */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+      background-color: #0f172a; /* พื้นหลังสไตล์ Tech โทนเข้ม */
+      color: #e2e8f0;
+      line-height: 1.8;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
+    }
+
+    /* Top Navigation */
+    .back-nav {
+      margin-bottom: 16px;
+    }
+
+    .back-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .back-link:hover {
+      color: #f8fafc;
+    }
+
+    /* Badge & Header */
+    .badge {
+      display: inline-block;
+      background: #06b6d4; /* สีฟ้าดิจิทัล */
+      color: #0f172a;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .hero-img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #475569;
+    }
+
+    /* Content & Paragraphs */
+    p {
+      color: #cbd5e1;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+
+    /* Comparison Cards (Analog vs Digital & Physics) */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    @media (max-width: 600px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .card-analog {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .card-digital {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .card-analog h3 { color: #fbbf24; }
+    .card-digital h3 { color: #22d3ee; }
+
+    .card p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    /* Digital Transformation Timeline Workflow */
+    .workflow-section {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 28px 0;
+    }
+
+    .workflow-title {
+      font-size: 1.1rem;
+      color: #f8fafc;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .timeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #1e293b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border-left: 4px solid #06b6d4;
+    }
+
+    .step-name {
+      font-weight: 700;
+      color: #22d3ee;
+      min-width: 140px;
+    }
+
+    .step-desc {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+    }
+
+    /* Highlight Box */
+    .highlight-box {
+      background: #fef9c3;
+      border-left: 4px solid #eab308;
+      color: #713f12;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+      font-weight: 500;
+    }
+
+    /* Footer Section */
+    .wiki-section {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .wiki-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wiki-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0891b2;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .wiki-btn:hover {
+      background: #0e7490;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- ปุ่มย้อนกลับไปหน้าหลัก -->
+    <div class="back-nav">
+      <a href="../index.html" class="back-link">⬅️ กลับหน้าหลัก Virtual Lab</a>
+    </div>
+
+    <span class="badge">💻 เทคโนโลยี & ฟิสิกส์</span>
+    <h1>ดิจิทัล กับ อนาล็อก (Digital vs Analog)</h1>
+
+    <!-- รูปภาพปกบทความ -->
+    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1000&auto=format&fit=crop&q=80" alt="Digital vs Analog" class="hero-img">
+
+    <!-- เกริ่นนำเกี่ยวกับวงจรไฟฟ้า -->
+    <p>
+      จุดเริ่มต้นของความเข้าใจเรื่อง <strong>อนาล็อก</strong> และ <strong>ดิจิทัล</strong> มักเริ่มจากวิชาไฟฟ้า ซึ่งทั้งสองระบบมีความแตกต่างพื้นฐานในการนำเสนอข้อมูลและสัญญาณไฟฟ้าอย่างชัดเจน
+    </p>
+
+    <!-- การ์ดเปรียบเทียบวงจรไฟฟ้า -->
+    <div class="comparison-grid">
+      <div class="card card-analog">
+        <h3>📻 อนาล็อก (Analog)</h3>
+        <p>เป็นการศึกษาวงจรไฟฟ้าที่มี <strong>สัญญาณแบบต่อเนื่อง</strong></p>
+      </div>
+
+      <div class="card card-digital">
+        <h3>💻 ดิจิทัล (Digital)</h3>
+        <p>เป็นการศึกษาวงจรไฟฟ้าที่ <strong>ไม่มีความต่อเนื่อง</strong> ใช้สัญญาณแบบขั้นบันไดเข้ารหัสเลขฐานสอง (มี/ไม่มี หรือ ติด/ดับ)</p>
+      </div>
+    </div>
+
+    <!-- ความเชื่อมโยงกับวิชาฟิสิกส์ -->
+    <p>
+      แนวคิดนี้มีความคล้ายคลึงอย่างน่าสนใจกับวิชาฟิสิกส์ 2 แขนง:
+    </p>
+    
+    <div class="comparison-grid">
+      <div class="card card-analog">
+        <h3>🍎 กลศาสตร์นิวตัน</h3>
+        <p>ศึกษาระบบที่มี <strong>ความต่อเนื่อง</strong> เปรียบเสมือนระบบอนาล็อก[cite: 6]</p>
+      </div>
+
+      <div class="card card-digital">
+        <h3>⚛️ กลศาสตร์ควอนตัม</h3>
+        <p>เริ่มศึกษจากระบบที่ <strong>ไม่ต่อเนื่อง</strong> แล้วนำมาอธิบายระบบที่ต่อเนื่อง (มองว่าเส้นตรงประกอบด้วยขั้นบันไดเล็กๆ จำนวนมาก)[cite: 6]</p>
+      </div>
+    </div>
+
+    <!-- วิวัฒนาการ Digital Transformation -->
+    <div class="workflow-section">
+      <div class="workflow-title">🚀 เส้นทางวิวัฒนาการ Digital Transformation</div>
+      <div class="timeline">
+        
+        <div class="timeline-step">
+          <div class="step-name">1. Binary</div>
+          <div class="step-desc">เลขฐานสอง ผลงานการคิดค้นของนักคณิตศาสตร์[cite: 6]</div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-name">2. Transistor</div>
+          <div class="step-desc">คิดค้นในปี ค.ศ. 1947 (พ.ศ. 2490) โดย Bardeen, Brattain และ Shockley (ได้รับรางวัลโนเบลในปี 1956)[cite: 6]</div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-name">3. Digital Computers</div>
+          <div class="step-desc">พัฒนาจากกลไกแมคคานิก ➔ อนาล็อก ➔ ดิจิทัล ทำให้เกิดการแพร่หลายอย่างกว้างขวาง[cite: 6]</div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-name">4. Internet</div>
+          <div class="step-desc">ระบบสื่อสารข้ามคอมพิวเตอร์ที่แม่ข่ายทำงานได้อย่างไม่จำกัด ป้องกันการถูกทำลายในเชิงการวิจัยและสงคราม[cite: 6]</div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-name">5. Digital Economy</div>
+          <div class="step-desc">การใช้ดิจิทัลเข้ารหัสข้อมูล ส่งกระจายขนาดใหญ่ นำไปสู่เศรษฐกิจและการบริหารจัดการยุคใหม่[cite: 6]</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- สรุปประเด็นน่าสนใจ -->
+    <div class="highlight-box">
+      🤔 <strong>ข้อสังเกตน่าคิด:</strong> แม้ในทางเทคโนโลยีคำว่า "ดิจิทัล" ต้องคู่กับ "อนาล็อก" เสมอ[cite: 6] แต่ในมิติทางเศรษฐกิจและการบริหารจัดการสมัยใหม่ คำว่า <strong>Digital Transformation</strong> ได้กลายมาเป็นคำหลักที่ถูกนำมาใช้อย่างแพร่หลายเพียงฝ่ายเดียว[cite: 6]
+    </div>
+
+    <!-- ส่วนลิงก์อ่านเพิ่มเติม -->
+    <div class="wiki-section">
+      <div class="wiki-info">
+        <span>🌐</span>
+        <div>
+          <strong style="color: #f8fafc; font-size: 0.95rem;">ต้องการศึกษาเรื่อง Digital Transformation?</strong>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">อ่านบทความฉบับเต็มเกี่ยวกับประวัติและการเปลี่ยนแปลงเชิงดิจิทัลได้บน Wikipedia[cite: 6]</p>
+        </div>
+      </div>
+      
+      <a href="https://en.wikipedia.org/wiki/Digital_transformation" target="_blank" class="wiki-btn">
+        อ่านบทความบน Wikipedia ↗
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

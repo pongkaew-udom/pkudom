@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: Capillary Effect (ปรากฏการณ์รูแคบ)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    p.subtitle { text-align: center; color: #94a3b8; margin-bottom: 20px; font-size: 14px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 850px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 18px; }
+    .card-title { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+
+    canvas { width: 100%; height: 260px; background: #020617; border-radius: 8px; }
+
+    .controls { display: flex; flex-direction: column; gap: 10px; font-size: 13px; margin-top: 12px; }
+    .control-row { display: flex; justify-content: space-between; align-items: center; }
+    select, input { background: #1e293b; border: 1px solid #475569; color: #fff; padding: 6px; border-radius: 6px; }
+
+    .btn-action { background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+    .btn-action:hover { background: #0369a1; }
+    .btn-reset { background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 5px; }
+    .btn-reset:hover { background: #dc2626; }
+
+    .table-container { max-height: 280px; overflow-y: auto; margin-top: 10px; border: 1px solid #334155; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
+    th, td { border-bottom: 1px solid #334155; padding: 8px 4px; }
+    th { background-color: #1e293b; color: #38bdf8; position: sticky; top: 0; }
+
+    .info-box { background: #0f2942; border: 1px solid #0369a1; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0; margin-top: 15px; }
+    .info-box h4 { color: #38bdf8; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: Capillary Effect (ปรากฏการณ์รูแคบจากแรงตึงผิว)</h1>
+  <p class="subtitle">ศึกษาผลของขนาดรัศมีหลอดแก้ว (r) ต่อการซึมตามรูเล็กของของเหลวชนิดต่างๆ ณ อุณหภูมิคงที่</p>
+
+  <div class="grid-2">
+    <!-- กล่อง 1: ชุดจำลองหลอดแก้วและส่วนควบคุม -->
+    <div class="card">
+      <div class="card-title">1. ชุดการทดลองหลอดรูแคบ (Capillary Tube)</div>
+      <canvas id="expCanvas" width="300" height="260"></canvas>
+      
+      <div class="controls">
+        <div class="control-row">
+          <label>ชนิดของเหลว:</label>
+          <select id="liquidSelect" onchange="updateSim()">
+            <option value="water">น้ำเปล่า (Water)</option>
+            <option value="coloredWater" selected>น้ำสี (Red Ink/Dye)</option>
+            <option value="alcohol">แอลกอฮอล์ (Ethanol)</option>
+            <option value="mercury">ปรอท (Mercury - นูนลง)</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>กำหนดอุณหภูมิ (T):</label>
+          <div>
+            <input type="number" id="tempInput" value="25" min="5" max="90" style="width: 70px;" onchange="updateSim()"> °C
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label>รัศมีหลอดปัจจุบัน (r):</label>
+          <div>
+            <input type="number" id="radiusInput" value="0.2" step="0.1" min="0.1" max="2.0" style="width: 70px;" onchange="updateSim()"> mm
+          </div>
+        </div>
+
+        <button class="btn-action" onclick="recordAndStep()">📊 บันทึกผล & เพิ่มขนาดรัศมี ($r$)</button>
+        <button class="btn-reset" onclick="resetLab()">🔄 เริ่มต้นใหม่ทั้งหมด (Reset All)</button>
+      </div>
+    </div>
+
+    <!-- กล่อง 2: ตารางบันทึกผลการทดลอง -->
+    <div class="card">
+      <div class="card-title">2. ตารางบันทึกผลการทดลอง (เรียงตาม r จากน้อยไปมาก)</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ครั้งที่</th>
+              <th>ของเหลว</th>
+              <th>T (°C)</th>
+              <th>r (mm)</th>
+              <th>$\gamma$ (mN/m)</th>
+              <th>h (mm)</th>
+            </tr>
+          </thead>
+          <tbody id="resultTable">
+            <!-- ข้อมูลจะถูกบันทึกที่นี่ -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        <h4>🩸 การเชื่อมโยงกับหลอดเลือดฝอยและระบบลำเลียง:</h4>
+        <p>ใน <b>หลอดเลือดฝอย (Capillaries)</b> แรง Adhesion ระหว่างเยื่อบุผนังหลอดเลือดกับพลาสมา มีส่วนช่วยให้เลือดไหลซึมผ่านแขนงหลอดเลือดขนาดเล็ก (3–10 u m) ได้อย่างทั่วถึง เช่นเดียวกับแรงซึมตามรูแคบในท่อ <b>Xylem</b> ที่ส่งน้ำขึ้นสู่ส่วนยอดของต้นไม้ใหญ่</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const expCanvas = document.getElementById('expCanvas');
+  const expCtx = expCanvas.getContext('2d');
+
+  const liquidProps = {
+    water: { name: 'น้ำเปล่า', gamma0: 0.0728, density: 1000, theta: 0, color: 'rgba(56, 189, 248, 0.6)', stroke: '#0284c7' },
+    coloredWater: { name: 'น้ำสี', gamma0: 0.0715, density: 1010, theta: 5, color: 'rgba(239, 68, 68, 0.7)', stroke: '#dc2626' },
+    alcohol: { name: 'แอลกอฮอล์', gamma0: 0.0223, density: 789, theta: 0, color: 'rgba(168, 85, 247, 0.6)', stroke: '#9333ea' },
+    mercury: { name: 'ปรอท', gamma0: 0.4850, density: 13534, theta: 140, color: 'rgba(148, 163, 184, 0.95)', stroke: '#475569' }
+  };
+
+  let recordCount = 0;
+
+  function calculateCapillary(liquidKey, r_mm, temp_C) {
+    const prop = liquidProps[liquidKey];
+    
+    // แรงตึงผิวแปรผันตามอุณหภูมิ: γ(T) = γ0 * (1 - 0.002 * (T - 20))
+    let gamma = prop.gamma0 * (1 - 0.002 * (temp_C - 20));
+    if (gamma < 0.005) gamma = 0.005;
+
+    let r_m = r_mm / 1000;
+    let theta_rad = (prop.theta * Math.PI) / 180;
+    let g = 9.81;
+
+    // กฎของจูแร็ง h = (2 * γ * cosθ) / (ρ * g * r)
+    let h_m = (2 * gamma * Math.cos(theta_rad)) / (prop.density * g * r_m);
+    let h_mm = h_m * 1000;
+
+    return { h_mm, gamma_mN: gamma * 1000 };
+  }
+
+  function updateSim() {
+    const liquidKey = document.getElementById('liquidSelect').value;
+    const r_mm = parseFloat(document.getElementById('radiusInput').value) || 0.2;
+    const temp_C = parseFloat(document.getElementById('tempInput').value) || 25;
+
+    const { h_mm } = calculateCapillary(liquidKey, r_mm, temp_C);
+    drawCanvas(liquidKey, r_mm, h_mm, temp_C);
+  }
+
+  function drawCanvas(liquidKey, r_mm, h_mm, temp_C) {
+    expCtx.clearRect(0, 0, expCanvas.width, expCanvas.height);
+    const prop = liquidProps[liquidKey];
+
+    // 1. วาดบีกเกอร์และระดับของเหลวพื้นฐาน
+    let beakerX = 50, beakerY = 160, beakerW = 160, beakerH = 80;
+    let liquidLevelY = 190; // ระดับอ้างอิง h = 0
+
+    expCtx.fillStyle = prop.color;
+    expCtx.fillRect(beakerX + 5, liquidLevelY, beakerW - 10, beakerY + beakerH - liquidLevelY);
+
+    expCtx.strokeStyle = '#94a3b8';
+    expCtx.lineWidth = 3;
+    expCtx.beginPath();
+    expCtx.moveTo(beakerX, beakerY);
+    expCtx.lineTo(beakerX, beakerY + beakerH);
+    expCtx.lineTo(beakerX + beakerW, beakerY + beakerH);
+    expCtx.lineTo(beakerX + beakerW, beakerY);
+    expCtx.stroke();
+
+    // 2. วาดหลอดแก้ว (ปรับขนาดตามรัศมี r_mm)
+    let tubeCenterX = beakerX + beakerW / 2;
+    let visualTubeWidth = Math.max(6, r_mm * 22); 
+    let tubeLeft = tubeCenterX - visualTubeWidth / 2;
+    let tubeRight = tubeCenterX + visualTubeWidth / 2;
+    let tubeTop = 25;
+    let tubeBottom = beakerY + beakerH - 10;
+
+    expCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    expCtx.lineWidth = 2;
+    expCtx.beginPath();
+    expCtx.moveTo(tubeLeft, tubeTop);
+    expCtx.lineTo(tubeLeft, tubeBottom);
+    expCtx.moveTo(tubeRight, tubeTop);
+    expCtx.lineTo(tubeRight, tubeBottom);
+    expCtx.stroke();
+
+    // 3. วาดการไต่ระดับของเหลวในหลอด (h)
+    let visualH = h_mm * 3.2; // 1 mm = 3.2 pixels
+    let liquidSurfaceY = liquidLevelY - visualH;
+
+    expCtx.fillStyle = prop.color;
+    if (h_mm >= 0) {
+      expCtx.fillRect(tubeLeft, liquidSurfaceY, visualTubeWidth, liquidLevelY - liquidSurfaceY + 20);
+    } else {
+      expCtx.fillRect(tubeLeft, liquidLevelY, visualTubeWidth, Math.abs(visualH));
+    }
+
+    // วาดส่วนโค้งเว้า/นูน (Meniscus)
+    expCtx.strokeStyle = prop.stroke;
+    expCtx.lineWidth = 2;
+    expCtx.beginPath();
+    if (prop.theta < 90) {
+      expCtx.arc(tubeCenterX, liquidSurfaceY, visualTubeWidth / 2, 0, Math.PI, false);
+    } else {
+      expCtx.arc(tubeCenterX, liquidSurfaceY, visualTubeWidth / 2, Math.PI, 0, false);
+    }
+    expCtx.stroke();
+
+    // 4. สเกลไม้บรรทัด
+    let rulerX = 230;
+    expCtx.strokeStyle = '#64748b';
+    expCtx.lineWidth = 1;
+    expCtx.beginPath();
+    expCtx.moveTo(rulerX, 35);
+    expCtx.lineTo(rulerX, 210);
+    expCtx.stroke();
+
+    expCtx.fillStyle = '#94a3b8';
+    expCtx.font = '9px sans-serif';
+    for (let y = 35; y <= 210; y += 15) {
+      expCtx.beginPath();
+      expCtx.moveTo(rulerX, y);
+      expCtx.lineTo(rulerX + 6, y);
+      expCtx.stroke();
+      let mmVal = ((liquidLevelY - y) / 3.2).toFixed(0);
+      if (y % 30 === 0) expCtx.fillText(`${mmVal}`, rulerX + 9, y + 3);
+    }
+
+    // เส้นประแสดงระดับ h
+    expCtx.setLineDash([3, 3]);
+    expCtx.strokeStyle = '#38bdf8';
+    expCtx.beginPath();
+    expCtx.moveTo(tubeRight + 2, liquidSurfaceY);
+    expCtx.lineTo(rulerX, liquidSurfaceY);
+    expCtx.stroke();
+    expCtx.setLineDash([]);
+
+    // ข้อความแสดงค่า
+    expCtx.fillStyle = '#f8fafc';
+    expCtx.font = '12px sans-serif';
+    expCtx.fillText(`ของเหลว: ${prop.name} | T = ${temp_C} °C`, 15, 20);
+    expCtx.fillText(`รัศมีหลอด (r) = ${r_mm.toFixed(1)} mm`, 15, 40);
+    
+    expCtx.fillStyle = '#38bdf8';
+    expCtx.font = 'bold 12.5px sans-serif';
+    expCtx.fillText(`ความสูง (h) = ${h_mm.toFixed(2)} mm`, 15, 60);
+  }
+
+  function recordAndStep() {
+    const liquidKey = document.getElementById('liquidSelect').value;
+    let r_mm = parseFloat(document.getElementById('radiusInput').value) || 0.2;
+    const temp_C = parseFloat(document.getElementById('tempInput').value) || 25;
+
+    const { h_mm, gamma_mN } = calculateCapillary(liquidKey, r_mm, temp_C);
+    const prop = liquidProps[liquidKey];
+
+    recordCount++;
+
+    // บันทึกลงตาราง
+    const tbody = document.getElementById('resultTable');
+    let row = `
+      <tr>
+        <td>${recordCount}</td>
+        <td>${prop.name}</td>
+        <td>${temp_C}</td>
+        <td><b>${r_mm.toFixed(1)}</b></td>
+        <td>${gamma_mN.toFixed(1)}</td>
+        <td style="color: ${h_mm >= 0 ? '#38bdf8' : '#f87171'}; font-weight:bold;">${h_mm.toFixed(2)}</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+
+    const container = document.querySelector('.table-container');
+    container.scrollTop = container.scrollHeight;
+
+    // ปรับเพิ่มค่า r ขึ้นเรื่อยๆ ทีละ 0.2 mm สำหรับการบันทึกครั้งถัดไป
+    let nextR = Math.min(2.0, r_mm + 0.2);
+    document.getElementById('radiusInput').value = nextR.toFixed(1);
+    updateSim();
+  }
+
+  function resetLab() {
+    recordCount = 0;
+    document.getElementById('resultTable').innerHTML = '';
+    document.getElementById('radiusInput').value = '0.2';
+    document.getElementById('tempInput').value = '25';
+    document.getElementById('liquidSelect').selectedIndex = 1; // กลับเป็นน้ำสี
+    
+    updateSim();
+  }
+
+  window.onload = () => {
+    updateSim();
+  };
+</script>
+
+</body>
+</html>

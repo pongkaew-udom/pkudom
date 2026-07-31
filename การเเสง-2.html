@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: การเลี้ยวเบนของแสงเลเซอร์และขนาดเส้นผม</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    /* Layout */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 850px) {
+      .grid-container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #334155;
+    }
+
+    /* Simulation Display */
+    .screen-visual {
+      background-color: #000000;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Input Controls */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-row label {
+      color: #cbd5e1;
+    }
+
+    .input-row input, .input-row select {
+      width: 120px;
+      padding: 6px;
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .result-box {
+      background-color: #0369a1;
+      color: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    /* Medical Info Section */
+    .medical-section {
+      background: #1e293b;
+      border-left: 5px solid #0284c7;
+      border: 1px solid #334155;
+      border-left-width: 5px;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .medical-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .medical-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .medical-content ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .medical-content strong {
+      color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: การกระเจิงและการแทรกสอดของแสงเลเซอร์</h1>
+  <p class="subtitle">คำนวณความหนาของเส้นผมด้วยรูปแบบการเลี้ยวเบน (Diffraction Pattern) และศึกษาการประยุกต์ใช้ในการผ่าตัด</p>
+
+  <div class="grid-container">
+    <!-- ฝั่งจำลองภาพการเลี้ยวเบน -->
+    <div class="card">
+      <div class="card-title">รูปแบบภาพบนฉากรับ (Diffraction Pattern)</div>
+      
+      <div class="screen-visual">
+        <canvas id="diffractionCanvas" width="450" height="120"></canvas>
+      </div>
+
+      <div class="input-group">
+        <div class="input-row">
+          <label>สีเลเซอร์ (lambda)</label>
+          <select id="laserColor" onchange="updateSim()">
+            <option value="650">สีแดง (650 nm)</option>
+            <option value="532">สีเขียว (532 nm)</option>
+            <option value="405">สีม่วง/น้ำเงิน (405 nm)</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <label>ระยะห่างถึงฉาก L (m)</label>
+          <input type="number" id="distL" value="1.00" step="0.05" oninput="updateSim()">
+        </div>
+        <div class="input-row">
+          <label>ระยะห่างจุดสว่างกลางถึงแถบมืดที่ 1 (y1) (cm)</label>
+          <input type="number" id="distY" value="0.80" step="0.05" oninput="updateSim()">
+        </div>
+      </div>
+
+      <div class="result-box" id="resultDisplay">
+        ขนาดเส้นผ่านศูนย์กลางเส้นผม (a): 81.25 µm
+      </div>
+    </div>
+
+    <!-- ฝั่งอธิบายหลักการคำนวณ -->
+    <div class="card">
+      <div class="card-title">หลักการทางฟิสิกส์ (Babinet's Principle)</div>
+      
+      <div style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1;">
+        <p><strong>1. หลักการของบาบิเนต์ (Babinet's Principle):</strong><br>
+        วัตถุทึบแสงขนาดเล็ก (เช่น เส้นผม) จะสร้างรูปแบบการเลี้ยวเบนและการแทรกสอดของแสงบนฉากเหมือนกับ <em>ช่องแคบเดี่ยว (Single Slit)</em> ที่มีความกว้างเท่ากับขนาดของวัตถุนั้นพอดี</p>
+        <br>
+        <p><strong>2. สมการคำนวณ:</strong></p>
+        <div style="background-color: #0f172a; padding: 10px; border-radius: 6px; text-align: center; margin: 8px 0; border: 1px solid #334155; font-family: monospace; color: #38bdf8;">
+          a = (m × λ × L) / y
+        </div>
+        <ul style="margin-left: 20px;">
+          <li><strong>a:</strong> ความหนาของเส้นผม (m)</li>
+          <li><strong>m:</strong> ลำดับของแถบมืด (m = 1, 2, 3)</li>
+          <li><strong>λ:</strong> ความยาวคลื่นแสงเลเซอร์ (m)</li>
+          <li><strong>L:</strong> ระยะจากเส้นผมถึงฉาก (m)</li>
+          <li><strong>y:</strong> ระยะจากแถบสว่างกลางถึงแถบมืดลำดับที่ m (m)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- การเชื่อมโยงทางการแพทย์ -->
+  <div class="medical-section">
+    <div class="medical-title">
+      🩺 การประยุกต์ใช้: ทำไมเลเซอร์จึงใช้ในการผ่าตัดที่มีความแม่นยำสูง?
+    </div>
+    <div class="medical-content">
+      <p>เลเซอร์ (LASER: Light Amplification by Stimulated Emission of Radiation) มีคุณสมบัติพิเศษต่างจากแสงทั่วไป เช่น **ความเป็นเอกพันธ์ (Monochromaticity)**, **ความพร้อมเพรียง (Coherence)** และ **ความขนานสูง (Collimation)** ทำให้ถูกนำมาใช้ในทางการแพทย์อย่างแพร่หลาย:</p>
+      <ul>
+        <li><strong>ความแม่นยำระดับไมครอน (High Precision & Focus):</strong> เลเซอร์สามารถบีบโฟกัสลงบนพื้นที่ขนาดเล็กมากๆ ระดับไมโครเมตรได้ พลังงานความร้อนจึงจำกัดอยู่เฉพาะเนื้อเยื่อเป้าหมาย โดยไม่ทำลายเนื้อเยื่อดีรอบข้าง (เช่น การทำ LASIK ตัดกระจกตา)</li>
+        <li><strong>การตัดพร้อมห้ามเลือด (Photocoagulation):</strong> ความร้อนจากแสงเลเซอร์จะทำให้โปรตีนในหลอดเลือดขนาดเล็กแข็งตัวและปิดลงทันทีขณะตัด ช่วยลดการสูญเสียเลือดของผู้ป่วยได้อย่างมีประสิทธิภาพ</li>
+        <li><strong>การเลือกตัดเฉพาะเจาะจง (Selective Photothermolysis):</strong> เลเซอร์แต่ละความยาวคลื่น  จะถูกดูดซึมได้ดีในตัวรับแสง (Chromophore) ที่ต่างกัน เช่น 
+          <em>เลเซอร์ CO₂ ( 10,600 nm) </em> ถูกดูดซึมได้ดีเยี่ยมโดยน้ำในเซลล์ จึงเหมาะกับการผ่าตัดตัดเฉือนเนื้อเยื่อ 
+          ขณะที่ <em>เลเซอร์ Pulsed Dye (585 nm)</em> ถูกดูดซึมได้ดีโดยฮีโมโกลบินในเลือด จึงใช้รักษาปานแดงหรือหลอดเลือดผิดปกติได้โดยไม่ทำลายผิวชั้นบน
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('diffractionCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function updateSim() {
+    const wavelengthNm = parseFloat(document.getElementById('laserColor').value);
+    const L = parseFloat(document.getElementById('distL').value); // เมตร
+    const yCm = parseFloat(document.getElementById('distY').value); // ซม.
+
+    const wavelengthM = wavelengthNm * 1e-9;
+    const yM = yCm / 100;
+
+    // คำนวณความหนาเส้นผม a (m = 1)
+    let aM = (1 * wavelengthM * L) / yM;
+    let aUm = aM * 1e6; // แปลงเป็น ไมโครเมตร (µm)
+
+    document.getElementById('resultDisplay').innerText = 
+      `ขนาดเส้นผ่านศูนย์กลางเส้นผม (a): ${aUm.toFixed(2)} µm`;
+
+    drawDiffractionPattern(wavelengthNm, aUm);
+  }
+
+  function drawDiffractionPattern(wavelengthNm, hairThicknessUm) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let colorRGB = "255, 0, 0"; // สีแดง
+    if (wavelengthNm === 532) colorRGB = "0, 255, 100"; // สีเขียว
+    if (wavelengthNm === 405) colorRGB = "180, 0, 255"; // สีม่วง
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // วาดรูปแบบการเลี้ยวเบนด้วยฟังก์ชั่น (sin(x)/x)^2
+    for (let x = 0; x < canvas.width; x++) {
+      let dx = (x - centerX) * 0.15;
+      let beta = (Math.PI * (hairThicknessUm / 50) * dx) / (wavelengthNm / 500);
+      
+      let intensity = 1;
+      if (beta !== 0) {
+        intensity = Math.pow(Math.sin(beta) / beta, 2);
+      }
+
+      ctx.fillStyle = `rgba(${colorRGB}, ${intensity})`;
+      ctx.fillRect(x, centerY - 25, 1, 50);
+    }
+  }
+
+  // เรียกใช้ครั้งแรกเมื่อโหลดหน้า
+  window.onload = updateSim;
+</script>
+
+</body>
+</html>

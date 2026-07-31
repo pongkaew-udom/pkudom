@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab: Transmission Electron Microscope (TEM) Simulator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    p.subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; font-size: 14px; }
+
+    .sim-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 850px) { .sim-grid { grid-template-columns: 1fr; } }
+
+    .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .card-title { font-size: 16px; font-weight: bold; color: #38bdf8; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #334155; }
+
+    /* Screen Displays */
+    .screen-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px; margin-bottom: 12px; }
+    canvas { width: 100%; height: 320px; background: #020617; border-radius: 8px; border: 1px solid #334155; }
+
+    .control-group { margin-bottom: 12px; }
+    .control-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; font-weight: bold; }
+
+    input[type="range"], select {
+      width: 100%; padding: 8px; background: #1e293b; border: 1px solid #475569; color: #f8fafc; border-radius: 6px; font-size: 13px;
+    }
+
+    .range-val { float: right; color: #38bdf8; font-weight: bold; }
+
+    .output-group {
+      background: #0c4a6e;
+      border: 1px solid #0284c7;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .output-item span { color: #7dd3fc; display: block; font-size: 11px; }
+    .output-item b { color: #ffffff; font-size: 13.5px; }
+
+    .btn-action {
+      background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 12px;
+    }
+    .btn-action:hover { background: #0369a1; }
+
+    .table-container { max-height: 200px; overflow-y: auto; margin-top: 10px; border: 1px solid #334155; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+    th, td { border-bottom: 1px solid #334155; padding: 8px 4px; }
+    th { background-color: #1e293b; color: #38bdf8; position: sticky; top: 0; }
+
+    .info-box { background: #0369a115; border: 1px solid #0284c7; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e0f2fe; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Lab: Electron Microscope & Quantum Wave Optics</h1>
+  <p class="subtitle">จำลองลำอิเล็กตรอนแนวดิ่ง (Vertical TEM Column) ตามทฤษฎีควอนตัม</p>
+
+  <div class="sim-grid">
+    <!-- กล่องควบคุมตัวแปร -->
+    <div class="card">
+      <div class="card-title">1. ปรับตัวแปรกล้องและเลือกตัวอย่าง (Controls)</div>
+
+      <div class="control-group">
+        <label for="sampleSelect">เลือกวัตถุตัวอย่างระดับนาโน (Nanoscale Samples):</label>
+        <select id="sampleSelect" onchange="updateSim()">
+          <option value="covid">ไวรัสโควิด-19 / SARS-CoV-2 (~120 nm)</option>
+          <option value="gold_np">อนุภาคทองนาโน / Gold NP (~20 nm)</option>
+          <option value="graphene">กราฟีน / Graphene Monolayer (~0.25 nm)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>
+          ความต่างศักย์เร่งอิเล็กตรอน ($V$):
+          <span class="range-val" id="vVal">80 kV</span>
+        </label>
+        <input type="range" id="vRange" min="10" max="200" value="80" step="5" oninput="updateSim()">
+      </div>
+
+      <div class="control-group">
+        <label>
+          ความเข้มสนามแม่เหล็ก Objective Lens ($B$):
+          <span class="range-val" id="bVal">0.50 Tesla</span>
+        </label>
+        <input type="range" id="bRange" min="0.10" max="1.00" value="0.50" step="0.01" oninput="updateSim()">
+      </div>
+
+      <div class="control-group">
+        <label>
+          ช่องรับแสงเชิงมุม / มุมเปิดอะเพอร์เจอร์ ($\alpha$):
+          <span class="range-val" id="aVal">0.010 rad</span>
+        </label>
+        <input type="range" id="aRange" min="0.002" max="0.020" value="0.010" step="0.001" oninput="updateSim()">
+      </div>
+
+      <!-- คำนวณค่าทางควอนตัมและทัศนศาสตร์ -->
+      <div class="output-group">
+        <div class="output-item">
+          <span>ความยาวคลื่นเดอบรอยล์ ($\lambda$):</span>
+          <b id="lambdaVal">0.000 nm</b>
+        </div>
+        <div class="output-item">
+          <span>ขีดจำกัดระยะแยกชัด ($d$ limit):</span>
+          <b id="resVal">0.00 nm</b>
+        </div>
+        <div class="output-item">
+          <span>ความยาวโฟกัสเลนส์ ($f$):</span>
+          <b id="focalVal">0.0 mm</b>
+        </div>
+        <div class="output-item">
+          <span>กำลังขยายจริง (Magnification):</span>
+          <b id="magVal" style="color: #38bdf8;">0x</b>
+        </div>
+      </div>
+
+      <button class="btn-action" onclick="recordData()">📌 บันทึกผลการทดลองลงตาราง</button>
+    </div>
+
+    <!-- กล่องแสดงภาพจำลอง 2 หน้าจอ -->
+    <div class="card">
+      <div class="card-title">2. ภาพจำลองโครงสร้างแนวดิ่ง TEM</div>
+      
+      <div class="screen-grid">
+        <div>
+          <div style="font-size: 11px; color:#cbd5e1; text-align:center; margin-bottom:4px;">โครงสร้างกล้องแนวดิ่ง (Column)</div>
+          <canvas id="rayCanvas" width="220" height="320"></canvas>
+        </div>
+        <div>
+          <div style="font-size: 11px; color:#cbd5e1; text-align:center; margin-bottom:4px;">ภาพตัวอย่างที่ฉากเรืองแสง (Fluorescent Screen)</div>
+          <canvas id="imageCanvas" width="240" height="320"></canvas>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>💡 หมายเหตุทางฟิสิกส์ TEM:</strong><br>
+        • **ลำอิเล็กตรอนจำกัดที่ฉาก:** ลำแสงจะบีบกว้าง/แคบลงบนฉากเรืองแสง ($Y = 290\text{px}$) ตามโฟกัส ไม่พุ่งล้นออกนอกจอ<br>
+        • **ตัวอย่างแบบโปร่งแสงอิเล็กตรอน:** ไวรัส โกลด์นาโน และกราฟีน มีความหนาบางพอที่ลำอิเล็กตรอนจะทะลุผ่าน (Transmitted) สร้างภาพ คอนทราสต์ ชัดเจน
+      </div>
+    </div>
+  </div>
+
+  <!-- ตารางบันทึกผลการทดลอง -->
+  <div class="card">
+    <div class="card-title">3. ตารางบันทึกผลการทดลอง (Data Table)</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ครั้งที่</th>
+            <th>ตัวอย่าง</th>
+            <th>$V$ (kV)</th>
+            <th>$B$ (T)</th>
+            <th>$\lambda$ (pm)</th>
+            <th>$d$ Resolution (nm)</th>
+            <th>กำลังขยาย ($M$)</th>
+            <th>สถานะโฟกัส</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable">
+          <!-- Data Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const rayCanvas = document.getElementById('rayCanvas');
+  const rayCtx = rayCanvas.getContext('2d');
+  const imgCanvas = document.getElementById('imageCanvas');
+  const imgCtx = imgCanvas.getContext('2d');
+
+  let recordCount = 0;
+
+  // ค่าคงที่ทางฟิสิกส์
+  const h = 6.626e-34;      // Planck constant (J*s)
+  const me = 9.109e-31;     // Electron mass (kg)
+  const e = 1.602e-19;      // Electron charge (C)
+
+  // ข้อมูลตัวอย่างทดสอบที่ใช้งานได้กับ TEM จริง
+  const sampleData = {
+    covid: { name: 'SARS-CoV-2 Virus', size_nm: 120, label: '100 nm', type: 'virus' },
+    gold_np: { name: 'Gold Nanoparticle', size_nm: 20, label: '20 nm', type: 'nanoparticle' },
+    graphene: { name: 'Graphene Lattice', size_nm: 0.25, label: '0.25 nm (Atoms)', type: 'atomic' }
+  };
+
+  function calculateOptics() {
+    const V_kV = parseFloat(document.getElementById('vRange').value);
+    const V = V_kV * 1000;
+    const B = parseFloat(document.getElementById('bRange').value);
+    const alpha = parseFloat(document.getElementById('aRange').value);
+    const sampleKey = document.getElementById('sampleSelect').value;
+
+    // 1. de Broglie Wavelength: lambda = h / sqrt(2 * me * e * V)
+    const lambda_m = h / Math.sqrt(2 * me * e * V);
+    const lambda_nm = lambda_m * 1e9;
+    const lambda_pm = lambda_m * 1e12;
+
+    // 2. Resolution Limit: d = lambda / (2 * alpha)
+    const res_m = lambda_m / (2 * alpha);
+    const res_nm = res_m * 1e9;
+
+    // 3. Focal length: f = k * (V / B^2)
+    const k_lens = 2.5e-8;
+    const f_mm = (k_lens * (V / (B * B))) * 1000;
+
+    // 4. Focal status (Optimal Focal Length = 20 mm)
+    const f_ideal = 20.0;
+    const focusError = Math.abs(f_mm - f_ideal);
+    
+    const baseMag = (V_kV / 80) * 300000;
+    const mag = Math.round(baseMag / (1 + (focusError / 8)));
+
+    let focusStatus = "โฟกัสชัดเจนพอดี";
+    if (f_mm > f_ideal + 3) focusStatus = "ภาพเบลอ (Under-focus)";
+    if (f_mm < f_ideal - 3) focusStatus = "ภาพเบลอ (Over-focus)";
+
+    return { V_kV, B, alpha, lambda_nm, lambda_pm, res_nm, f_mm, mag, focusError, focusStatus, sample: sampleData[sampleKey] };
+  }
+
+  function updateSim() {
+    const p = calculateOptics();
+
+    document.getElementById('vVal').innerText = p.V_kV + ' kV';
+    document.getElementById('bVal').innerText = p.B.toFixed(2) + ' Tesla';
+    document.getElementById('aVal').innerText = p.alpha.toFixed(3) + ' rad';
+
+    document.getElementById('lambdaVal').innerText = p.lambda_pm.toFixed(2) + ' pm';
+    document.getElementById('resVal').innerText = p.res_nm.toFixed(3) + ' nm';
+    document.getElementById('focalVal').innerText = p.f_mm.toFixed(1) + ' mm';
+    document.getElementById('magVal').innerText = p.mag.toLocaleString() + 'x';
+
+    drawVerticalTEMColumn(p);
+    drawTEMImage(p);
+  }
+
+  // วาดโครงสร้างกล้อง TEM แบบแนวดิ่ง (Vertical Column)
+  function drawVerticalTEMColumn(p) {
+    rayCtx.clearRect(0, 0, rayCanvas.width, rayCanvas.height);
+    const w = rayCanvas.width;
+    const cx = w / 2;
+    const screenY = 290; // ระดับ Y ของฉากรับภาพ
+
+    // 1. Electron Gun (ส่วนเร่งอิเล็กตรอน Y: 20)
+    rayCtx.fillStyle = '#ef4444';
+    rayCtx.beginPath();
+    rayCtx.arc(cx, 20, 10, 0, Math.PI * 2);
+    rayCtx.fill();
+    rayCtx.fillStyle = '#f8fafc';
+    rayCtx.font = '10px sans-serif';
+    rayCtx.fillText('e- Gun', cx + 18, 23);
+
+    // Anode Plate
+    rayCtx.fillStyle = '#64748b';
+    rayCtx.fillRect(cx - 30, 42, 20, 4);
+    rayCtx.fillRect(cx + 10, 42, 20, 4);
+
+    // 2. Condenser Lens (Y: 75)
+    drawMagneticLens(cx, 75, 'Condenser');
+
+    // 3. Specimen / Sample Stage (Y: 133)
+    rayCtx.fillStyle = '#facc15';
+    rayCtx.fillRect(cx - 35, 133, 70, 4);
+    rayCtx.fillText('Sample', cx + 40, 137);
+
+    // 4. Objective Lens (Y: 185)
+    drawMagneticLens(cx, 185, 'Objective (B)');
+
+    // 5. Fluorescent Screen (ฉากรับภาพด้านล่าง Y: 290)
+    rayCtx.fillStyle = '#10b981';
+    rayCtx.fillRect(cx - 50, screenY, 100, 6);
+    rayCtx.fillText('Screen', cx + 55, screenY + 5);
+
+    // --- วาดทางเดินลำแสงอิเล็กตรอน (Electron Beams) ---
+    rayCtx.strokeStyle = '#38bdf8';
+    rayCtx.lineWidth = 1.5;
+    rayCtx.shadowBlur = 6;
+    rayCtx.shadowColor = '#38bdf8';
+
+    // คำนวณจุดกระจายของลำแสงที่กระทบบนฉากรับภาพพอดี
+    const beamRadiusOnScreen = Math.min(48, Math.max(2, Math.abs(p.f_mm - 20) * 4));
+
+    rayCtx.beginPath();
+    // Gun -> Condenser
+    rayCtx.moveTo(cx, 20);
+    rayCtx.lineTo(cx - 15, 75);
+    rayCtx.moveTo(cx, 20);
+    rayCtx.lineTo(cx + 15, 75);
+
+    // Condenser -> Sample (ลำขนาน)
+    rayCtx.lineTo(cx + 15, 133);
+    rayCtx.moveTo(cx - 15, 75);
+    rayCtx.lineTo(cx - 15, 133);
+
+    // Sample -> Objective Lens
+    rayCtx.lineTo(cx - 25, 185);
+    rayCtx.moveTo(cx + 15, 133);
+    rayCtx.lineTo(cx + 25, 185);
+
+    // Objective Lens -> Screen (สิ้นสุดที่ Y = screenY)
+    rayCtx.lineTo(cx + beamRadiusOnScreen, screenY);
+    rayCtx.moveTo(cx - 25, 185);
+    rayCtx.lineTo(cx - beamRadiusOnScreen, screenY);
+
+    rayCtx.stroke();
+    rayCtx.shadowBlur = 0;
+  }
+
+  function drawMagneticLens(cx, y, label) {
+    rayCtx.fillStyle = '#334155';
+    rayCtx.strokeStyle = '#0284c7';
+    rayCtx.lineWidth = 1.5;
+
+    rayCtx.beginPath();
+    rayCtx.roundRect(cx - 45, y - 12, 22, 24, 4);
+    rayCtx.roundRect(cx + 23, y - 12, 22, 24, 4);
+    rayCtx.fill();
+    rayCtx.stroke();
+
+    rayCtx.fillStyle = '#94a3b8';
+    rayCtx.font = '9px sans-serif';
+    rayCtx.fillText(label, cx + 48, y + 3);
+  }
+
+  // วาดภาพตัวอย่างบนฉากเรืองแสงสไตล์ TEM
+  function drawTEMImage(p) {
+    imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
+    const w = imgCanvas.width;
+    const h = imgCanvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Background สไตล์ฉากเรืองแสง TEM เขียวมืด
+    imgCtx.fillStyle = '#022c22';
+    imgCtx.fillRect(0, 0, w, h);
+
+    // ระดับความเบลอตามโฟกัส และขีดจำกัดความละเอียด
+    const blurAmount = Math.min(10, p.focusError * 0.9 + (p.res_nm * 4));
+    imgCtx.filter = `blur(${blurAmount}px)`;
+
+    if (p.sample.type === 'virus') {
+      // 1. ไวรัสโควิด-19 (SARS-CoV-2): วงกลม + โปรตีนหนาม (Spike Proteins)
+      const radius = 45 * (p.mag / 300000);
+      
+      // ตัวไวรัสหลัก
+      imgCtx.fillStyle = '#34d399';
+      imgCtx.beginPath();
+      imgCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+      imgCtx.fill();
+
+      // โปรตีนหนาม (Spikes)
+      imgCtx.fillStyle = '#10b981';
+      const spikes = 14;
+      for (let i = 0; i < spikes; i++) {
+        const angle = (i * Math.PI * 2) / spikes;
+        const sx = cx + Math.cos(angle) * (radius + 10);
+        const sy = cy + Math.sin(angle) * (radius + 10);
+        imgCtx.beginPath();
+        imgCtx.arc(sx, sy, 4, 0, Math.PI * 2);
+        imgCtx.fill();
+
+        imgCtx.strokeStyle = '#10b981';
+        imgCtx.lineWidth = 2;
+        imgCtx.beginPath();
+        imgCtx.moveTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+        imgCtx.lineTo(sx, sy);
+        imgCtx.stroke();
+      }
+    } 
+    else if (p.sample.type === 'nanoparticle') {
+      // 2. อนุภาคทองนาโน (Gold Nanoparticles): คอนทราสต์ทึบแสงสูง เข้มชัดเจน
+      const size = 35 * (p.mag / 300000);
+      imgCtx.fillStyle = '#059669'; // คอนทราสต์ทึบแสงอิเล็กตรอน
+      
+      // อนุภาคหลัก 3 เม็ด
+      imgCtx.beginPath();
+      imgCtx.arc(cx - 20, cy - 10, size, 0, Math.PI * 2);
+      imgCtx.arc(cx + 25, cy + 15, size * 0.8, 0, Math.PI * 2);
+      imgCtx.arc(cx + 10, cy - 35, size * 0.6, 0, Math.PI * 2);
+      imgCtx.fill();
+    } 
+    else if (p.sample.type === 'atomic') {
+      // 3. กราฟีน (Graphene Lattice): โครงสร้างรังผึ้ง 6 เหลี่ยม (Hexagonal Atomic Grid)
+      const step = 18 * (p.mag / 300000);
+      imgCtx.strokeStyle = '#6ee7b7';
+      imgCtx.lineWidth = 1.2;
+
+      if (p.res_nm > 0.3) {
+        // ถ้าระยะแยกชัดไม่พอ จะมองไม่เห็นอะตอมชัดเจน
+        imgCtx.fillStyle = '#047857';
+        imgCtx.fillText('⚡ ต้องใช้วิธีเร่ง $V$ สูงขึ้นเพื่อดูโครงสร้างอะตอม', 15, cy);
+      } else {
+        for (let x = -w; x < w * 2; x += step * 3) {
+          for (let y = -h; y < h * 2; y += step * Math.sqrt(3)) {
+            drawHexagon(cx + x, cy + y, step);
+            drawHexagon(cx + x + step * 1.5, cy + y + (step * Math.sqrt(3))/2, step);
+          }
+        }
+      }
+    }
+
+    imgCtx.filter = 'none';
+
+    // สเกลวัดระยะบนจอ (Scale Bar)
+    imgCtx.fillStyle = '#ffffff';
+    imgCtx.fillRect(15, h - 25, 45, 3);
+    imgCtx.font = '11px sans-serif';
+    imgCtx.fillText(p.sample.label, 18, h - 10);
+  }
+
+  // วาดโครงสร้างรูป 6 เหลี่ยมของอะตอมคาร์บอนในกราฟีน
+  function drawHexagon(x, y, r) {
+    imgCtx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const hx = x + r * Math.cos(angle);
+      const hy = y + r * Math.sin(angle);
+      if (i === 0) imgCtx.moveTo(hx, hy);
+      else imgCtx.lineTo(hx, hy);
+    }
+    imgCtx.closePath();
+    imgCtx.stroke();
+  }
+
+  function recordData() {
+    const p = calculateOptics();
+    recordCount++;
+
+    const tbody = document.getElementById('resultTable');
+    let row = `
+      <tr>
+        <td>${recordCount}</td>
+        <td>${p.sample.name}</td>
+        <td>${p.V_kV}</td>
+        <td>${p.B.toFixed(2)}</td>
+        <td>${p.lambda_pm.toFixed(1)}</td>
+        <td>${p.res_nm.toFixed(3)}</td>
+        <td style="color:#38bdf8; font-weight:bold;">${p.mag.toLocaleString()}x</td>
+        <td style="color:${p.focusError < 2 ? '#4ade80' : '#f87171'};">${p.focusStatus}</td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+
+    const container = document.querySelector('.table-container');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  window.onload = () => {
+    updateSim();
+  };
+</script>
+
+</body>
+</html>

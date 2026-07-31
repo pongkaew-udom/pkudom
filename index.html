@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>พื้นที่แบ่งปันความรู้และเรื่องเล่า - พงษ์แก้ว อุดมสมุทรหิรัญ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; 
+    }
+    
+    body { 
+      display: flex; 
+      flex-direction: column; 
+      height: 100vh; 
+      background: #f8fafc; 
+      overflow: hidden; 
+    }
+    
+    /* ----------------------------------------------------
+       ✨ แถบเมนูด้านบนแนวนอน (Horizontal Navbar)
+    ---------------------------------------------------- */
+    .navbar { 
+      width: 100%; 
+      background: #0f172a; 
+      color: white; 
+      padding: 12px 24px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      z-index: 10;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .navbar h2 { 
+      font-family: 'Prompt', sans-serif;
+      font-size: 1.1rem; 
+      color: #38bdf8; 
+      white-space: nowrap;
+    }
+
+    .author-tag {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      border-left: 1px solid #334155;
+      padding-left: 12px;
+      white-space: nowrap;
+    }
+    
+    .lab-list { 
+      list-style: none; 
+      display: flex; 
+      flex-direction: row; 
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .lab-list::-webkit-scrollbar {
+      height: 4px;
+    }
+    .lab-list::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 2px;
+    }
+    
+    .lab-item { 
+      padding: 8px 16px; 
+      background: #1e293b; 
+      color: #e2e8f0;
+      border-radius: 6px; 
+      cursor: pointer; 
+      transition: all 0.25s ease; 
+      border-bottom: 3px solid transparent; 
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .lab-item:hover {
+      background: #334155;
+      border-bottom-color: #38bdf8;
+    }
+    
+    .lab-item.active { 
+      background: #0284c7; 
+      color: #ffffff;
+      border-bottom-color: #38bdf8; 
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+    }
+    
+    /* ----------------------------------------------------
+       ✨ พื้นที่แสดงผลด้านล่างตามแนวนอน (Main Viewer Area)
+    ---------------------------------------------------- */
+    .main-content { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* สไตล์เมื่อกดขยายเต็มจอของ Main Content */
+    .main-content.is-fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background: #f8fafc;
+    }
+
+    .header { 
+      height: 50px; 
+      background: white; 
+      border-bottom: 1px solid #e2e8f0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      padding: 0 24px; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+    }
+
+    .header h3 { 
+      font-family: 'Prompt', sans-serif;
+      color: #0f172a; 
+      font-size: 1rem; 
+      font-weight: 600;
+    }
+
+    /* ปุ่ม ย่อ-ขยาย หน้าจอ */
+    .expand-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Prompt', sans-serif;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .expand-btn:hover {
+      background: #0284c7;
+      color: white;
+      border-color: #0284c7;
+    }
+
+    .viewer { 
+      flex: 1; 
+      padding: 16px; 
+      background: #f1f5f9; 
+    }
+
+    iframe { 
+      width: 100%; 
+      height: 100%; 
+      border: none; 
+      border-radius: 10px; 
+      background: white; 
+      box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); 
+    }
+
+    /* ----------------------------------------------------
+       ✨ หน้าต่างเต็มจอสำหรับ Lab (แสดงผลตามแนวตั้ง)
+    ---------------------------------------------------- */
+    .fullscreen-modal {
+      display: none; 
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #0f172a;
+      z-index: 99999; 
+      flex-direction: column; 
+    }
+
+    .fullscreen-modal.active {
+      display: flex; 
+    }
+
+    .modal-bar {
+      height: 60px;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .modal-title {
+      font-family: 'Prompt', sans-serif;
+      font-size: 1.1rem;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* ปุ่มย้อนกลับ */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Prompt', sans-serif;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+
+    .back-btn:hover {
+      background: #0369a1;
+      transform: translateX(-2px);
+    }
+
+    .modal-body {
+      flex: 1;
+      padding: 12px;
+      background: #1e293b;
+      display: flex;
+      flex-direction: column; 
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบเมนูด้านบนแนวนอน (Horizontal Navbar) -->
+  <div class="navbar">
+    <div class="site-header">
+      <h2>📖 พื้นที่แบ่งปันความรู้และเรื่องเล่า</h2>
+      <p class="author-tag">โดย พงษ์แก้ว อุดมสมุทรหิรัญ</p>
+    </div>
+    
+    <ul id="lab-list" class="lab-list">
+      <!-- รายการเมนูจะถูกสร้างอัตโนมัติจาก JavaScript -->
+    </ul>
+  </div>
+
+  <!-- หน้าจอแสดงผลเนื้อหาด้านล่างตามแนวนอน (Main Content Frame) -->
+  <div id="main-content" class="main-content">
+    <div class="header">
+      <h3 id="lab-title">กำลังโหลดเนื้อหา...</h3>
+      <!-- ปุ่ม ย่อ-ขยาย หน้าต่าง -->
+      <button id="toggle-expand-btn" class="expand-btn" onclick="toggleMainFullscreen()">
+        ⛶ ขยายเต็มจอ
+      </button>
+    </div>
+    <div class="viewer">
+      <iframe id="lab-frame" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <!-- 🚀 หน้าต่างลอยทับเต็มจอสำหรับแสดงผลเนื้อหา Lab ตามแนวตั้ง -->
+  <div id="fullscreen-modal" class="fullscreen-modal">
+    <div class="modal-bar">
+      <button class="back-btn" onclick="closeLabModal()">
+        &#8592; ย้อนกลับหน้าสารบัญ Virtual Lab
+      </button>
+      <div id="modal-title-text" class="modal-title">🧪 Virtual Lab Experience</div>
+    </div>
+    <div class="modal-body">
+      <iframe id="modal-frame" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // 📌 ข้อมูลรายการเมนู (ตัดส่วนนิยายออกแล้ว)
+    const labs = [
+      { title: "📚 บทความความรู้", url: "pk-m-2.html" },
+      { title: "🧪 Virtual Lab", url: "pk-virtual-1.html" },
+      { title: "👨‍💻 เกี่ยวกับผู้เขียน", url: "pk-me-2.html" },
+      { title: "☕ สนับสนุนผู้เขียน", url: "4.html" }
+    ];
+
+    const labListEl = document.getElementById('lab-list');
+    const labFrame = document.getElementById('lab-frame');
+    const labTitle = document.getElementById('lab-title');
+    const mainContent = document.getElementById('main-content');
+    const toggleExpandBtn = document.getElementById('toggle-expand-btn');
+    
+    const fullscreenModal = document.getElementById('fullscreen-modal');
+    const modalFrame = document.getElementById('modal-frame');
+    const modalTitleText = document.getElementById('modal-title-text');
+
+    // สร้างรายการเมนูด้านบนแนวนอน
+    labs.forEach((lab, index) => {
+      const li = document.createElement('li');
+      li.className = 'lab-item';
+      li.innerText = lab.title;
+      li.onclick = () => selectLab(lab, li);
+      labListEl.appendChild(li);
+
+      if (index === 0) {
+        selectLab(lab, li);
+      }
+    });
+
+    function selectLab(lab, element) {
+      document.querySelectorAll('.lab-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+
+      labFrame.src = lab.url;
+      labTitle.innerText = lab.title;
+    }
+
+    // 💡 ฟังก์ชันสลับ ย่อ-ขยาย หน้าต่างอ่านเนื้อหา
+    function toggleMainFullscreen() {
+      mainContent.classList.toggle('is-fullscreen');
+      if (mainContent.classList.contains('is-fullscreen')) {
+        toggleExpandBtn.innerHTML = '🗗 ย่อขนาด';
+      } else {
+        toggleExpandBtn.innerHTML = '⛶ ขยายเต็มจอ';
+      }
+    }
+
+    // 💡 ฟังก์ชันเปิดหน้าการทดลองแบบเต็มจอ (แสดงผลแนวตั้ง)
+    function openFullscreenLab(labUrl, labName) {
+      modalFrame.src = labUrl;
+      modalTitleText.innerText = labName || "🧪 Virtual Lab Experience";
+      fullscreenModal.classList.add('active');
+    }
+
+    // ฟังก์ชันสำหรับปุ่ม "ย้อนกลับหน้าสารบัญ"
+    function closeLabModal() {
+      fullscreenModal.classList.remove('active');
+      modalFrame.src = "about:blank"; // ปิดและเคลียร์หน้าแลป
+    }
+
+    // 📩 ระบบรอรับข้อความสั่งเปิดแลปจากหน้า Index (Lab/pk-virtual-1.html)
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'OPEN_LAB') {
+        openFullscreenLab(event.data.url, event.data.title);
+      }
+    });
+  </script>
+</body>
+</html>
