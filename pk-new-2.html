@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Lab Hub </title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { display: flex; height: 100vh; background: #f8fafc; overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 280px; background: #0f172a; color: white; padding: 20px; display: flex; flex-direction: column; }
+    .sidebar h2 { font-size: 1.3rem; margin-bottom: 24px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .lab-list { list-style: none; overflow-y: auto; flex: 1; }
+    .lab-item { padding: 14px 16px; margin-bottom: 8px; background: #1e293b; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; border-left: 4px solid transparent; }
+    .lab-item:hover, .lab-item.active { background: #0284c7; border-left-color: #38bdf8; transform: translateX(4px); }
+    
+    /* Main Viewer */
+    .main-content { flex: 1; display: flex; flex-direction: column; }
+    .header { height: 60px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .header h3 { color: #1e293b; font-size: 1.1rem; }
+    .viewer { flex: 1; padding: 16px; background: #f1f5f9; }
+    iframe { width: 100%; height: 100%; border: none; border-radius: 12px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2> 💬 ประกาศ </h2>
+  <h5>โดย พงษ์แก้ว อุดมสมุทรหิรัญ </h5>
+    <ul id="lab-list" class="lab-list">
+      <!-- รายชื่อแลปจะถูกสร้างอัตโนมัติจาก JavaScript ด้านล่าง -->
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h3 id="lab-title">กรุณาเลือกการทดลองจากเมนูด้านซ้าย</h3>
+    </div>
+    <div class="viewer">
+      <iframe id="lab-frame" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // 📌 ข้อมูลการทดลองทั้งหมด (เพิ่ม/ลบ แลปได้ที่นี่)
+    const labs = [
+      { title:  " 💬 ข้อเสนอเเนะ", url: "new-1.html" }
+       
+    ];
+
+    const labListEl = document.getElementById('lab-list');
+    const labFrame = document.getElementById('lab-frame');
+    const labTitle = document.getElementById('lab-title');
+
+    // สร้างเมนูด้านซ้ายอัตโนมัติ
+    labs.forEach((lab, index) => {
+      const li = document.createElement('li');
+      li.className = 'lab-item';
+      li.innerText = lab.title;
+      li.onclick = () => selectLab(lab, li);
+      labListEl.appendChild(li);
+
+      // เปิดแลปแรกเป็นค่าเริ่มต้น
+      if (index === 0) {
+        selectLab(lab, li);
+      }
+    });
+
+    function selectLab(lab, element) {
+      // เปลี่ยน iframe และหัวข้อ
+      labFrame.src = lab.url;
+      labTitle.innerText = lab.title;
+
+      // จัดการ Active Class ของเมนู
+      document.querySelectorAll('.lab-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+    }
+  </script>
+</body>
+</html>
