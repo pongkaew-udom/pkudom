@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> รศ.ดร.พงษ์แก้ว อุดมสมุทรหิรัญ</title>
+    <style>
+        :root {
+            --primary-color: #1a365d; /* Dark Blue for Academia */
+            --secondary-color: #c05621; /* Accent Orange/Brown for distinction */
+            --text-color: #2d3748;
+            --light-bg: #f7fafc;
+            --white: #ffffff;
+            --accent-light: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif, 'Sarabun', sans-serif; /* Fallback to Sarabun for Thai */
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: 12px;
+        }
+
+        /* --- Header Section --- */
+        header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-light);
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .portrait-container {
+            flex: 0 0 180px; /* Fixed width for portrait */
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--primary-color);
+            background-color: var(--white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .portrait-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        header .title-area {
+            flex: 1;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        header h2 {
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* --- Main Content Section --- */
+        main p.bio {
+            font-size: 1.1em;
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+
+        /* --- Sections Style --- */
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2.section-title {
+            font-size: 1.6em;
+            color: var(--primary-color);
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 15px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* --- MEB Books Grid --- */
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .book-item {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-light);
+            transition: transform 0.2s ease;
+        }
+
+        .book-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .book-item span.icon {
+            font-size: 1.3em;
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+
+        .book-item .book-title {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .book-item .book-desc {
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .meb-link-callout {
+            margin-top: 25px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .meb-link-callout a {
+            color: var(--white);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* --- Chula Books List --- */
+        .chula-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .chula-item {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .chula-item:before {
+            content: '🏛️';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--primary-color);
+        }
+
+        /* --- YouTube Section --- */
+        .youtube-callout {
+            background-color: #ffeeee; /* Very light red */
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ffcccc;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .youtube-icon {
+            font-size: 3em;
+            color: #ff0000;
+        }
+
+        .youtube-text h3 {
+            margin: 0 0 10px 0;
+            color: #ff0000;
+        }
+
+        .youtube-text p {
+            margin: 0;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            .portrait-container {
+                flex: 0 0 150px;
+                height: 150px;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+            .book-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="portrait-container">
+            <pk-01.jpg.>
+            <img src="URL_OF_YOUR_IMAGE_HERE.jpg" alt="รองศาสตราจารย์ ดร.พงษ์แก้ว อุดมสมุทรหิรัญ">
+        </div>
+        <div class="title-area">
+            <h1>รองศาสตราจารย์ ดร.พงษ์แก้ว อุดมสมุทรหิรัญ</h1>
+            <h2>อาจารย์ประจำภาควิชาฟิสิกส์ </h2>
+        </div>
+    </header>
+
+    <main>
+        <p class="bio">
+            รองศาสตราจารย์ ดร.พงษ์แก้ว อุดมสมุทรหิรัญ เป็นอาจารย์ประจำภาควิชาฟิสิกส์เป็นผู้เชี่ยวชาญพิเศษด้านฟิสิกส์ทฤษฎีและฟิสิกส์สถานะของแข็ง โดยเฉพาะงานวิจัยเกี่ยวกับ "ตัวนำยวดยิ่ง" (Superconductors) ที่ได้ทุ่มเทสร้างสรรค์ผลงานวิจัย ตำราวิชาการ และสื่อการเรียนรู้เพื่อถ่ายทอดฟิสิกส์ให้เป็นเรื่องใกล้ตัว
+        </p>
+
+        <section>
+            <h2 class="section-title">📚 ผลงานหนังสือบน MEB (E-Book)</h2>
+            <p>ท่านได้ถ่ายทอดความรู้ทางวิทยาศาสตร์และฟิสิกส์ผ่าน E-Book บนแพลตฟอร์ม MEB โดยมุ่งเน้นการเล่าเรื่องที่เข้าใจง่าย สนุก และนำไปปรับใช้ในชีวิตประจำวันได้ ผลงานทั้งหมดประกอบด้วย:</p>
+            <ul class="book-list">
+                <li class="book-item"><span class="icon">💡</span><span class="book-title">จากสมการสู่นวัตกรรม</span><span class="book-desc">— อธิบายแนวคิดพื้นฐานทางฟิสิกส์ที่ต่อยอดไปสู่นวัตกรรมรอบตัว</span></li>
+                <li class="book-item"><span class="icon">🔋</span><span class="book-title">เซลล์สุดท้าย</span><span class="book-desc">— ถ่ายทอดความรู้เชิงวิชาการเรื่องแบตเตอรี่ผ่านมุมมองงานวิจัยและเรื่องเล่า</span></li>
+                <li class="book-item"><span class="icon">🪐</span><span class="book-title">อยู่อย่างเข้าใจฟิสิกส์</span><span class="book-desc">— ปรัชญาและการมองโลกผ่านมุมมองของฟิสิกส์</span></li>
+                <li class="book-item"><span class="icon">📐</span><span class="book-title">กลศาสตร์แบบลากรานจ์</span><span class="book-desc">— ตำราฟิสิกส์ทฤษฎีขั้นสูงในรูปแบบอ่านง่าย</span></li>
+                <li class="book-item"><span class="icon">📈</span><span class="book-title">มองคริปโต ด้วยโมเมนตัม</span><span class="book-desc">— ประยุกต์หลักการทางฟิสิกส์เข้ากับการวิเคราะห์การลงทุน</span></li>
+                <li class="book-item"><span class="icon">🌍</span><span class="book-title">เข้าใจวัสดุ เข้าใจโลก</span><span class="book-desc">— เรียนรู้คุณสมบัติของวัสดุที่มีผลต่อการพัฒนาเทคโนโลยีโลก</span></li>
+                <li class="book-item"><span class="icon">⚡</span><span class="book-title">ตัวนำยวดยิ่งขั้นต้น</span><span class="book-desc">— ปูพื้นฐานความเข้าใจเรื่องตัวนำยวดยิ่งสำหรับผู้เริ่มต้น</span></li>
+                <li class="book-item"><span class="icon">📖</span><span class="book-title">อภิธานศัพท์ตัวนำยวดยิ่ง</span><span class="book-desc">— รวบรวมและรวบรัดคำศัพท์เฉพาะทางด้านตัวนำยวดยิ่ง</span></li>
+            </ul>
+            <div class="meb-link-callout">
+                🛒 รับชมและอ่านผลงาน E-book ทั้งหมดได้ที่: <a href="https://www.mebmarket.com/" target="_blank">mebmarket.com</a>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">🏛️ ผลงานหนังสือ ณ ศูนย์หนังสือจุฬาลงกรณ์มหาวิทยาลัย</h2>
+            <p>ท่านมีผลงานตำราและหนังสือวิชาการที่ได้รับการยอมรับในระดับอุดมศึกษา ตีพิมพ์และจัดจำหน่ายผ่านศูนย์หนังสือจุฬาฯ ได้แก่:</p>
+            <ul class="chula-list">
+                <li class="chula-item"><strong>ตัวนำยวดยิ่งพื้นฐาน (สำนักพิมพ์แห่งจุฬาลงกรณ์มหาวิทยาลัย)</strong> — ตำราหลักที่รวบรวมทฤษฎีและเนื้อหาสำคัญเกี่ยวกับตัวนำยวดยิ่งไว้อย่างเป็นระบบ</li>
+                <li class="chula-item"><strong>การสร้างงานวิจัยแบบนักฟิสิกส์</strong> — หนังสือแนะแนวคิด กระบวนการคิด และขั้นตอนการสร้างสรรค์ผลงานวิจัยทางวิทยาศาสตร์อย่างมีประสิทธิภาพ</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="section-title">🎥 ช่องทางการเรียนรู้บน YouTube</h2>
+            <div class="youtube-callout">
+                <div class="youtube-icon">🔴</div>
+                <div class="youtube-text">
+                    <h3>Science in Story</h3>
+                    <p>ช่องถ่ายทอดเรื่องราวทางวิทยาศาสตร์ ฟิสิกส์ และนวัตกรรมในรูปแบบเรื่องเล่าที่ฟังง่าย เข้าใจสนุก</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>
