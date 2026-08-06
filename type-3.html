@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: การทดลองเรื่อง คานอันดับที่ 3</title>
+    <!-- Sarabun Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #0f172a;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --border-color: #e2e8f0;
+            --accent-load: #ef4444;   /* สีแดงสำหรับวัตถุ */
+            --accent-effort: #10b981; /* สีเขียวสำหรับแรงดึงขึ้น */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Layout Grid */
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 900px) {
+            .lab-grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 8px;
+        }
+
+        /* Controls Form */
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .control-group label span.val {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e1;
+            outline: none;
+            accent-color: var(--primary-color);
+        }
+
+        /* Canvas / Visualizer Area */
+        .visualizer-container {
+            width: 100%;
+            height: 320px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Calculated Results Display */
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .res-box {
+            background-color: #f1f5f9;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .res-box .title {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .res-box .number {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .res-box.highlight {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+        }
+
+        .res-box.highlight .number {
+            color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 18px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            margin-top: 8px;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* Data Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .status-tag {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-balanced { background-color: #d1fae5; color: #047857; }
+        .status-unbalanced { background-color: #fee2e2; color: #b91c1c; }
+
+        /* Formula Info Box */
+        .info-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🧪 Virtual Lab: การทดลองเรื่อง คานอันดับที่ 3 (Third-Class Lever)</h1>
+        <p class="subtitle">แรงพยายาม (Effort) อยู่ตรงกลางระหว่าง จุดหมุน (Fulcrum) และ วัตถุ (Load)</p>
+    </header>
+
+    <div class="lab-grid">
+        
+        <!-- Left Panel: Controls -->
+        <div>
+            <div class="card">
+                <div class="card-title">⚙️ ตั้งค่าพารามิเตอร์</div>
+                
+                <!-- Effort Force (E) -->
+                <div class="control-group">
+                    <label>
+                        <span>แรงพยายามพยุงขึ้น (Effort: E)</span>
+                        <span class="val" id="val-e">300 N</span>
+                    </label>
+                    <input type="range" id="input-e" min="10" max="600" step="10" value="300">
+                </div>
+
+                <!-- Distance to Effort (d2) -->
+                <div class="control-group">
+                    <label>
+                        <span>ระยะแรงพยายามถึงจุดหมุน (d2)</span>
+                        <span class="val" id="val-d2">1.5 m</span>
+                    </label>
+                    <input type="range" id="input-d2" min="0.5" max="4.5" step="0.1" value="1.5">
+                </div>
+
+                <hr style="margin: 15px 0; border: none; border-top: 1px dashed var(--border-color);">
+
+                <!-- Weight (Load) -->
+                <div class="control-group">
+                    <label>
+                        <span>น้ำหนักวัตถุ (Load: W)</span>
+                        <span class="val" id="val-w">100 N</span>
+                    </label>
+                    <input type="range" id="input-w" min="10" max="500" step="10" value="100">
+                </div>
+
+                <!-- Distance to Load (d1) -->
+                <div class="control-group">
+                    <label>
+                        <span>ระยะวัตถุถึงจุดหมุน (d1)</span>
+                        <span class="val" id="val-d1">4.5 m</span>
+                    </label>
+                    <input type="range" id="input-d1" min="0.5" max="5.0" step="0.1" value="4.5">
+                </div>
+
+                <button class="btn" id="btn-add-data">📌 บันทึกผลการทดลองนี้</button>
+            </div>
+
+            <!-- Formula Info -->
+            <div class="card">
+                <div class="card-title">📚 คุณสมบัติของคานอันดับ 3</div>
+                <div class="info-box">
+                    • <strong>จุดหมุน (Fulcrum)</strong> อยู่ที่ปลายด้านหนึ่ง<br>
+                    • <strong>แรงพยายาม (E)</strong> ออกแรงดึงขึ้นอยู่ตรงกลาง<br>
+                    • <strong>วัตถุ (W)</strong> อยู่ปลายสุดอีกด้านกดลง<br>
+                    • เนื่องจาก <code>d2 < d1</code> เสมอ คานประเภทนี้จึง <strong>ไม่ผ่อนแรง (MA < 1)</strong> เน้นเพิ่มความสะดวกและระยะการเคลื่อนที่<br><br>
+                    <strong>สภาวะสมดุล:</strong> <code>W × d1 = E × d2</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Visualizer & Data Table -->
+        <div>
+            <!-- Visualizer Card -->
+            <div class="card">
+                <div class="card-title">🖥️ การจำลองแบบเรียลไทม์ (Simulation)</div>
+                <div class="visualizer-container">
+                    <canvas id="leverCanvas"></canvas>
+                </div>
+
+                <!-- Dynamic Calculated Results -->
+                <div class="calc-results">
+                    <div class="res-box">
+                        <div class="title">โมเมนต์ตาม (W × d1)</div>
+                        <div class="number" id="res-m1">450 N·m</div>
+                    </div>
+                    <div class="res-box">
+                        <div class="title">โมเมนต์ทวน (E × d2)</div>
+                        <div class="number" id="res-m2">450 N·m</div>
+                    </div>
+                    <div class="res-box highlight">
+                        <div class="title">การได้เปรียบเชิงกล (MA)</div>
+                        <div class="number" id="res-ma">0.33</div>
+                    </div>
+                    <div class="res-box">
+                        <div class="title">สถานะคาน</div>
+                        <div class="number" id="res-status" style="font-size: 1rem; color: #10b981;">สมดุล</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card">
+                <div class="card-title" style="justify-content: space-between;">
+                    <span>📊 ตารางบันทึกผลการทดลอง</span>
+                    <button class="btn btn-danger" id="btn-clear-table" style="width: auto; padding: 4px 12px; font-size: 0.8rem;">ล้างตาราง</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>น้ำหนัก W (N)</th>
+                                <th>ระยะ d1 (m)</th>
+                                <th>แรง E (N)</th>
+                                <th>ระยะ d2 (m)</th>
+                                <th>MA (d2/d1)</th>
+                                <th>MA (W/E)</th>
+                                <th>สภาวะสมดุล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Canvas & Context
+    const canvas = document.getElementById('leverCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // DOM Inputs
+    const inputW = document.getElementById('input-w');
+    const inputD1 = document.getElementById('input-d1');
+    const inputE = document.getElementById('input-e');
+    const inputD2 = document.getElementById('input-d2');
+
+    // DOM Displays
+    const valW = document.getElementById('val-w');
+    const valD1 = document.getElementById('val-d1');
+    const valE = document.getElementById('val-e');
+    const valD2 = document.getElementById('val-d2');
+
+    // DOM Calc Results
+    const resM1 = document.getElementById('res-m1');
+    const resM2 = document.getElementById('res-m2');
+    const resMA = document.getElementById('res-ma');
+    const resStatus = document.getElementById('res-status');
+
+    // Buttons & Table
+    const btnAddData = document.getElementById('btn-add-data');
+    const btnClearTable = document.getElementById('btn-clear-table');
+    const tableBody = document.querySelector('#data-table tbody');
+
+    let experimentCount = 0;
+
+    // Resize Canvas dynamically
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        drawLever();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Get current values
+    function getValues() {
+        let d1Val = parseFloat(inputD1.value);
+        let d2Val = parseFloat(inputD2.value);
+
+        // ในคานอันดับ 3 ระยะ d2 (แรงพยายาม) ต้องไม่เกิน d1 (วัตถุ)
+        if (d2Val > d1Val) {
+            d2Val = d1Val;
+            inputD2.value = d1Val;
+        }
+
+        return {
+            W: parseFloat(inputW.value),
+            d1: d1Val,
+            E: parseFloat(inputE.value),
+            d2: d2Val
+        };
+    }
+
+    // Update labels and calculated values
+    function updateCalculations() {
+        const { W, d1, E, d2 } = getValues();
+
+        // Update Labels
+        valW.textContent = `${W} N`;
+        valD1.textContent = `${d1.toFixed(1)} m`;
+        valE.textContent = `${E} N`;
+        valD2.textContent = `${d2.toFixed(1)} m`;
+
+        // Calculate Moments
+        const momentLoad = W * d1;     // Clockwise (กดคานลง)
+        const momentEffort = E * d2;   // Counter-clockwise (ดึงคานขึ้น)
+        
+        const maIdeal = d2 / d1;
+
+        resM1.textContent = `${momentLoad.toFixed(0)} N·m`;
+        resM2.textContent = `${momentEffort.toFixed(0)} N·m`;
+        resMA.textContent = maIdeal.toFixed(2);
+
+        // Balance Check
+        const diff = momentEffort - momentLoad;
+        if (Math.abs(diff) < 1) {
+            resStatus.textContent = "สมดุล (Balanced)";
+            resStatus.style.color = "#10b981";
+        } else if (diff > 0) {
+            resStatus.textContent = "เอียงขึ้น (แรงยกมากกว่า)";
+            resStatus.style.color = "#ef4444";
+        } else {
+            resStatus.textContent = "เอียงลง (น้ำหนักกดมากกว่า)";
+            resStatus.style.color = "#ef4444";
+        }
+
+        drawLever();
+    }
+
+    // Draw Lever Simulation on Canvas
+    function drawLever() {
+        const { W, d1, E, d2 } = getValues();
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Fulcrum point (อยู่ฝั่งซ้ายสุด)
+        const fulcrumX = 80;
+        const fulcrumY = height / 2 + 40;
+
+        // Calculate Rotation Angle based on Moment difference
+        const momentLoad = W * d1;
+        const momentEffort = E * d2;
+        const diff = momentEffort - momentLoad;
+        
+        // Limit max tilt angle to +/- 15 degrees
+        let angle = (-diff / 5000) * (Math.PI / 12);
+        angle = Math.max(-Math.PI / 12, Math.min(Math.PI / 12, angle));
+
+        // Scale meters to pixels
+        const scalePx = (width - 150) / 5.5;
+
+        // --- Draw Ground & Fulcrum ---
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(fulcrumX - 40, fulcrumY + 30, 100, 8); // Ground base
+
+        // Fulcrum Triangle (จุดหมุนฝั่งซ้าย)
+        ctx.beginPath();
+        ctx.moveTo(fulcrumX, fulcrumY);
+        ctx.lineTo(fulcrumX - 25, fulcrumY + 30);
+        ctx.lineTo(fulcrumX + 25, fulcrumY + 30);
+        ctx.closePath();
+        ctx.fillStyle = '#0f172a';
+        ctx.fill();
+
+        // Label Fulcrum
+        ctx.font = '12px Sarabun';
+        ctx.fillStyle = '#475569';
+        ctx.textAlign = 'center';
+        ctx.fillText('จุดหมุน', fulcrumX, fulcrumY + 48);
+
+        // --- Draw Lever Beam (Rotated around Fulcrum) ---
+        ctx.save();
+        ctx.translate(fulcrumX, fulcrumY);
+        ctx.rotate(angle);
+
+        // Beam
+        const beamLength = 5.5 * scalePx;
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(0, -6, beamLength, 12);
+
+        // --- Draw Effort (E) in the Middle (Pulling UP) ---
+        const effortX = d2 * scalePx;
+        const arrowLen = Math.min(20 + E * 0.08, 50);
+
+        // Effort Force Arrow (Pulling UP)
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(effortX, 6);
+        ctx.lineTo(effortX, -arrowLen - 10);
+        ctx.stroke();
+
+        // Arrow Head pointing UP
+        ctx.beginPath();
+        ctx.moveTo(effortX - 6, -arrowLen);
+        ctx.lineTo(effortX, -arrowLen - 12);
+        ctx.lineTo(effortX + 6, -arrowLen);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+
+        // Label Effort E
+        ctx.fillStyle = '#10b981';
+        ctx.font = 'bold 12px Sarabun';
+        ctx.fillText(`E = ${E}N`, effortX, -arrowLen - 20);
+
+        // --- Draw Load (W) at the End (Pushing Down) ---
+        const loadX = d1 * scalePx;
+        const boxSize = Math.min(20 + W * 0.08, 50);
+        
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(loadX - boxSize / 2, -6 - boxSize, boxSize, boxSize);
+        
+        // Label Load W
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Sarabun';
+        ctx.fillText(`${W}N`, loadX, -12 - boxSize / 2);
+
+        // Load Arrow (Pushing down)
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(loadX, -6 - boxSize);
+        ctx.lineTo(loadX, -30 - boxSize);
+        ctx.stroke();
+
+        // Distance indicators (d1 and d2)
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        // d2 line (Effort)
+        ctx.beginPath();
+        ctx.moveTo(0, 20);
+        ctx.lineTo(effortX, 20);
+        ctx.stroke();
+        ctx.fillStyle = '#10b981';
+        ctx.fillText(`d2 = ${d2.toFixed(1)}m`, effortX / 2, 35);
+
+        // d1 line (Load)
+        ctx.beginPath();
+        ctx.moveTo(0, 45);
+        ctx.lineTo(loadX, 45);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText(`d1 = ${d1.toFixed(1)}m`, loadX / 2, 60);
+
+        ctx.restore();
+    }
+
+    // Add Record to Table
+    function addDataToTable() {
+        const { W, d1, E, d2 } = getValues();
+        const momentLoad = W * d1;
+        const momentEffort = E * d2;
+        const isBalanced = Math.abs(momentEffort - momentLoad) < 1;
+
+        const maIdeal = (d2 / d1).toFixed(2);
+        const maReal = (W / E).toFixed(2);
+
+        experimentCount++;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${experimentCount}</td>
+            <td>${W}</td>
+            <td>${d1.toFixed(1)}</td>
+            <td>${E}</td>
+            <td>${d2.toFixed(1)}</td>
+            <td><strong>${maIdeal}</strong></td>
+            <td><strong>${maReal}</strong></td>
+            <td>
+                <span class="status-tag ${isBalanced ? 'status-balanced' : 'status-unbalanced'}">
+                    ${isBalanced ? 'สมดุล' : 'ไม่สมดุล'}
+                </span>
+            </td>
+        `;
+
+        tableBody.appendChild(tr);
+    }
+
+    // Event Listeners for Controls
+    [inputW, inputD1, inputE, inputD2].forEach(input => {
+        input.addEventListener('input', updateCalculations);
+    });
+
+    btnAddData.addEventListener('click', addDataToTable);
+
+    btnClearTable.addEventListener('click', () => {
+        tableBody.innerHTML = '';
+        experimentCount = 0;
+    });
+
+    // Initial Setup
+    setTimeout(() => {
+        resizeCanvas();
+        updateCalculations();
+    }, 100);
+
+</script>
+
+</body>
+</html>
