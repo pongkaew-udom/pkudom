@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การรวมเวกเตอร์และการแตกองค์ประกอบ (Vector Decomposition)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --vector-r: #dc2626;
+            --vector-x: #2563eb;
+            --vector-y: #16a34a;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --success: #10b981;
+            --success-dark: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .lab-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .lab-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .control-label span.val {
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: #f1f5f9;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-save {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: var(--success-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-reset {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border);
+        }
+
+        .btn-reset:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            background-color: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .calculation-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .calc-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .calc-row .label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .color-dot.r { background: var(--vector-r); }
+        .color-dot.x { background: var(--vector-x); }
+        .color-dot.y { background: var(--vector-y); }
+
+        .calc-val {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .checkbox-label input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Result Table Section Styling */
+        .table-card {
+            grid-column: 1 / -1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            margin-top: 8px;
+        }
+
+        .table-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .table-card h3 {
+            font-size: 1.15rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 0.95rem;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .results-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .results-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: #0f172a;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .empty-row td {
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .highlight-r {
+            color: var(--vector-r);
+            font-weight: bold;
+        }
+
+        .highlight-x {
+            color: var(--vector-x);
+            font-weight: bold;
+        }
+
+        .highlight-y {
+            color: var(--vector-y);
+            font-weight: bold;
+        }
+
+        .formula-note {
+            margin-top: 12px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>การรวมเวกเตอร์และการแตกองค์ประกอบ (Vector Decomposition)</h1>
+        <p>ทดลองปรับขนาดแรง (r) และมุม (θ) เพื่อเรียนรู้การหาองค์ประกอบบนแกน X (ทิศตะวันออก) และแกน Y (ทิศเหนือ)</p>
+    </header>
+
+    <div class="lab-layout">
+        <div class="canvas-card">
+            <div class="canvas-container">
+                <canvas id="vectorCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="controls-card">
+            <!-- Preset Button -->
+            <div class="control-group">
+                <label class="control-label">การตั้งค่าตัวอย่าง</label>
+                <div class="presets">
+                    <button class="btn-preset" onclick="setPreset(20, 67.5)">ค่าตั้งต้น (20m, 67.5°)</button>
+                    <button class="btn-preset" onclick="setPreset(25, 30)">30 องศา (25m, 30°)</button>
+                    <button class="btn-preset" onclick="setPreset(30, 45)">45 องศา (30m, 45°)</button>
+                </div>
+            </div>
+
+            <!-- R Slider -->
+            <div class="control-group">
+                <div class="control-label">
+                    <span>ความยาวเวกเตอร์ (r):</span>
+                    <span class="val" id="rVal">20.0 m</span>
+                </div>
+                <input type="range" id="rSlider" min="5" max="40" step="0.5" value="20">
+            </div>
+
+            <!-- Theta Slider -->
+            <div class="control-group">
+                <div class="control-label">
+                    <span>มุมทำกับแกน X (θ):</span>
+                    <span class="val" id="thetaVal">67.5°</span>
+                </div>
+                <input type="range" id="thetaSlider" min="0" max="360" step="0.5" value="67.5">
+            </div>
+
+            <!-- Action Buttons: Save & Reset -->
+            <div class="action-buttons">
+                <button class="btn-action btn-save" onclick="saveRecord()">
+                    📥 บันทึกผลลงตาราง
+                </button>
+                <button class="btn-action btn-reset" onclick="resetControls()">
+                    ↺ รีเซ็ตค่า
+                </button>
+            </div>
+
+            <!-- Calculations -->
+            <div class="calculation-card">
+                <div class="calc-title">การคำนวณปัจจุบัน</div>
+                <div class="calc-row">
+                    <span class="label"><span class="color-dot r"></span> เวกเตอร์หลัก (r):</span>
+                    <span class="calc-val" id="calcR">20.00 m</span>
+                </div>
+                <div class="calc-row">
+                    <span class="label"><span class="color-dot x"></span> แกน X (r cos θ):</span>
+                    <span class="calc-val" style="color: var(--vector-x);" id="calcX">7.65 m</span>
+                </div>
+                <div class="calc-row">
+                    <span class="label"><span class="color-dot y"></span> แกน Y (r sin θ):</span>
+                    <span class="calc-val" style="color: var(--vector-y);" id="calcY">18.48 m</span>
+                </div>
+            </div>
+
+            <!-- Display Toggles -->
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showComponents" checked> แสดงเส้นองค์ประกอบ (Component Vectors)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showGrid" checked> แสดงตารางพิกัด (Grid)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showDashed" checked> แสดงเส้นประกล่อง (Bounding Box)
+                </label>
+            </div>
+        </div>
+
+        <!-- Table Recording Results Section -->
+        <div class="table-card">
+            <div class="table-header-container">
+                <h3>📊 ตารางบันทึกผลการคำนวณเวกเตอร์</h3>
+                <button class="btn-clear" onclick="clearTable()">ล้างประวัติตาราง</button>
+            </div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>ครั้งที่</th>
+                        <th>เวกเตอร์หลัก (r)</th>
+                        <th>มุมทำกับแกน X (θ)</th>
+                        <th>ค่าในแกน X (x = r cos θ)</th>
+                        <th>ค่าในแกน Y (y = r sin θ)</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                    <!-- Dynamic Records Will Be Inserted Here -->
+                </tbody>
+            </table>
+            <div class="formula-note">
+                <strong>หลักการคำนวณทางคณิตศาสตร์:</strong><br>
+                • แกน X (ทิศตะวันออก): <i>x = r × cos(θ)</i><br>
+                • แกน Y (ทิศเหนือ): <i>y = r × sin(θ)</i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('vectorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const rSlider = document.getElementById('rSlider');
+    const thetaSlider = document.getElementById('thetaSlider');
+
+    const rVal = document.getElementById('rVal');
+    const thetaVal = document.getElementById('thetaVal');
+
+    const calcR = document.getElementById('calcR');
+    const calcX = document.getElementById('calcX');
+    const calcY = document.getElementById('calcY');
+
+    const recordsTableBody = document.getElementById('recordsTableBody');
+
+    const showComponents = document.getElementById('showComponents');
+    const showGrid = document.getElementById('showGrid');
+    const showDashed = document.getElementById('showDashed');
+
+    let isDragging = false;
+    let records = [];
+
+    // Default Values
+    const DEFAULT_R = 20;
+    const DEFAULT_THETA = 67.5;
+
+    function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        draw();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawArrow(ctx, fromX, fromY, toX, toY, color, width = 3, headLength = 12) {
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const angle = Math.atan2(dy, dx);
+
+        ctx.beginPath();
+        ctx.lineWidth = width;
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function draw() {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const scale = 8; // 1 meter = 8 pixels
+
+        const r = parseFloat(rSlider.value);
+        const thetaDeg = parseFloat(thetaSlider.value);
+        const thetaRad = thetaDeg * Math.PI / 180;
+
+        const xVal = r * Math.cos(thetaRad);
+        const yVal = r * Math.sin(thetaRad);
+
+        // Update Control Display
+        rVal.innerText = `${r.toFixed(1)} m`;
+        thetaVal.innerText = `${thetaDeg.toFixed(1)}°`;
+
+        calcR.innerText = `${r.toFixed(2)} m`;
+        calcX.innerText = `${xVal.toFixed(2)} m`;
+        calcY.innerText = `${yVal.toFixed(2)} m`;
+
+        // 1. Draw Grid
+        if (showGrid.checked) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            const gridSize = 20;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.moveTo(x, 0); ctx.lineTo(x, height);
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.moveTo(0, y); ctx.lineTo(width, y);
+            }
+            ctx.stroke();
+        }
+
+        // 2. Draw Axes
+        ctx.beginPath();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        // X-Axis
+        ctx.moveTo(40, centerY); ctx.lineTo(width - 40, centerY);
+        // Y-Axis
+        ctx.moveTo(centerX, 40); ctx.lineTo(centerX, height - 40);
+        ctx.stroke();
+
+        // Axis Labels (N, S, E, W)
+        ctx.font = 'bold 14px Sarabun, sans-serif';
+        ctx.fillStyle = '#475569';
+        ctx.fillText('N (ทิศเหนือ)', centerX - 35, 30);
+        ctx.fillText('S (ทิศใต้)', centerX - 30, height - 20);
+        ctx.fillText('E (ทิศตะวันออก)', width - 110, centerY + 25);
+        ctx.fillText('W (ทิศตะวันตก)', 20, centerY + 25);
+
+        // Target Pixel Coordinates
+        const targetPxX = centerX + (xVal * scale);
+        const targetPxY = centerY - (yVal * scale);
+
+        // 3. Draw Dashed Bounding Box
+        if (showDashed.checked) {
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            // Vertical line to X
+            ctx.moveTo(targetPxX, centerY);
+            ctx.lineTo(targetPxX, targetPxY);
+            // Horizontal line to Y
+            ctx.moveTo(centerX, targetPxY);
+            ctx.lineTo(targetPxX, targetPxY);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset dash
+        }
+
+        // 4. Draw Angle Arc
+        if (thetaDeg !== 0) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 2;
+            const arcRadius = 40;
+            ctx.arc(centerX, centerY, arcRadius, 0, -thetaRad, thetaRad < 0);
+            ctx.stroke();
+
+            // Angle Text
+            const midAngle = -thetaRad / 2;
+            const textX = centerX + (arcRadius + 15) * Math.cos(midAngle);
+            const textY = centerY + (arcRadius + 15) * Math.sin(midAngle);
+            ctx.fillStyle = '#7c3aed';
+            ctx.font = 'bold 13px Sarabun, sans-serif';
+            ctx.fillText(`${thetaDeg.toFixed(1)}°`, textX - 10, textY + 5);
+        }
+
+        // 5. Draw Component Vectors
+        if (showComponents.checked) {
+            // X-Component Vector
+            if (Math.abs(xVal) > 0.1) {
+                drawArrow(ctx, centerX, centerY, targetPxX, centerY, '#2563eb', 3, 10);
+                ctx.fillStyle = '#2563eb';
+                ctx.font = 'bold 12px Sarabun, sans-serif';
+                ctx.fillText(`x = ${xVal.toFixed(2)}m`, centerX + (xVal * scale) / 2 - 20, centerY + (yVal >= 0 ? 20 : -10));
+            }
+
+            // Y-Component Vector
+            if (Math.abs(yVal) > 0.1) {
+                drawArrow(ctx, centerX, centerY, centerX, targetPxY, '#16a34a', 3, 10);
+                ctx.fillStyle = '#16a34a';
+                ctx.font = 'bold 12px Sarabun, sans-serif';
+                ctx.fillText(`y = ${yVal.toFixed(2)}m`, centerX + (xVal >= 0 ? -70 : 10), centerY - (yVal * scale) / 2);
+            }
+        }
+
+        // 6. Draw Main Vector (R)
+        drawArrow(ctx, centerX, centerY, targetPxX, targetPxY, '#dc2626', 4, 12);
+
+        // Vector Label R
+        ctx.fillStyle = '#dc2626';
+        ctx.font = 'bold 14px Sarabun, sans-serif';
+        const labelRPosX = centerX + (xVal * scale) / 2 + (xVal >= 0 ? 10 : -30);
+        const labelRPosY = centerY - (yVal * scale) / 2 - 10;
+        ctx.fillText(`r = ${r.toFixed(1)}m`, labelRPosX, labelRPosY);
+
+        // Draggable Handle Point
+        ctx.beginPath();
+        ctx.arc(targetPxX, targetPxY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#dc2626';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    // Save current calculations to the table
+    function saveRecord() {
+        const r = parseFloat(rSlider.value);
+        const thetaDeg = parseFloat(thetaSlider.value);
+        const thetaRad = thetaDeg * Math.PI / 180;
+        const xVal = r * Math.cos(thetaRad);
+        const yVal = r * Math.sin(thetaRad);
+
+        records.push({
+            r: r.toFixed(2),
+            theta: thetaDeg.toFixed(2),
+            x: xVal.toFixed(2),
+            y: yVal.toFixed(2)
+        });
+
+        renderTable();
+    }
+
+    // Reset controls to initial state
+    function resetControls() {
+        rSlider.value = DEFAULT_R;
+        thetaSlider.value = DEFAULT_THETA;
+        showComponents.checked = true;
+        showGrid.checked = true;
+        showDashed.checked = true;
+        draw();
+    }
+
+    // Clear all records in table
+    function clearTable() {
+        records = [];
+        renderTable();
+    }
+
+    // Render table rows
+    function renderTable() {
+        if (records.length === 0) {
+            recordsTableBody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="5">ยังไม่มีข้อมูลที่บันทึก กดปุ่ม "บันทึกผลลงตาราง" เพื่อเพิ่มข้อมูล</td>
+                </tr>
+            `;
+            return;
+        }
+
+        recordsTableBody.innerHTML = records.map((rec, index) => `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td class="highlight-r">${rec.r} m</td>
+                <td>${rec.theta}°</td>
+                <td class="highlight-x">${rec.x} m</td>
+                <td class="highlight-y">${rec.y} m</td>
+            </tr>
+        `).join('');
+    }
+
+    // Interactive Dragging on Canvas
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 8;
+
+        const r = parseFloat(rSlider.value);
+        const thetaRad = parseFloat(thetaSlider.value) * Math.PI / 180;
+
+        const targetPxX = centerX + (r * Math.cos(thetaRad) * scale);
+        const targetPxY = centerY - (r * Math.sin(thetaRad) * scale);
+
+        const dist = Math.hypot(mouseX - targetPxX, mouseY - targetPxY);
+
+        if (dist < 15) {
+            isDragging = true;
+        }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 8;
+
+        const dx = (mouseX - centerX) / scale;
+        const dy = -(mouseY - centerY) / scale; // Y Inverted
+
+        let newR = Math.hypot(dx, dy);
+        let newThetaRad = Math.atan2(dy, dx);
+        let newThetaDeg = newThetaRad * 180 / Math.PI;
+
+        if (newThetaDeg < 0) newThetaDeg += 360;
+
+        // Clamp R
+        newR = Math.min(Math.max(newR, 5), 40);
+
+        rSlider.value = newR;
+        thetaSlider.value = newThetaDeg;
+
+        draw();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Event Listeners for Sliders & Checkboxes
+    rSlider.addEventListener('input', draw);
+    thetaSlider.addEventListener('input', draw);
+    showComponents.addEventListener('change', draw);
+    showGrid.addEventListener('change', draw);
+    showDashed.addEventListener('change', draw);
+
+    function setPreset(r, theta) {
+        rSlider.value = r;
+        thetaSlider.value = theta;
+        draw();
+    }
+
+    // Initial Setup
+    resizeCanvas();
+    // Add default initial record on start
+    saveRecord();
+</script>
+
+</body>
+</html>

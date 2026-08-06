@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Vector Cross Product Visualizer (Interactive)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 6px;
+            font-size: 1.8rem;
+            color: #38bdf8;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        .controls-panel {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .vector-input-group {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ccc;
+        }
+        .vector-input-group.group-a { border-left-color: #f43f5e; }
+        .vector-input-group.group-b { border-left-color: #10b981; }
+
+        .vector-input-group h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vec-a-title { color: #f43f5e; }
+        .vec-b-title { color: #10b981; }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .input-row label {
+            width: 25px;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+        .input-row input[type="number"] {
+            width: 70px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .input-row input[type="number"]:focus {
+            border-color: #38bdf8;
+        }
+        .input-row input[type="range"] {
+            flex-grow: 1;
+            accent-color: #38bdf8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-update {
+            background-color: #0284c7;
+            color: white;
+        }
+        .btn-update:hover {
+            background-color: #0369a1;
+        }
+        .btn-reset {
+            background-color: #475569;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #334155;
+        }
+
+        #container3d {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            background-color: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+        .overlay-info {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            pointer-events: none;
+        }
+        .color-legend {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 6px;
+        }
+        
+        .axis-legend {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+            display: flex;
+            gap: 12px;
+        }
+        .axis-x { color: #ef4444; font-weight: bold; }
+        .axis-y { color: #22c55e; font-weight: bold; }
+        .axis-z { color: #3b82f6; font-weight: bold; }
+
+        .table-container {
+            width: 100%;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        th, td {
+            padding: 14px 18px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            background-color: #0f172a;
+            color: #38bdf8;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #26354a;
+        }
+        .vec-a { color: #f43f5e; font-weight: bold; }
+        .vec-b { color: #10b981; font-weight: bold; }
+        .vec-c { color: #38bdf8; font-weight: bold; }
+        .hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: -10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>การคูณแบบครอสของเวกเตอร์สามมิติ (Vector Cross Product: A × B = C)</h1>
+    <div class="subtitle">แสดงการ Cross Product เวกเตอร์ 3D แบบปรับค่าได้ พร้อมปุ่มคำนวณและ Reset</div>
+
+    <div class="main-layout">
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <!-- Vector A Inputs -->
+                <div class="vector-input-group group-a">
+                    <h3 class="vec-a-title">Vector A [Ax, Ay, Az]</h3>
+                    <div class="input-row">
+                        <label>Ax:</label>
+                        <input type="number" id="ax_num" value="3" step="0.5" min="-10" max="10">
+                        <input type="range" id="ax_slider" value="3" step="0.5" min="-10" max="10">
+                    </div>
+                    <div class="input-row">
+                        <label>Ay:</label>
+                        <input type="number" id="ay_num" value="4" step="0.5" min="-10" max="10">
+                        <input type="range" id="ay_slider" value="4" step="0.5" min="-10" max="10">
+                    </div>
+                    <div class="input-row">
+                        <label>Az:</label>
+                        <input type="number" id="az_num" value="0" step="0.5" min="-10" max="10">
+                        <input type="range" id="az_slider" value="0" step="0.5" min="-10" max="10">
+                    </div>
+                </div>
+
+                <!-- Vector B Inputs -->
+                <div class="vector-input-group group-b">
+                    <h3 class="vec-b-title">Vector B [Bx, By, Bz]</h3>
+                    <div class="input-row">
+                        <label>Bx:</label>
+                        <input type="number" id="bx_num" value="0" step="0.5" min="-10" max="10">
+                        <input type="range" id="bx_slider" value="0" step="0.5" min="-10" max="10">
+                    </div>
+                    <div class="input-row">
+                        <label>By:</label>
+                        <input type="number" id="by_num" value="4" step="0.5" min="-10" max="10">
+                        <input type="range" id="by_slider" value="4" step="0.5" min="-10" max="10">
+                    </div>
+                    <div class="input-row">
+                        <label>Bz:</label>
+                        <input type="number" id="bz_num" value="3" step="0.5" min="-10" max="10">
+                        <input type="range" id="bz_slider" value="3" step="0.5" min="-10" max="10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetValues()">Reset ค่าเริ่มต้น</button>
+                <button class="btn btn-update" onclick="updateAndApply()">คำนวณและอัปเดตลงตาราง</button>
+            </div>
+        </div>
+
+        <!-- 3D Viewport -->
+        <div id="container3d">
+            <div id="canvas3d"></div>
+            <div class="overlay-info">
+                <div><span class="color-legend" style="background:#f43f5e;"></span><strong class="vec-a">Vector A</strong> = [<span id="disp_a">3, 4, 0</span>]</div>
+                <div><span class="color-legend" style="background:#10b981;"></span><strong class="vec-b">Vector B</strong> = [<span id="disp_b">0, 4, 3</span>]</div>
+                <div><span class="color-legend" style="background:#38bdf8;"></span><strong class="vec-c">Vector C (A × B)</strong> = [<span id="disp_c">12, -9, 12</span>]</div>
+            </div>
+            <div class="axis-legend">
+                <span class="axis-x">■ แกน X (แดง)</span>
+                <span class="axis-y">■ แกน Y (เขียว)</span>
+                <span class="axis-z">■ แกน Z (น้ำเงิน)</span>
+            </div>
+        </div>
+        <div class="hint">💡 หมุนมุมมอง: คลิกลากเมาส์ซ้าย | ย่อ-ขยาย: สโครลเมาส์ | ย้ายมุมมอง: คลิกลากเมาส์ขวา</div>
+
+        <!-- Output Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>เวกเตอร์ (Vector)</th>
+                        <th>ส่วนประกอบ (Components [x, y, z])</th>
+                        <th>สูตรคำนวณขนาด (Magnitude Calculation)</th>
+                        <th>ขนาดของเวกเตอร์ (Magnitude)</th>
+                    </tr>
+                </thead>
+                <tbody id="table_body">
+                    <!-- Populated dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Setup Scene, Camera, Renderer
+        const container = document.getElementById('canvas3d');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e293b);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(18, 16, 22);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Lights
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 15);
+        scene.add(dirLight);
+
+        // Grid & Axes
+        const gridHelper = new THREE.GridHelper(30, 30, 0x475569, 0x334155);
+        scene.add(gridHelper);
+
+        const axesHelper = new THREE.AxesHelper(12);
+        scene.add(axesHelper);
+
+        // Text Labels for Axes (X, Y, Z)
+        function createAxisLabel(text, position, colorStr) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = colorStr;
+            ctx.font = 'Bold 80px Sarabun, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 64, 64);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.copy(position);
+            sprite.scale.set(2, 2, 1);
+            return sprite;
+        }
+
+        scene.add(createAxisLabel("X", new THREE.Vector3(13, 0, 0), "#ef4444"));
+        scene.add(createAxisLabel("Y", new THREE.Vector3(0, 13, 0), "#22c55e"));
+        scene.add(createAxisLabel("Z", new THREE.Vector3(0, 0, 13), "#3b82f6"));
+
+        // Objects Group for dynamic update
+        const vectorGroup = new THREE.Group();
+        scene.add(vectorGroup);
+
+        const origin = new THREE.Vector3(0, 0, 0);
+
+        // Link Inputs (Number and Slider)
+        function bindPair(numId, sliderId) {
+            const num = document.getElementById(numId);
+            const slider = document.getElementById(sliderId);
+            num.addEventListener('input', () => { slider.value = num.value; updateScene(); });
+            slider.addEventListener('input', () => { num.value = slider.value; updateScene(); });
+        }
+
+        bindPair('ax_num', 'ax_slider');
+        bindPair('ay_num', 'ay_slider');
+        bindPair('az_num', 'az_slider');
+        bindPair('bx_num', 'bx_slider');
+        bindPair('by_num', 'by_slider');
+        bindPair('bz_num', 'bz_slider');
+
+        function getInputs() {
+            return {
+                ax: parseFloat(document.getElementById('ax_num').value) || 0,
+                ay: parseFloat(document.getElementById('ay_num').value) || 0,
+                az: parseFloat(document.getElementById('az_num').value) || 0,
+                bx: parseFloat(document.getElementById('bx_num').value) || 0,
+                by: parseFloat(document.getElementById('by_num').value) || 0,
+                bz: parseFloat(document.getElementById('bz_num').value) || 0,
+            };
+        }
+
+        function createVectorArrow(vec, hexColor) {
+            const len = vec.length();
+            if (len === 0) return new THREE.Group();
+            const dir = vec.clone().normalize();
+            const headLength = Math.min(1.2, len * 0.3);
+            const headWidth = Math.min(0.8, len * 0.2);
+            return new THREE.ArrowHelper(dir, origin, len, hexColor, headLength, headWidth);
+        }
+
+        function updateScene() {
+            // Clear previous arrows and plane
+            while(vectorGroup.children.length > 0) {
+                vectorGroup.remove(vectorGroup.children[0]);
+            }
+
+            const inp = getInputs();
+            const A = new THREE.Vector3(inp.ax, inp.ay, inp.az);
+            const B = new THREE.Vector3(inp.bx, inp.by, inp.bz);
+            const C = new THREE.Vector3().crossVectors(A, B);
+
+            // Add Vector Arrows
+            vectorGroup.add(createVectorArrow(A, 0xf43f5e)); // Red/Pink
+            vectorGroup.add(createVectorArrow(B, 0x10b981)); // Green
+            vectorGroup.add(createVectorArrow(C, 0x38bdf8)); // Light Blue
+
+            // Parallelogram plane
+            if (A.length() > 0 && B.length() > 0) {
+                const planeGeo = new THREE.BufferGeometry();
+                const vertices = new Float32Array([
+                    0, 0, 0,
+                    A.x, A.y, A.z,
+                    A.x + B.x, A.y + B.y, A.z + B.z,
+                    B.x, B.y, B.z
+                ]);
+                planeGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                planeGeo.setIndex([0, 1, 2, 0, 2, 3]);
+                planeGeo.computeVertexNormals();
+
+                const planeMat = new THREE.MeshBasicMaterial({
+                    color: 0x38bdf8,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                vectorGroup.add(new THREE.Mesh(planeGeo, planeMat));
+            }
+
+            // Update Overlay
+            document.getElementById('disp_a').innerText = `${A.x}, ${A.y}, ${A.z}`;
+            document.getElementById('disp_b').innerText = `${B.x}, ${B.y}, ${B.z}`;
+            document.getElementById('disp_c').innerText = `${C.x.toFixed(2)}, ${C.y.toFixed(2)}, ${C.z.toFixed(2)}`;
+        }
+
+        function updateAndApply() {
+            updateScene();
+            
+            const inp = getInputs();
+            const A = new THREE.Vector3(inp.ax, inp.ay, inp.az);
+            const B = new THREE.Vector3(inp.bx, inp.by, inp.bz);
+            const C = new THREE.Vector3().crossVectors(A, B);
+
+            const magA = A.length();
+            const magB = B.length();
+            const magC = C.length();
+
+            const formatFormula = (x, y, z) => `√(${x}² + ${y}² + ${z}²)`;
+
+            const tbody = document.getElementById('table_body');
+            tbody.innerHTML = `
+                <tr>
+                    <td><span class="vec-a">Vector A</span></td>
+                    <td>[${A.x}, ${A.y}, ${A.z}]</td>
+                    <td>${formatFormula(A.x, A.y, A.z)} = √(${(A.x**2 + A.y**2 + A.z**2).toFixed(2)})</td>
+                    <td><strong>${magA.toFixed(3)}</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="vec-b">Vector B</span></td>
+                    <td>[${B.x}, ${B.y}, ${B.z}]</td>
+                    <td>${formatFormula(B.x, B.y, B.z)} = √(${(B.x**2 + B.y**2 + B.z**2).toFixed(2)})</td>
+                    <td><strong>${magB.toFixed(3)}</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="vec-c">Vector C (A × B)</span></td>
+                    <td>[${C.x.toFixed(2)}, ${C.y.toFixed(2)}, ${C.z.toFixed(2)}]</td>
+                    <td>${formatFormula(C.x.toFixed(1), C.y.toFixed(1), C.z.toFixed(1))} = √(${(C.x**2 + C.y**2 + C.z**2).toFixed(2)})</td>
+                    <td><strong>${magC.toFixed(3)}</strong></td>
+                </tr>
+            `;
+        }
+
+        function resetValues() {
+            const defaults = { ax: 3, ay: 4, az: 0, bx: 0, by: 4, bz: 3 };
+            for (let key in defaults) {
+                document.getElementById(`${key}_num`).value = defaults[key];
+                document.getElementById(`${key}_slider`).value = defaults[key];
+            }
+            updateAndApply();
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+
+        // Init
+        updateAndApply();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
