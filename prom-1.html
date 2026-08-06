@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ศิลปะและศาสตร์แห่งการสั่งการเอไอ (AI Prompting)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+        @page {
+            size: A4;
+            margin: 18mm 15mm 20mm 15mm;
+            background-color: #f8fafc;
+            @bottom-right {
+                content: "หน้า " counter(page) " จาก " counter(pages);
+                font-family: 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+            @bottom-left {
+                content: "ศาสตร์และศิลป์แห่งวิศวกรรมคำสั่ง (Prompt Engineering)";
+                font-family: 'Sarabun', sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.7;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+
+        /* Header Banner */
+        .header-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            margin: -18mm -15mm 25px -15mm;
+            padding: 28px 20mm;
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background-color: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 8.5pt;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 20pt;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 11pt;
+            color: #cbd5e1;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        /* Intro Section */
+        .intro-box {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #2563eb;
+        }
+
+        .intro-box p {
+            margin: 0 0 12px 0;
+            text-align: justify;
+        }
+
+        .intro-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .quote-citation {
+            font-size: 9pt;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 14pt;
+            color: #0f172a;
+            margin: 25px 0 15px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #cbd5e1;
+            font-weight: 700;
+            page-break-after: avoid;
+        }
+
+        h2 span.highlight {
+            color: #2563eb;
+        }
+
+        /* Highlight Callout Box */
+        .callout-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: #1e40af;
+            font-size: 11pt;
+            margin-bottom: 6px;
+        }
+
+        .callout-box p {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 10pt;
+            text-align: justify;
+        }
+
+        /* Framework Items / Cards */
+        .framework-container {
+            margin-top: 15px;
+        }
+
+        .framework-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            page-break-inside: avoid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .card-header {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .card-number {
+            display: table-cell;
+            width: 28px;
+            height: 28px;
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 10pt;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 50%;
+        }
+
+        .card-title {
+            display: table-cell;
+            vertical-align: middle;
+            padding-left: 12px;
+            font-size: 11.5pt;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .card-body {
+            color: #334155;
+            font-size: 10pt;
+            margin: 0;
+            padding-left: 40px;
+        }
+
+        .example-tag {
+            display: inline-block;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-family: 'Sarabun', sans-serif;
+            margin-top: 6px;
+        }
+
+        /* Footer Note */
+        .summary-card {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-top: 25px;
+            page-break-inside: avoid;
+        }
+
+        .summary-card h3 {
+            color: #60a5fa;
+            margin: 0 0 8px 0;
+            font-size: 12pt;
+        }
+
+        .summary-card p {
+            margin: 0;
+            font-size: 9.5pt;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Banner -->
+    <div class="header-container">
+        <div class="header-badge">Human-Computer Interaction (HCI)</div>
+        <h1>การสั่งการเอไอ (Prompting)<br>สะพานเชื่อมโยงศักยภาพมนุษย์และปัญญาประดิษฐ์</h1>
+        <div class="subtitle">แนวทางการสื่อสารและสถาปัตยกรรมคำสั่งเพื่อดึงประสิทธิภาพสูงสุดของ AI</div>
+    </div>
+
+    <!-- Intro Section -->
+    <div class="intro-box">
+        <p>
+            ในยุคปัจจุบัน ความท้าทายสำคัญของเทคโนโลยีปัญญาประดิษฐ์ ไม่ได้ขึ้นอยู่กับว่า <strong>"เอไอมีศักยภาพสูงเพียงใด"</strong> หากแต่อยู่ที่ <strong>"ผู้ใช้งานสามารถดึงศักยภาพของเอไอออกมาใช้ได้มากน้อยเพียงใด"</strong> ต่างหาก คำถามสำคัญคือ มนุษย์จะสื่อสารและนำศักยภาพเหล่านั้นมาแก้ไขปัญหาหรือสร้างสรรค์งานได้อย่างไร
+        </p>
+        <p>
+            กระบวนการดังกล่าวเรียกว่า <strong>"การสั่งการ" (Prompting)</strong> หรือ <strong>"วิศวกรรมคำสั่ง" (Prompt Engineering)</strong> ซึ่งนับเป็นทั้งศาสตร์และศิลป์ในการปฏิสัมพันธ์ระหว่างมนุษย์กับคอมพิวเตอร์ (Human-Computer Interaction: HCI) ยุคใหม่ ที่เปลี่ยนจากการเขียนโค้ดภาษาคอมพิวเตอร์แบบเดิม (Programming Code) มาเป็นการใช้ <strong>ภาษาธรรมชาติ (Natural Language)</strong> เป็นอินเทอร์เฟซหลักในการสั่งการ <span class="quote-citation">(Liu et al., 2023)</span>
+        </p>
+    </div>
+
+    <!-- Context & Effective Prompting -->
+    <h2><span class="highlight">หลักการ</span>การสั่งการที่มีประสิทธิภาพ</h2>
+    
+    <p style="text-align: justify; margin-bottom: 16px;">
+        การเขียนคำสั่งหรือ "พรอมต์" (Prompt) ที่ดี คือการกำหนดบริบทและทิศทางเพื่อให้ AI ประมวลผลข้อมูลได้อย่างแม่นยำตรงตามความต้องการ หรือตรงตามฐานข้อมูลที่เอไอตัวนั้นมีสิทธิ์เข้าถึง
+    </p>
+
+    <div class="callout-box">
+        <div class="callout-title">ข้อควรระวัง: ความแตกต่างระหว่าง AI แบบใช้งานฟรี และ เสียเงิน</div>
+        <p>
+            โมเดล AI แบบฟรีและแบบเสียเงินมักมีความแตกต่างกันที่ <strong>เงื่อนไขด้านเวลาและทรัพยากรในการประมวลผลหรือเสาะหาข้อมูล</strong> สำหรับการใช้งานแบบฟรี ผู้ใช้ยิ่งจำเป็นต้องเขียนพรอมต์ให้รัดกุมและชัดเจนที่สุด เพื่อให้ AI เข้าใจเป้าหมายได้ทันที หากพรอมต์มีความคลุมเครือ AI อาจดึงข้อมูลทั่วไปจากอินเทอร์เน็ตที่พบได้บ่อยมาตอบ ซึ่งหลายครั้งเป็นข้อมูลที่ไม่ถูกต้องหรือเป็นความเชื่อผิดๆ (Misinformation) ที่ถูกส่งต่อกันจนกลายเป็นความเข้าใจผิดในสังคม
+        </p>
+    </div>
+
+    <!-- Framework Section -->
+    <h2><span class="highlight">5 องค์ประกอบสำคัญ</span> ของโครงสร้างคำสั่ง (Prompt Framework)</h2>
+    <p style="margin-bottom: 20px;">การสร้างคำสั่งที่มีประสิทธิภาพสูงสุด ควรประกอบด้วยโครงสร้าง 5 ส่วนสำคัญ ดังนี้:</p>
+
+    <div class="framework-container">
+        
+        <!-- Element 1 -->
+        <div class="framework-card">
+            <div class="card-header">
+                <div class="card-number">1</div>
+                <div class="card-title">ระบุบทบาทและสถานภาพ (Role & Persona)</div>
+            </div>
+            <div class="card-body">
+                การกำหนดให้ AI สวมบทบาทเป็นผู้เชี่ยวชาญเฉพาะด้าน เพื่อบีบขอบเขตของชุดข้อมูล ความเชี่ยวชาญ และความลึกซึ้งในการคำนวณหรือหาคำตอบ
+                <br>
+                <div class="example-tag">ตัวอย่าง: "คุณคือผู้เชี่ยวชาญด้านวิศวกรรมซอฟต์แวร์ที่มีประสบการณ์มากกว่า 10 ปี"</div>
+            </div>
+        </div>
+
+        <!-- Element 2 -->
+        <div class="framework-card">
+            <div class="card-header">
+                <div class="card-number">2</div>
+                <div class="card-title">กำหนดบริบทและข้อมูลแวดล้อม (Context & Background)</div>
+            </div>
+            <div class="card-body">
+                การให้ข้อมูลพื้นฐาน กลุ่มเป้าหมาย เงื่อนไข หรือวัตถุประสงค์หลักของงาน เพื่อให้ AI เข้าใจสถานการณ์จริงและประมวลผลได้ตรงบริบท
+                <br>
+                <div class="example-tag">ตัวอย่าง: "กำลังเตรียมเนื้อหาการสอนสำหรับนักเรียนระดับมัธยมศึกษาตอนปลายที่ไม่มีพื้นฐานการเขียนโปรแกรม"</div>
+            </div>
+        </div>
+
+        <!-- Element 3 -->
+        <div class="framework-card">
+            <div class="card-header">
+                <div class="card-number">3</div>
+                <div class="card-title">กำหนดภารกิจหลักที่ชัดเจน (Task & Action Verb)</div>
+            </div>
+            <div class="card-body">
+                การใช้คำสั่งที่เจาะจงและเป็นคำนัยตรงเพื่อระบุ Action ที่ต้องการให้ AI ลงมือทำอย่างชัดเจน
+                <br>
+                <div class="example-tag">ตัวอย่าง: "จงสรุป", "จงเปรียบเทียบข้อดีข้อเสีย", "จงเขียนโครงร่างบทเรียน"</div>
+            </div>
+        </div>
+
+        <!-- Element 4 -->
+        <div class="framework-card">
+            <div class="card-header">
+                <div class="card-number">4</div>
+                <div class="card-title">การกำหนดข้อจำกัด (Constraints & Boundaries)</div>
+            </div>
+            <div class="card-body">
+                กำหนดข้อห้าม เงื่อนไขบังคับ หรือขอบเขตที่ชัดเจน เพื่อป้องกันไม่ให้ AI ออกนอกเรื่องหรือสร้างผลลัพธ์ที่ไม่เหมาะสม
+                <br>
+                <div class="example-tag">ตัวอย่าง: "เขียนบทความเชิงวิชาการความยาวไม่เกิน 500 คำ", "ห้ามใช้ศัพท์เทคนิคที่ซับซ้อน", "ใช้สำนวนภาษาที่อ่านสนุกและไหลลื่น"</div>
+            </div>
+        </div>
+
+        <!-- Element 5 -->
+        <div class="framework-card">
+            <div class="card-header">
+                <div class="card-number">5</div>
+                <div class="card-title">กำหนดรูปแบบผลลัพธ์ (Output Format)</div>
+            </div>
+            <div class="card-body">
+                การระบุรูปแบบ โครงสร้าง หรือประเภทของไฟล์ผลลัพธ์ที่ต้องการรับตอบกลับมา
+                <br>
+                <div class="example-tag">ตัวอย่าง: "สรุปเนื้อหาเป็นตารางเปรียบเทียบ", "ระบุรายการเป็นข้อๆ (Bullet points)", "เขียนโปรแกรมด้วยภาษา C เวอร์ชัน 5"</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Summary Box -->
+    <div class="summary-card">
+        <h3>บทสรุป</h3>
+        <p>
+            การสั่งการปัญญาประดิษฐ์อย่างมีศิลปะและเป็นระบบผ่าน Prompt Framework ทั้ง 5 ข้อนี้ จะเปลี่ยน AI จากเครื่องมือค้นหาทั่วไปให้กลายเป็นผู้ช่วยผู้เชี่ยวชาญส่วนบุคคลที่สามารถส่งมอบผลลัพธ์ที่มีความแม่นยำ ตรงประเด็น และมีคุณค่าสูงในการทำงานจริง
+        </p>
+    </div>
+
+</body>
+</html>
