@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>กฎการเคลื่อนที่ของนิวตัน</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm;
+            background-color: #f8fafc;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Sarabun', 'Helvetica Neue', Arial, sans-serif;
+            color: #1e293b;
+            line-height: 1.7;
+            font-size: 10.5pt;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            padding: 24px 28px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-card h1 {
+            font-size: 18pt;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+        
+        .header-card p {
+            margin: 0;
+            font-size: 10pt;
+            color: #93c5fd;
+            font-weight: 300;
+        }
+
+        .academic-paragraph-box {
+            background-color: #ffffff;
+            border-left: 4px solid #2563eb;
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+
+        .academic-paragraph-box h2 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .academic-paragraph-box p {
+            margin: 0;
+            text-align: justify;
+            text-justify: inter-word;
+            font-size: 10.5pt;
+            color: #334155;
+            line-height: 1.8;
+        }
+
+        .section-title {
+            font-size: 13pt;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .law-grid {
+            margin-bottom: 20px;
+        }
+
+        .law-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+
+        .law-card .law-title {
+            font-weight: 700;
+            color: #1e40af;
+            font-size: 11pt;
+            margin-bottom: 4px;
+        }
+
+        .law-card .law-desc {
+            margin: 0;
+            color: #475569;
+            font-size: 10pt;
+        }
+
+        .math-expr {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #0f172a;
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10.5pt;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 10pt;
+            font-weight: 700;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .summary-table td {
+            padding: 10px 14px;
+            font-size: 9.5pt;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 8.5pt;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-card">
+        <h1>กฎการเคลื่อนที่ของนิวตัน</h1>
+        <p>Newton's Laws of Motion</p>
+    </div>
+
+    <div class="academic-paragraph-box">
+        <h2>บทสรุปเชิงวิชาการ</h2>
+        <p>
+            กฎการเคลื่อนที่ของนิวตัน (Newton's Laws of Motion) มีรากฐานมาจากแนวคิดเรื่องความเฉื่อยและการเคลื่อนที่ของกาลิเลโอและเดการ์ต ก่อนถูกเรียบเรียงอย่างเป็นระบบในหนังสือ <em>Principia Mathematica</em> (ค.ศ. 1687) ประกอบด้วยกฎ 3 ข้อ ได้แก่ <strong>กฎข้อที่ 1 (สภาพความเฉื่อย)</strong> วัตถุจะรักษาสภาพหยุดนิ่งหรือเคลื่อนที่ด้วยความเร็วคงที่ตราบใดที่ไม่มีแรงสุทธิมากระทำ, <strong>กฎข้อที่ 2 (การเปลี่ยนแปลงการเคลื่อนที่)</strong> อัตราการเปลี่ยนแปลงโมเมนตัมของวัตถุจะแปรผันตรงกับแรงสุทธิที่มากระทำ (<span class="math-expr">F = dp/dt</span>) และ <strong>กฎข้อที่ 3 (แรงกิริยาและปฏิกิริยา)</strong> ทุกแรงกิริยาจะมีแรงปฏิกิริยาขนาดเท่ากันในทิศทางตรงกันข้ามเสมอ ซึ่งในเวลาต่อมา เลออนฮาร์ด ออยเลอร์ (Leonhard Euler) ได้ปรับปรุงรูปเล่มทางคณิตศาสตร์ของกฎข้อที่ 2 ให้กระชับขึ้นสำหรับกรณีมวลคงที่จนเกิดเป็นสมการ <span class="math-expr">∑F = ma</span> ที่ใช้กันในปัจจุบัน ทั้งนี้ แม้กฎทั้งสามจะยังคงเป็นเสาหลักของกลศาสตร์ดั้งเดิม (Classical Mechanics) แต่ในฟิสิกส์สมัยใหม่ ขอบเขตการใช้งานถูกเติมเต็มด้วยทฤษฎีสัมพัทธภาพของไอน์สไตน์เมื่อวัตถุมีความเร็วใกล้ความเร็วแสง และใช้กลศาสตร์ควอนตัมอธิบายพฤติกรรมในระดับอะตอม
+        </p>
+    </div>
+
+    <div class="section-title">สรุปรายละเอียดกฎทั้ง 3 ข้อของนิวตัน</div>
+
+    <div class="law-grid">
+        <div class="law-card">
+            <div class="law-title">กฎข้อที่ 1: กฎของความเฉื่อย (Law of Inertia)</div>
+            <div class="law-desc">
+                วัตถุจะพยายามรักษาสภาพหยุดนิ่ง หรือเคลื่อนที่ด้วยความเร็วคงที่ในแนวเส้นตรง เว้นแต่จะมีแรงภายนอกที่ไม่เป็นศูนย์มากระทำ
+                <br><strong>รูปเล่มสมการ:</strong> <span class="math-expr">∑F = 0 ⟹ v = ศูนย์ หรือ v = คงที่ </span>
+            </div>
+        </div>
+
+        <div class="law-card">
+            <div class="law-title">กฎข้อที่ 2: กฎการเปลี่ยนแปลงการเคลื่อนที่ (Law of Acceleration / Momentum)</div>
+            <div class="law-desc">
+                อัตราการเปลี่ยนแปลงโมเมนตัมของวัตถุเป็นสัดส่วนโดยตรงกับแรงสุทธิที่มากระทำ โดยมีทิศทางเดียวกับแรงนั้น (ออยเลอร์ปรับปรุงเป็น <span class="math-expr">∑F = ma</span> ในกรณีมวลคงที่)
+                <br><strong>รูปเล่มดั้งเดิม:</strong> <span class="math-expr">F = dp/dt</span> | <strong>รูปเล่มปัจจุบัน:</strong> <span class="math-expr">∑F = ma</span>
+            </div>
+        </div>
+
+        <div class="law-card">
+            <div class="law-title">กฎข้อที่ 3: กฎแรงกิริยาและแรงปฏิกิริยา (Action and Reaction)</div>
+            <div class="law-desc">
+                เมื่อวัตถุหนึ่งออกแรงกระทำต่ออีกวัตถุหนึ่ง วัตถุที่สองจะออกแรงขนาดเท่ากันแต่ทิศทางตรงกันข้ามกระทำกลับมาเสมอ
+                <br><strong>รูปเล่มสมการ:</strong> <span class="math-expr">F<sub>action</sub> = -F<sub>reaction</sub></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">เปรียบเทียบพัฒนาการทางแนวคิดและคณิตศาสตร์</div>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>ยุคสมัย / ผู้พัฒนา</th>
+                <th>รูปแบบการอธิบาย</th>
+                <th>ความสมบูรณ์และขอบเขตการใช้งาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>ต้นแบบ (Galileo & Descartes)</strong></td>
+                <td>การทดลองเชิงความคิดเรื่องความเฉื่อยและการเคลื่อนที่แนวตรง</td>
+                <td>วางรากฐานเชิงคุณภาพ ยังไม่มีสมการคณิตศาสตร์รองรับครอบคลุม</td>
+            </tr>
+            <tr>
+                <td><strong>นิวตัน (1687)</strong></td>
+                <td>อธิบายผ่านอัตราการเปลี่ยนโมเมนตัม (<span class="math-expr">F = dp/dt</span>)</td>
+                <td>ครอบคลุมระบบที่มวลเปลี่ยนแปลงได้ (เช่น จรวด/การชน)</td>
+            </tr>
+            <tr>
+                <td><strong>ออยเลอร์ (1750)</strong></td>
+                <td>ปรับให้อยู่ในรูปมวลคูณความเร่ง (<span class="math-expr">∑F = ma</span>)</td>
+                <td>กระชับ เข้าใจง่าย เหมาะกับระบบมวลคงที่ในกลศาสตร์ดั้งเดิม</td>
+            </tr>
+            <tr>
+                <td><strong>ฟิสิกส์สมัยใหม่ (Einstein / Quantum)</strong></td>
+                <td>ขยายสู่อย่างสัมพัทธภาพและระดับควอนตัม</td>
+                <td>ใช้สัมพัทธภาพเมื่อ <span class="math-expr">v ≈ c</span> และกลศาสตร์ควอนตัมในระดับอนุภาค</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        เอกสารฉบับนี้สร้างขึ้นเพื่อเป็นสรุปเนื้อหาทางวิชาการ | Newton's Laws of Motion Document
+    </div>
+
+</body>
+</html>
