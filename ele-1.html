@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: การชั่งน้ำหนักในลิฟต์ (Apparent Weight in Elevator)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #38bdf8;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .lab-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .panel {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .panel-title {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Simulation Visual Area */
+        .simulation-viewport {
+            height: 450px;
+            background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .shaft-line {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            left: 50%;
+            transform: translateX(-50%);
+            border-style: dashed;
+        }
+        .elevator-car {
+            position: absolute;
+            width: 160px;
+            height: 220px;
+            border: 4px solid #94a3b8;
+            background-color: rgba(51, 65, 85, 0.85);
+            border-radius: 6px;
+            bottom: 30px; /* controlled by JS */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 15px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+            transition: bottom 0.1s linear;
+        }
+        .elevator-ceiling-light {
+            position: absolute;
+            top: 0;
+            width: 60px;
+            height: 6px;
+            background: #e2e8f0;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 5px 15px rgba(255,255,255,0.5);
+        }
+        /* Indicator inside elevator */
+        .elevator-indicator {
+            position: absolute;
+            top: 15px;
+            background: #000;
+            border: 1px solid #334155;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #ef4444;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .indicator-arrow {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        /* Scale and Person Graphic */
+        .person {
+            width: 50px;
+            height: 110px;
+            position: relative;
+            margin-bottom: 4px;
+            z-index: 2;
+        }
+        .person-head {
+            width: 24px;
+            height: 24px;
+            background-color: #f1f5f9;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 13px;
+        }
+        .person-body {
+            width: 10px;
+            height: 50px;
+            background-color: #38bdf8;
+            position: absolute;
+            top: 24px;
+            left: 20px;
+            border-radius: 4px;
+        }
+        .person-arm-l {
+            width: 6px;
+            height: 40px;
+            background-color: #0284c7;
+            position: absolute;
+            top: 26px;
+            left: 12px;
+            border-radius: 3px;
+            transform-origin: top center;
+        }
+        .person-arm-r {
+            width: 6px;
+            height: 40px;
+            background-color: #0284c7;
+            position: absolute;
+            top: 26px;
+            left: 32px;
+            border-radius: 3px;
+            transform-origin: top center;
+        }
+        .person-leg-l {
+            width: 6px;
+            height: 38px;
+            background-color: #38bdf8;
+            position: absolute;
+            top: 72px;
+            left: 15px;
+            border-radius: 3px;
+        }
+        .person-leg-r {
+            width: 6px;
+            height: 38px;
+            background-color: #38bdf8;
+            position: absolute;
+            top: 72px;
+            left: 29px;
+            border-radius: 3px;
+        }
+        .scale {
+            width: 75px;
+            height: 14px;
+            background-color: #e2e8f0;
+            border: 2px solid #64748b;
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+        .scale-screen {
+            background-color: #0f172a;
+            color: #22c55e;
+            font-family: monospace;
+            font-size: 0.7rem;
+            padding: 0px 4px;
+            border-radius: 2px;
+            border: 1px solid #475569;
+        }
+        /* Force vector arrows */
+        .vector-arrow {
+            position: absolute;
+            width: 4px;
+            transform-origin: bottom center;
+            z-index: 5;
+            display: none;
+        }
+        .vector-arrow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+        }
+        .arrow-n {
+            background-color: #22c55e;
+            bottom: 25px;
+            left: 45px;
+        }
+        .arrow-n::after { border-bottom: 8px solid #22c55e; top: -8px; }
+        .arrow-mg {
+            background-color: #ef4444;
+            bottom: 25px;
+            left: 115px;
+            transform-origin: top center;
+        }
+        .arrow-mg::after { border-top: 8px solid #ef4444; bottom: -8px; top: auto; }
+        
+        .vector-label {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 1px 4px;
+            border-radius: 3px;
+            background: rgba(15,23,42,0.8);
+        }
+
+        /* Inputs Form styling */
+        .input-group {
+            margin-bottom: 16px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+        .input-control-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            accent-color: #38bdf8;
+        }
+        .value-badge {
+            background-color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #38bdf8;
+            min-width: 65px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .radio-tile-group {
+            display: flex;
+            gap: 10px;
+        }
+        .radio-tile {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .radio-tile-group input[type="radio"] {
+            display: none;
+        }
+        .radio-tile-group input[type="radio"]:checked + .radio-tile {
+            background-color: #0284c7;
+            border-color: #38bdf8;
+            color: white;
+        }
+        
+        /* Buttons */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-start { background-color: #10b981; color: white; }
+        .btn-start:hover { background-color: #059669; }
+        .btn-log { background-color: #38bdf8; color: #0f172a; }
+        .btn-log:hover { background-color: #0ea5e9; }
+        .btn-reset { background-color: #64748b; color: white; grid-column: span 2; }
+        .btn-reset:hover { background-color: #475569; }
+
+        /* Dashboard Readouts */
+        .readout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .readout-box {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+        .readout-box p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .readout-box h2 {
+            font-size: 1.4rem;
+            font-family: monospace;
+        }
+        .highlight-green { color: #22c55e; }
+        .highlight-orange { color: #f97316; }
+
+        /* Data Table */
+        .table-section {
+            grid-column: span 2;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .table-section { grid-column: span 1; }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #0f172a;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+        td { background-color: #1e293b; }
+        tr:last-child td { border-bottom: none; }
+        .empty-row {
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ห้องปฏิบัติการฟิสิกส์เสมือนจริง </h1>
+    <div class="subtitle">การศึกษาเรื่องน้ำหนักปรากฏของคนในลิฟต์ (Apparent Weight in Elevator)</div>
+
+    <div class="lab-container">
+        
+        <!-- Left Panel: Controls and Parameters -->
+        <div class="panel">
+            <div class="panel-title">ตั้งค่าตัวแปรและควบคุม</div>
+            
+            <!-- Mass Input -->
+            <div class="input-group">
+                <label for="mass">มวลของคน (m):</label>
+                <div class="input-control-row">
+                    <input type="range" id="mass" min="30" max="100" value="60" step="5" oninput="updateParameters()">
+                    <span class="value-badge" id="mass_val">60 kg</span>
+                </div>
+            </div>
+
+            <!-- Acceleration Input -->
+            <div class="input-group">
+                <label for="accel">ความเร่งของลิฟต์ (a):</label>
+                <div class="input-control-row">
+                    <input type="range" id="accel" min="0" max="8" value="3" step="0.5" oninput="updateParameters()">
+                    <span class="value-badge" id="accel_val">3.0 m/s²</span>
+                </div>
+            </div>
+
+            <!-- Direction Input -->
+            <div class="input-group">
+                <label>ทิศทางการเคลื่อนที่ (จากหยุดนิ่ง):</label>
+                <div class="radio-tile-group">
+                    <label style="flex:1;">
+                        <input type="radio" name="direction" value="up" checked onclick="updateParameters()">
+                        <div class="radio-tile">↑ เคลื่อนที่ขึ้นด้วยความเร่ง</div>
+                    </label>
+                    <label style="flex:1;">
+                        <input type="radio" name="direction" value="down" onclick="updateParameters()">
+                        <div class="radio-tile">↓ เคลื่อนที่ลงด้วยความเร่ง</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Live Dashboard Readout -->
+            <div class="readout-grid">
+                <div class="readout-box">
+                    <p>น้ำหนักจริง (mg)</p>
+                    <h2 id="true_weight_dash">588 N</h2>
+                </div>
+                <div class="readout-box">
+                    <p>น้ำหนักที่ตาชั่งอ่านได้ (N)</p>
+                    <h2 id="apparent_weight_dash" class="highlight-green">768 N</h2>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="btn-grid">
+                <button class="btn btn-start" id="btn_sim" onclick="toggleSimulation()">▶ เริ่มการเคลื่อนที่</button>
+                <button class="btn btn-log" id="btn_log" onclick="logData()">💾 บันทึกลงตาราง</button>
+                <button class="btn btn-reset" onclick="resetLab()">🔄 รีเซ็ตแล็บ</button>
+            </div>
+        </div>
+
+        <!-- Right Panel: Visual Animation Area -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>การแสดงผล Real-time Animation</span>
+                <span style="font-size:0.8rem; color:#94a3b8;">*กำหนดให้ g = 9.8 m/s²</span>
+            </div>
+
+            <div class="simulation-viewport">
+                <div class="shaft-line"></div>
+                
+                <!-- Elevator Car -->
+                <div class="elevator-car" id="elevator">
+                    <div class="elevator-ceiling-light"></div>
+                    
+                    <!-- Elevator UI State display -->
+                    <div class="elevator-indicator">
+                        <span id="ind_status">READY</span><br>
+                        <span id="ind_arrow" class="indicator-arrow">-</span> <span id="ind_a">0.0 m/s²</span>
+                    </div>
+
+                    <!-- Force Vector Arrows overlay inside the elevator -->
+                    <!-- Normal Force Arrow (Up) -->
+                    <div class="vector-arrow arrow-n" id="arrow_n">
+                        <span class="vector-label" style="color:#22c55e; bottom: 100%; left:-10px;">N</span>
+                    </div>
+                    <!-- Weight Force Arrow (Down) -->
+                    <div class="vector-arrow arrow-mg" id="arrow_mg">
+                        <span class="vector-label" style="color:#ef4444; top: 100%; left:-15px;">mg</span>
+                    </div>
+
+                    <!-- Person Drawing -->
+                    <div class="person">
+                        <div class="person-head"></div>
+                        <div class="person-body"></div>
+                        <div class="person-arm-l" id="arm_l"></div>
+                        <div class="person-arm-r" id="arm_r"></div>
+                        <div class="person-leg-l"></div>
+                        <div class="person-leg-r"></div>
+                    </div>
+
+                    <!-- Weighing Scale -->
+                    <div class="scale">
+                        <div class="scale-screen" id="scale_display">60.0 kg</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Data Collection Table -->
+        <div class="panel table-section">
+            <div class="panel-title">ตารางบันทึกผลการทดลองห้องปฏิบัติการ</div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>มวลคน (kg)</th>
+                            <th>น้ำหนักจริง mg (N)</th>
+                            <th>ความเร่ง a (m/s²)</th>
+                            <th>ทิศทางลิฟต์</th>
+                            <th>สมการที่ใช้คำนวณ</th>
+                            <th>น้ำหนักบนตาชั่ง N (N)</th>
+                            <th>น้ำหนักบนตาชั่ง (kg)</th>
+                            <th>ผลลัพธ์ความรู้สึก</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data_table_body">
+                        <tr id="empty_row"><td colspan="9" class="empty-row">ยังไม่มีการบันทึกข้อมูล กดปุ่ม "บันทึกลงตาราง" เพื่อจัดเก็บข้อมูลจากการทดลอง</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const g = 9.8;
+        let simInterval = null;
+        let isSimulating = false;
+        let elevatorBottom = 30; // initial position in px
+        let velocity = 0;
+        let time = 0;
+        let recordCount = 0;
+
+        // Sound effect representation / Visual states variables
+        function updateParameters() {
+            const mass = parseFloat(document.getElementById('mass').value);
+            const accel = parseFloat(document.getElementById('accel').value);
+            const dir = document.querySelector('input[name="direction"]:checked').value;
+
+            // Update range text labels
+            document.getElementById('mass_val').innerText = mass + " kg";
+            document.getElementById('accel_val').innerText = accel.toFixed(1) + " m/s²";
+
+            // Physics Calculations
+            const trueWeight = mass * g;
+            let apparentWeight = 0;
+
+            if (dir === 'up') {
+                apparentWeight = mass * (g + accel);
+            } else {
+                apparentWeight = mass * (g - accel);
+                if(apparentWeight < 0) apparentWeight = 0; // cannot float away from normal mechanical scale pull down
+            }
+
+            // Update Live Dashboard Text
+            document.getElementById('true_weight_dash').innerText = trueWeight.toFixed(1) + " N";
+            document.getElementById('apparent_weight_dash').innerText = apparentWeight.toFixed(1) + " N";
+            
+            // Apparent weight in kg equivalent for the digital scale screen display
+            const apparentKg = apparentWeight / g;
+            document.getElementById('scale_display').innerText = apparentKg.toFixed(1) + " kg";
+
+            // Color highlight dynamic feedback
+            const dashObj = document.getElementById('apparent_weight_dash');
+            if (apparentWeight > trueWeight) {
+                dashObj.className = "highlight-green"; // feels heavier
+            } else if (apparentWeight < trueWeight) {
+                dashObj.className = "highlight-orange"; // feels lighter
+            } else {
+                dashObj.className = "";
+            }
+
+            // Visual sizing of arrows inside simulation viewport
+            const arrowN = document.getElementById('arrow_n');
+            const arrowMg = document.getElementById('arrow_mg');
+
+            arrowN.style.display = "block";
+            arrowMg.style.display = "block";
+
+            // Scale arrow length based on force scale factor
+            const scaleFactor = 0.15; // 100N = 15px
+            arrowMg.style.height = (trueWeight * scaleFactor) + "px";
+            arrowN.style.height = (apparentWeight * scaleFactor) + "px";
+        }
+
+        function toggleSimulation() {
+            const btn = document.getElementById('btn_sim');
+            const dir = document.querySelector('input[name="direction"]:checked').value;
+            const accel = parseFloat(document.getElementById('accel').value);
+
+            if (isSimulating) {
+                // Stop simulation
+                clearInterval(simInterval);
+                isSimulating = false;
+                btn.innerText = "▶ เริ่มการเคลื่อนที่";
+                btn.style.backgroundColor = "#10b981";
+                document.getElementById('ind_status').innerText = "PAUSED";
+            } else {
+                // Start simulation from current position or reset bounds if maxed out
+                if (elevatorBottom > 200 || elevatorBottom < 10) {
+                    elevatorBottom = dir === 'up' ? 20 : 210;
+                    velocity = 0;
+                }
+                
+                isSimulating = true;
+                btn.innerText = "⏸ หยุดการเคลื่อนที่";
+                btn.style.backgroundColor = "#ef4444";
+                
+                document.getElementById('ind_status').innerText = "MOVING";
+                document.getElementById('ind_arrow').innerText = dir === 'up' ? "↑" : "↓";
+                document.getElementById('ind_a').innerText = accel.toFixed(1) + " m/s²";
+
+                const dt = 0.05; // 50ms timestep
+                simInterval = setInterval(() => {
+                    // Kinematics equations: displacement update
+                    velocity += accel * dt;
+                    const deltaY = velocity * dt * 8; // scaling factor for screen animation pixels
+
+                    if (dir === 'up') {
+                        elevatorBottom += deltaY;
+                        // Arm visual reaction (pulled down relative to car when accelerating up)
+                        document.getElementById('arm_l').style.transform = "rotate(15deg)";
+                        document.getElementById('arm_r').style.transform = "rotate(-15deg)";
+                    } else {
+                        elevatorBottom -= deltaY;
+                        // Arm visual reaction (floating up slightly when accelerating down)
+                        document.getElementById('arm_l').style.transform = "rotate(-35deg)";
+                        document.getElementById('arm_r').style.transform = "rotate(35deg)";
+                    }
+
+                    // Viewport Boundaries Check
+                    if (elevatorBottom >= 215 || elevatorBottom <= 15) {
+                        clearInterval(simInterval);
+                        isSimulating = false;
+                        btn.innerText = "▶ เริ่มการเคลื่อนที่";
+                        btn.style.backgroundColor = "#10b981";
+                        document.getElementById('ind_status').innerText = "ARRIVED";
+                      
+                        document.getElementById('arm_l').style.transform = "none";
+                        document.getElementById('arm_r').style.transform = "none";
+                    }
+
+                    document.getElementById('elevator').style.bottom = elevatorBottom + "px";
+                }, 50);
+            }
+        }
+
+        function logData() {
+            // Remove empty placeholder row if it exists
+            const emptyRow = document.getElementById('empty_row');
+            if (emptyRow) {
+                emptyRow.remove();
+            }
+
+            recordCount++;
+            const mass = parseFloat(document.getElementById('mass').value);
+            const accel = parseFloat(document.getElementById('accel').value);
+            const dir = document.querySelector('input[name="direction"]:checked').value;
+            
+            const trueWeight = mass * g;
+            let apparentWeight = 0;
+            let equation = "";
+            let outcome = "";
+
+            if (dir === 'up') {
+                apparentWeight = mass * (g + accel);
+                equation = `N = m(g + a)`;
+                outcome = "ตัวหนักขึ้น (N > mg)";
+            } else {
+                apparentWeight = mass * (g - accel);
+                if(apparentWeight < 0) apparentWeight = 0;
+                equation = `N = m(g - a)`;
+                outcome = accel === 0 ? "ปกติ" : (apparentWeight === 0 ? "ไร้น้ำหนัก (N=0)" : "ตัวเบาลง (N < mg)");
+            }
+
+            const apparentKg = apparentWeight / g;
+            const dirText = dir === 'up' ? "↑ ขึ้นด้วยความเร่ง" : "↓ ลงด้วยความเร่ง";
+
+            // Append row to data table
+            const tbody = document.getElementById('data_table_body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><strong>${recordCount}</strong></td>
+                <td>${mass} kg</td>
+                <td>${trueWeight.toFixed(1)} N</td>
+                <td>${accel.toFixed(1)}</td>
+                <td>${dirText}</td>
+                <td style="font-family: monospace; color:#38bdf8;">${equation}</td>
+                <td style="color:#22c55e; font-weight:bold;">${apparentWeight.toFixed(1)} N</td>
+                <td>${apparentKg.toFixed(1)} kg-w</td>
+                <td style="font-weight:600; color:${dir==='up'?'#22c55e':'#f97316'};">${outcome}</td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function resetLab() {
+            // Stop any active simulations
+            if (isSimulating) {
+                toggleSimulation();
+            }
+            
+            // Reset input fields to initial values
+            document.getElementById('mass').value = 60;
+            document.getElementById('accel').value = 3.0;
+            document.getElementsByName('direction')[0].checked = true;
+            
+            // Reset elevator position graphical parameters
+            elevatorBottom = 30;
+            velocity = 0;
+            document.getElementById('elevator').style.bottom = elevatorBottom + "px";
+            document.getElementById('ind_status').innerText = "READY";
+            document.getElementById('ind_arrow').innerText = "-";
+            document.getElementById('ind_a').innerText = "0.0 m/s²";
+            document.getElementById('arm_l').style.transform = "none";
+            document.getElementById('arm_r').style.transform = "none";
+            
+            // Refresh calculated dashboard values
+            updateParameters();
+        }
+
+        // Initialize state inside viewport on windows dynamic ready load
+        window.onload = function() {
+            updateParameters();
+        };
+    </script>
+</body>
+</html>
