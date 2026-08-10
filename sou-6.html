@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: การสั่นพล้องของเสียงตามหลักฟิสิกส์</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --water: rgba(56, 189, 248, 0.65);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .control-group label span.value {
+            color: var(--primary-accent);
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .audio-btn {
+            width: 100%;
+            padding: 12px;
+            background: #475569;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background 0.2s;
+        }
+
+        .audio-btn.playing {
+            background: var(--danger);
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button.action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-reset { background: #e2e8f0; color: var(--text-main); }
+        .btn-reset:hover { background: #cbd5e1; }
+        .btn-log { background: var(--success); color: white; }
+        .btn-log:hover { opacity: 0.9; }
+
+        .lab-space {
+            display: flex;
+            background: #ffffff;
+            border-radius: 16px;
+            min-height: 540px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            gap: 40px;
+            position: relative;
+        }
+
+        .visual-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 70px 20px 40px 20px;
+        }
+
+        /* จำลองท่อเรโซแนนซ์ */
+        .tube-container {
+            position: relative;
+            width: 130px;
+            height: 400px;
+            border-left: 5px solid #64748b;
+            border-right: 5px solid #64748b;
+            border-bottom: 5px solid #64748b;
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* โครงสร้างลำโพงปรับตำแหน่งและรูปทรงให้รับกับท่อและเส้นคลื่น */
+        .speaker-wrapper {
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 42px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .speaker-top {
+            width: 45px;
+            height: 12px;
+            background: #475569;
+            border: 2px solid #1e293b;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .speaker-body {
+            width: 96px;
+            height: 26px;
+            background: #cbd5e1;
+            border-left: 2px solid #1e293b;
+            border-right: 2px solid #1e293b;
+            border-bottom: 4px solid #1e293b;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        /* ชั้นน้ำปรับระดับได้ */
+        .water-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--water);
+            border-top: 4px solid #0284c7;
+            transition: height 0.05s ease;
+            z-index: 2;
+        }
+
+        /* SVG วาดคลื่นลัพธ์ */
+        .wave-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* ไม้บรรทัดข้างท่อ */
+        .ruler-container {
+            position: absolute;
+            left: calc(50% + 80px);
+            top: 70px;
+            height: 400px;
+            border-left: 2px solid #475569;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #475569;
+            padding-left: 5px;
+        }
+
+        .ruler-mark {
+            position: relative;
+        }
+        .ruler-mark::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            width: 5px;
+            height: 1px;
+            background: #475569;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .bottom-container {
+            max-width: 1400px;
+            margin: 25px auto 0 auto;
+            width: 100%;
+        }
+
+        .table-responsive {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ห้องปฏิบัติการเสมือนจริง: การสั่นพล้องของเสียงในท่อปลายปิด</h1>
+        <p>วิเคราะห์ผลรวมคลื่นซ้อนทับตามฟิสิกส์: บัพ (Node) อยู่ที่ผิวสะท้อนน้ำ และปฏิบัพ (Antinode) อยู่ที่ปากท่อ</p>
+    </header>
+
+    <div class="main-container">
+        <!-- แผงควบคุมด้านซ้าย -->
+        <div class="card">
+            <div class="card-title">⚙️ แผงควบคุมการทดลอง</div>
+
+            <button id="btn-audio" class="audio-btn" onclick="toggleAudio()">🔊 เปิดลำโพงสัญญาณเสียง</button>
+
+            <!-- เพิ่มตัวปรับอุณหภูมิ -->
+            <div class="control-group">
+                <label>อุณหภูมิอากาศ (T)
+                    <span class="value" id="val-temp">25.0 °C</span>
+                </label>
+                <input type="range" id="param-temp" min="-10" max="50" step="0.5" value="25">
+            </div>
+
+            <!-- ความถี่ลำโพง -->
+            <div class="control-group">
+                <label>ความถี่ของแหล่งกำเนิด (f)
+                    <span class="value" id="val-freq">500 Hz</span>
+                </label>
+                <input type="range" id="param-freq" min="300" max="1200" step="5" value="500">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 20px;">
+
+            <!-- ระดับน้ำ / ความลึก L -->
+            <div class="control-group">
+                <label>ความยาวช่องอากาศ (L)
+                    <span class="value" id="val-water-depth">0.0 cm</span>
+                </label>
+                <input type="range" id="param-depth" min="0" max="100" step="0.1" value="17.3">
+            </div>
+
+            <!-- ผลการคำนวณฟิสิกส์สด -->
+            <div class="control-group" style="background: var(--bg-main); padding: 12px; border-radius: 8px; font-size: 0.85rem; line-height: 1.6;">
+                <div>• ความเร็วเสียง (v): <span id="lbl-v" style="font-weight:bold;">346.50 m/s</span></div>
+                <div>• ความยาวคลื่น (λ): <span id="lbl-lambda" style="font-weight:bold; color:var(--primary-accent);">0.69 m</span></div>
+                <div>• สั่นพล้องครั้งแรก (λ/4): <span id="lbl-res1" style="font-weight:bold; color:var(--success);">17.3 cm</span></div>
+            </div>
+
+            <div class="btn-container">
+                <button class="action-btn btn-reset" onclick="resetLab()">🔄 รีเซ็ต</button>
+                <button class="action-btn btn-log" onclick="logData()">📥 บันทึกค่าลงตาราง</button>
+            </div>
+        </div>
+
+        <!-- แผงแสดงผลจำลองด้านขวา -->
+        <div class="card" style="padding: 20px;">
+            <div class="card-title" style="position: relative;">
+                🧪 หลอดเรโซแนนซ์จำลอง (Resonance Tube)
+                <div id="resonance-badge" class="status-badge" style="background:#cbd5e1; color:#475569;">ปกติ</div>
+            </div>
+            
+            <div class="lab-space">
+                <div class="visual-panel">
+                    
+                    <div class="tube-container" id="tube">
+                        <!-- ลำโพงหัวคว่ำแบบสมบูรณ์ตามตำแหน่งปากหลอดพอดี -->
+                        <div class="speaker-wrapper">
+                            <div class="speaker-top"></div>
+                            <div class="speaker-body"></div>
+                        </div>
+
+                        <!-- ชั้นน้ำภายในท่อ -->
+                        <div class="water-layer" id="water"></div>
+
+                        <!-- วาดเส้นคลื่นสะท้อนและคลื่นลัพธ์จริง -->
+                        <svg class="wave-svg" id="wave-svg">
+                            <!-- เส้นทึบ: คลื่นรวมลัพธ์คงตัว (Standing Wave Envelope) -->
+                            <path id="path-total-1" d="" fill="none" stroke="rgba(37, 99, 235, 0.9)" stroke-width="2.5"/>
+                            <path id="path-total-2" d="" fill="none" stroke="rgba(37, 99, 235, 0.9)" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+
+                    <!-- ไม้บรรทัดวัดเซนติเมตรข้างท่อ -->
+                    <div class="ruler-container">
+                        <div class="ruler-mark">0 cm (ปากท่อ)</div>
+                        <div class="ruler-mark">10 cm</div>
+                        <div class="ruler-mark">20 cm</div>
+                        <div class="ruler-mark">30 cm</div>
+                        <div class="ruler-mark">40 cm</div>
+                        <div class="ruler-mark">50 cm</div>
+                        <div class="ruler-mark">60 cm</div>
+                        <div class="ruler-mark">70 cm</div>
+                        <div class="ruler-mark">80 cm</div>
+                        <div class="ruler-mark">90 cm</div>
+                        <div class="ruler-mark">100 cm</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ตารางบันทึกผลการทดลองด้านล่าง -->
+    <div class="bottom-container">
+        <div class="card">
+            <div class="card-title">📊 ตารางบันทึกผลการทดลอง: การแทรกสอดและการสั่นพล้อง</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>อุณหภูมิ (°C)</th>
+                            <th>ความเร็วเสียง v (m/s)</th>
+                            <th>ความถี่ f (Hz)</th>
+                            <th>ความยาวช่องอากาศ L (cm)</th>
+                            <th>สถานะทางฟิสิกส์</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let experimentCount = 0;
+
+        // องค์ประกอบเสียง ออดิโอคอนเท็กซ์
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isPlaying = false;
+
+        // ดึงอิลิเมนต์ต่าง ๆ
+        const paramTemp = document.getElementById('param-temp');
+        const paramFreq = document.getElementById('param-freq');
+        const paramDepth = document.getElementById('param-depth');
+        
+        const valTemp = document.getElementById('val-temp');
+        const valFreq = document.getElementById('val-freq');
+        const valWaterDepth = document.getElementById('val-water-depth');
+        
+        const lblV = document.getElementById('lbl-v');
+        const lblLambda = document.getElementById('lbl-lambda');
+        const lblRes1 = document.getElementById('lbl-res1');
+        
+        const water = document.getElementById('water');
+        const resonanceBadge = document.getElementById('resonance-badge');
+        const tube = document.getElementById('tube');
+        const logTableBody = document.getElementById('log-table-body');
+
+        const pathTotal1 = document.getElementById('path-total-1');
+        const pathTotal2 = document.getElementById('path-total-2');
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(parseFloat(paramFreq.value), audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+            }
+        }
+
+        function toggleAudio() {
+            initAudio();
+            const btn = document.getElementById('btn-audio');
+            if (!isPlaying) {
+                audioCtx.resume();
+                btn.innerText = "🛑 ปิดลำโพงสัญญาณเสียง";
+                btn.classList.add('playing');
+                isPlaying = true;
+            } else {
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                btn.innerText = "🔊 เปิดลำโพงสัญญาณเสียง";
+                btn.classList.remove('playing');
+                isPlaying = false;
+            }
+            updateSystem();
+        }
+
+        function updateSystem() {
+            const tc = parseFloat(paramTemp.value);
+            const freq = parseFloat(paramFreq.value);
+            const LCm = parseFloat(paramDepth.value); 
+            const LM = LCm / 100;
+
+            // 1. คำนวณความเร็วเสียงตามอุณหภูมิอากาศ
+            const v = 331.5 + (0.6 * tc);
+            
+            // 2. คำนวณความยาวคลื่นแลมบ์ดา
+            const lambda = v / freq;
+            const k = (2 * Math.PI) / lambda;
+
+            // คำนวณจุดสั่นพล้องครั้งแรกสุด (L = lambda / 4) เพื่อแสดงเป็นแนวทาง
+            const firstResonanceCm = (lambda / 4) * 100;
+
+            // แสดงตัวเลขคำนวณบนหน้าจอหน้าควบคุม
+            valTemp.innerText = tc.toFixed(1) + " °C";
+            valFreq.innerText = freq + " Hz";
+            valWaterDepth.innerText = LCm.toFixed(1) + " cm";
+            
+            lblV.innerText = v.toFixed(2) + " m/s";
+            lblLambda.innerText = lambda.toFixed(2) + " m";
+            lblRes1.innerText = firstResonanceCm.toFixed(1) + " cm";
+
+            // ปรับระดับการแสดงผลของผิวน้ำในท่อ (ความสูงท่อ 400px)
+            const tubeHeightPx = 400; 
+            const airHeightPx = (LCm / 100) * tubeHeightPx;
+            const waterHeightPx = tubeHeightPx - airHeightPx;
+            water.style.height = waterHeightPx + "px";
+
+            if (oscillator && audioCtx) {
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            }
+
+            // คำนวณหาความต่างระหว่างความยาวท่อปัจจุบันกับจุดสั่นพล้องตามทฤษฎี (2n-1)*lambda / 4
+            let minDiff = Infinity;
+            for(let n=1; n<=4; n++) {
+                const idealL = (2*n - 1) * lambda / 4;
+                const diff = Math.abs(LM - idealL);
+                if(diff < minDiff) minDiff = diff;
+            }
+
+            // ตั้งเกณฑ์ความกว้างในการตรวจจับตำแหน่งสั่นพล้อง (2.5 cm)
+            const resonanceRange = 0.025; 
+            let resonanceFactor = 0;
+            if (minDiff < resonanceRange) {
+                // คำนวณตัวคูณแอมพลิจูดเสียงและกราฟให้สูงสุดเมื่อตรงจุดพอดี
+                resonanceFactor = Math.exp(-Math.pow(minDiff / 0.012, 2));
+            }
+
+            if (isPlaying && gainNode) {
+                const targetGain = 0.02 + (resonanceFactor * 0.28);
+                gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.04);
+            }
+
+            // แสดงสถานะ Badge ตามตำแหน่งจริง
+            if (resonanceFactor > 0.75) {
+                resonanceBadge.innerText = `🔊 สั่นพล้องสมบูรณ์ (แอมพลิจูดสูงสุด)`;
+                resonanceBadge.style.backgroundColor = "var(--success)";
+                resonanceBadge.style.color = "white";
+            } else if (resonanceFactor > 0.15) {
+                resonanceBadge.innerText = `🔉 เกิดการแทรกสอดแบบเสริมกัน`;
+                resonanceBadge.style.backgroundColor = "#fef08a";
+                resonanceBadge.style.color = "#a16207";
+            } else {
+                resonanceBadge.innerText = "🔇 แทรกสอดปกติ";
+                resonanceBadge.style.backgroundColor = "#cbd5e1";
+                resonanceBadge.style.color = "#475569";
+            }
+
+            // ส่งข้อมูลไปวาดเส้นคลื่นตามฟังก์ชันที่ถูกปรับปรุงถูกต้องตามแกนฟิสิกส์
+            drawWavePhysics(airHeightPx, LM, k);
+        }
+
+        function drawWavePhysics(airHeightPx, LM, k) {
+            const w = tube.clientWidth;
+            const midX = w / 2;
+            const maxAmpPx = w / 2.4; 
+
+            if (airHeightPx < 2) {
+                pathTotal1.setAttribute('d', '');
+                pathTotal2.setAttribute('d', '');
+                return;
+            }
+
+            let dTotal1 = "";
+            let dTotal2 = "";
+
+            // วาดกราฟโดยไล่พิกัด Y จากปากท่อ (y=0) ลงไปจนถึงผิวน้ำสะท้อน (y=airHeightPx)
+            for (let pixelY = 0; pixelY <= airHeightPx; pixelY++) {
+                // x_dist คือระยะทางจริงในหน่วยเมตร วัดจากปากท่อ (x=0) ลงไป
+                const x_dist = (pixelY / airHeightPx) * LM;
+
+                // ปรับสมการคลื่นนิ่งเพื่อให้ "ผิวน้ำสะท้อนปลายปิด (x_dist = LM) เกิดบัพ (Node = 0)" เสมอ
+                // และที่ปากท่อ (x_dist = 0) จะกลายเป็นปฏิบัพ (Antinode) เมื่อ L แตกตัวลงล๊อคพอดี
+                const w_envelope = Math.sin(k * (LM - x_dist));
+
+                // แปลงค่าแอมพลิจูดเป็นระยะการแสดงผลบนจอพิกเซล SVG
+                const ampTotalPx = w_envelope * maxAmpPx;
+
+                const prefix = (pixelY === 0) ? "M" : "L";
+
+                // วาดแนวคลื่นนิ่งสมมาตรซ้ายขวาตามแบบจำลองคลื่นนิ่ง
+                dTotal1 += `${prefix} ${midX + ampTotalPx} ${pixelY}`;
+                dTotal2 += `${prefix} ${midX - ampTotalPx} ${pixelY}`;
+            }
+
+            pathTotal1.setAttribute('d', dTotal1);
+            pathTotal2.setAttribute('d', dTotal2);
+        }
+
+        function logData() {
+            experimentCount++;
+            const tc = parseFloat(paramTemp.value);
+            const freq = parseFloat(paramFreq.value);
+            const LCm = parseFloat(paramDepth.value);
+            const v = 331.5 + (0.6 * tc);
+            
+            const badgeText = resonanceBadge.innerText;
+            let status = "ปกติ (ไม่มีการสั่นพล้อง)";
+            if(badgeText.includes("สมบูรณ์")) status = "💥 สั่นพล้อง (Resonance)";
+            else if(badgeText.includes("เสริมกัน")) status = "🔔 แทรกสอดเสริมกันบางส่วน";
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${experimentCount}</b></td>
+                <td>${tc.toFixed(1)} °C</td>
+                <td>${v.toFixed(1)} m/s</td>
+                <td>${freq} Hz</td>
+                <td style="font-weight: bold; color: var(--primary-accent);">${LCm.toFixed(1)} cm</td>
+                <td>${status}</td>
+            `;
+            logTableBody.appendChild(row);
+        }
+
+        function resetLab() {
+            paramTemp.value = "25";
+            paramFreq.value = "500";
+            // คำนวณหาค่าสั่นพล้องครั้งแรกเพื่อตั้งค่าเริ่มต้นให้เป๊ะกับปุ่มรีเซ็ต
+            const v = 331.5 + (0.6 * 25);
+            const lambda = v / 500;
+            paramDepth.value = ((lambda / 4) * 100).toFixed(1);
+            logTableBody.innerHTML = "";
+            experimentCount = 0;
+            updateSystem();
+        }
+
+        // เชื่อม Event Listener เข้ากับปุ่มสไลด์
+        paramTemp.addEventListener('input', updateSystem);
+        paramFreq.addEventListener('input', updateSystem);
+        paramDepth.addEventListener('input', updateSystem);
+
+        // เซ็ตค่าความกว้างเริ่มต้นให้ตรงจุดสั่นพล้องครั้งแรกทันทีตอนโหลดหน้า
+        window.addEventListener('DOMContentLoaded', () => {
+            const v = 331.5 + (0.6 * 25);
+            const lambda = v / 500;
+            paramDepth.value = ((lambda / 4) * 100).toFixed(1);
+            updateSystem();
+        });
+    </script>
+</body>
+</html>
