@@ -65,7 +65,7 @@
 
       <div class="controls">
         <div class="control-row">
-          <label>ความยาวโฟกัส ($|f|$):</label>
+          <label>ความยาวโฟกัส (|f|):</label>
           <div>
             <input type="range" id="fRange" min="30" max="100" value="60" step="5" oninput="updateSim()">
             <span id="fVal" style="display:inline-block; width:50px; text-align:right;">60 cm</span>
@@ -73,7 +73,7 @@
         </div>
 
         <div class="control-row">
-          <label>ระยะวัตถุ ($s$):</label>
+          <label>ระยะวัตถุ (s):</label>
           <div>
             <input type="range" id="sRange" min="20" max="250" value="120" step="5" oninput="updateSim()">
             <span id="sVal" style="display:inline-block; width:50px; text-align:right;">120 cm</span>
@@ -81,7 +81,7 @@
         </div>
 
         <div class="control-row">
-          <label>ขนาดความสูงวัตถุ ($y$):</label>
+          <label>ขนาดความสูงวัตถุ (y):</label>
           <div>
             <input type="range" id="hRange" min="20" max="70" value="40" step="5" oninput="updateSim()">
             <span id="hVal" style="display:inline-block; width:50px; text-align:right;">40 cm</span>
@@ -90,8 +90,8 @@
 
         <!-- ค่าทางฟิสิกส์ที่คำนวณได้ -->
         <div class="output-group">
-          <div class="output-item"><span>ระยะภาพ ($s'$):</span> <b id="sPrimeVal">0.0 cm</b></div>
-          <div class="output-item"><span>กำลังขยาย ($m$):</span> <b id="mVal">0.00x</b></div>
+          <div class="output-item"><span>ระยะภาพ (s'):</span> <b id="sPrimeVal">0.0 cm</b></div>
+          <div class="output-item"><span>กำลังขยาย (m):</span> <b id="mVal">0.00x</b></div>
           <div class="output-item" style="grid-column: span 2;"><span>ลักษณะภาพ:</span> <b id="imageTypeVal" style="color:#f43f5e;">-</b></div>
         </div>
 
@@ -108,11 +108,11 @@
           <thead>
             <tr>
               <th>ครั้งที่</th>
-              <th>$f$ (cm)</th>
-              <th>$s$ (cm)</th>
-              <th>$y$ (cm)</th>
-              <th>$s'$ (cm)</th>
-              <th>$m$</th>
+              <th>f (cm)</th>
+              <th>s (cm)</th>
+              <th>y (cm)</th>
+              <th>s' (cm)</th>
+              <th>m</th>
               <th>ชนิดภาพ</th>
             </tr>
           </thead>
@@ -124,9 +124,9 @@
 
       <div class="info-box">
         <h4>💡 หลักการทางทัศนศาสตร์ของเลนส์เว้า:</h4>
-        <p>1. **เครื่องหมายโฟกัส:** เลนส์เว้ามีจุดโฟกัสเสมือน กำหนดให้ $f$ ติดลบเสมอ ($f < 0$)</p>
-        <p>2. **สมการเลนส์:** $\frac{1}{-f} = \frac{1}{s} + \frac{1}{s'} \implies s' = \frac{-f \cdot s}{s + f}$</p>
-        <p>3. **ลักษณะภาพ:** เกิด **ภาพเสมือนหัวตั้ง ขนาดเล็กกว่าวัตถุ** เสมอ ($s' < 0, m < 1$) อยู่ฝั่งเดียวกับวัตถุระหว่างจุด $F_1$ กับเลนส์</p>
+        <p>1. **เครื่องหมายโฟกัส:** เลนส์เว้ามีจุดโฟกัสเสมือน กำหนดให้ f ติดลบเสมอ (f < 0)</p>
+        <p>2. **สมการเลนส์:** </p>
+        <p>3. **ลักษณะภาพ:** เกิด **ภาพเสมือนหัวตั้ง ขนาดเล็กกว่าวัตถุ** เสมอ (s' < 0, m < 1) อยู่ฝั่งเดียวกับวัตถุระหว่างจุด F_1 กับเลนส์</p>
       </div>
     </div>
   </div>
