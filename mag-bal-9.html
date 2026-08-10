@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: เครื่องชั่งแรงแม่เหล็ก</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .control-group label span.value {
+            color: var(--primary-accent);
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .radio-tile-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .radio-tile {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .radio-tile.active {
+            background-color: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-start {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-start:hover {
+            opacity: 0.9;
+        }
+
+        .btn-reset {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-reset:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-log {
+            grid-column: span 2;
+            background: var(--primary-accent);
+            color: white;
+        }
+
+        .btn-log:disabled {
+            background: #cbd5e1;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Lab Animation Area */
+        .lab-space {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 16px;
+            min-height: 520px;
+            position: relative;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .visual-container {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* แท่งแม่เหล็กแยกฝั่ง ซ้าย (N) - ขวา (S) วางบนตาชั่ง */
+        .magnet-pole-container {
+            position: absolute;
+            width: 480px;
+            height: 160px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            bottom: 125px; 
+            transition: width 0.3s ease;
+        }
+
+        .pole-block {
+            width: 100px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .pole-n-left {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border-right: 4px solid #fecaca;
+        }
+
+        .pole-s-right {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-left: 4px solid #bfdbfe;
+        }
+
+        /* เส้นสนามแม่เหล็กจำลองพุ่งจากซ้ายไปขวา */
+        .b-field-stream {
+            position: absolute;
+            width: 280px;
+            height: 120px;
+            left: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            pointer-events: none;
+            z-index: 1;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        .b-line {
+            height: 2px;
+            background: repeating-linear-gradient(90deg, #10b981, #10b981 10px, transparent 10px, transparent 15px);
+            position: relative;
+            width: 100%;
+        }
+
+        .b-line::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #10b981;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* สายไฟแสดงผลมุมมองด้านหน้า: วงกลมสีน้ำตาลอยู่ตรงกลาง */
+        .wire-center-line {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            background: #b45309; 
+            border: 4px solid #78350f;
+            border-radius: 50%; 
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .wire-center-line.active {
+            background: #f59e0b;
+            border-color: #d97706;
+            box-shadow: 0 0 20px #f59e0b, 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* เครื่องชั่งดิจิทัลที่รองรับแท่งแม่เหล็ก */
+        .digital-scale-bottom {
+            position: absolute;
+            bottom: 25px;
+            width: 520px;
+            height: 110px;
+            background: #1e293b;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 8px solid #0f172a;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        /* จานรองเครื่องชั่ง */
+        .scale-plate {
+            position: absolute;
+            top: -10px;
+            width: 500px;
+            height: 15px;
+            background: #94a3b8;
+            border-radius: 4px;
+            border-bottom: 3px solid #64748b;
+        }
+
+        .scale-display {
+            background: #020617;
+            color: #00ff66;
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 6px 24px;
+            border-radius: 4px;
+            border: 2px solid #475569;
+            letter-spacing: 1px;
+            box-shadow: inset 0 0 8px rgba(0,255,102,0.2);
+        }
+
+        /* ลูกศรแสดงเวกเตอร์แรง */
+        .force-arrow {
+            position: absolute;
+            display: none;
+            align-items: center;
+            flex-direction: column;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .arrow-stem {
+            width: 6px;
+            height: 40px;
+        }
+
+        .arrow-head-up {
+            width: 0;
+            height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+        }
+
+        .arrow-head-down {
+            width: 0;
+            height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+        }
+
+        /* Table & Log section */
+        .bottom-container {
+            max-width: 1400px;
+            margin: 25px auto 0 auto;
+            width: 100%;
+        }
+
+        .table-responsive {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-up { background: #fee2e2; color: #ef4444; }
+        .badge-down { background: #dcfce7; color: #10b981; }
+        .badge-stable { background: #f1f5f9; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>เครื่องชั่งแรงแม่เหล็กเสมือนจริง (Magnetic Force Balance Lab)</h1>
+        <p>ศึกษาความสัมพันธ์ระหว่างกระแสไฟฟ้า (I), ความยาวเส้นลวด (L), และขนาดสนามแม่เหล็ก (B) ที่มีผลต่อแรงแม่เหล็ก</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Column: Controls -->
+        <div class="card">
+            <div class="card-title">⚙️ ตั้งค่าตัวแปรระบบ</div>
+
+            <!-- Magnet Slider -->
+            <div class="control-group">
+                <label>ขนาดสนามแม่เหล็กถาวร (B)
+                    <span class="value" id="val-b">0.15 T</span>
+                </label>
+                <input type="range" id="param-b" min="0.01" max="0.60" step="0.01" value="0.15">
+            </div>
+
+            <!-- Wire Length -->
+            <div class="control-group">
+                <label>ความยาวเส้นลวดในสนามแม่เหล็ก (L)
+                    <span class="value" id="val-l">3.0 cm</span>
+                </label>
+                <input type="range" id="param-l" min="1.0" max="6.0" step="0.5" value="3.0">
+            </div>
+
+            <!-- Current Direction Type -->
+            <div class="control-group">
+                <label>ทิศทางไหลของกระแสไฟฟ้า</label>
+                <div class="radio-tile-group">
+                    <div class="radio-tile active" id="dir-forward" onclick="setDirection('forward')">พุ่งเข้ากระดาษ (⊗) น้ำหนักเพิ่ม</div>
+                    <div class="radio-tile" id="dir-backward" onclick="setDirection('backward')">พุ่งออกกระดาษ (⊙) น้ำหนักลด</div>
+                </div>
+            </div>
+
+            <!-- Current Amount -->
+            <div class="control-group">
+                <label>ปริมาณกระแสไฟฟ้าจากแหล่งจ่าย (I)
+                    <span class="value" id="val-i">0.0 A</span>
+                </label>
+                <input type="range" id="param-i" min="0.0" max="5.0" step="0.1" value="0.0">
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-container">
+                <button class="btn-start" id="btn-run" onclick="toggleSimulation()">⚡ สับสวิตช์จ่ายไฟ</button>
+                <button class="btn-reset" onclick="resetLab()">🔄 รีเซ็ตระบบ</button>
+                <button class="btn-log" id="btn-add-log" onclick="logData()" disabled>📥 บันทึกผลการทดลอง</button>
+            </div>
+        </div>
+
+        <!-- Right Column: Visualizer Space -->
+        <div class="card" style="padding: 20px;">
+            <div class="card-title">🔬 อุปกรณ์จำลองการทดลอง (แม่เหล็กและลวดตัวนำ)</div>
+            <div class="lab-space">
+                <div class="visual-container">
+                    
+                    <!-- สายไฟทรงกลมหน้าตัดสีน้ำตาลอยู่ตรงกลางระหว่างแม่เหล็ก -->
+                    <div id="wire-line" class="wire-center-line"></div>
+
+                    <!-- เวกเตอร์จำลองแม่เหล็ก วางอยู่ด้านบนของตาชั่ง แยกบล็อกซ้ายขวา (N - S) -->
+                    <div id="magnet-box" class="magnet-pole-container">
+                        <div class="pole-block pole-n-left">N</div>
+                        
+                        <!-- ช่องแสดงทิศทางเส้นสนามแม่เหล็ก -->
+                        <div id="field-lines" class="b-field-stream">
+                            <div class="b-line"></div>
+                            <div class="b-line"></div>
+                            <div class="b-line"></div>
+                        </div>
+
+                        <div class="pole-block pole-s-right">S</div>
+                    </div>
+
+                    <!-- เครื่องชั่งดิจิทัลรองรับด้านล่างแม่เหล็กทั้งสอง -->
+                    <div class="digital-scale-bottom">
+                        <div class="scale-plate"></div>
+                        <div class="scale-display" id="weight-display">150.00 g</div>
+                    </div>
+
+                    <!-- ลูกศรแสดงแรงแม่เหล็กกระทำต่อลวด (F_B) -->
+                    <div class="force-arrow" id="arrow-wire" style="color: var(--danger);">
+                        <span id="wire-arrow-lbl">แรงแม่เหล็กบนลวด ($F_B$)</span>
+                        <div class="arrow-head-up" id="wire-arrow-head" style="border-bottom: 12px solid var(--danger);"></div>
+                        <div class="arrow-head-down" id="wire-arrow-head-down" style="border-top: 12px solid var(--danger); display:none;"></div>
+                        <div class="arrow-stem" style="background: var(--danger);"></div>
+                    </div>
+
+                    <!-- ลูกศรแสดงแรงปฏิกิริยาสะท้อนกลับลงแม่เหล็กบนตาชั่ง -->
+                    <div class="force-arrow" id="arrow-magnet" style="color: var(--primary-accent);">
+                        <div class="arrow-head-up" id="magnet-arrow-head-up" style="border-bottom: 12px solid var(--primary-accent); display:none;"></div>
+                        <div class="arrow-stem" style="background: var(--primary-accent); height:30px;"></div>
+                        <div class="arrow-head-down" id="magnet-arrow-head" style="border-top: 12px solid var(--primary-accent);"></div>
+                        <span style="font-size:0.75rem;">แรงปฎิกิริยากับตาชั่ง</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Container: Table Log -->
+    <div class="bottom-container">
+        <div class="card">
+            <div class="card-title">📊 ตารางบันทึกผลการทดลอง</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>ความเข้มสนามแม่เหล็ก B (T)</th>
+                            <th>ความยาวลวด L (cm)</th>
+                            <th>กระแสไฟฟ้า I (A)</th>
+                            <th>ทิศทางกระแส</th>
+                            <th>แรงแม่เหล็กที่คำนวณได้ F_B (N)</th>
+                            <th>น้ำหนักบนตาชั่ง (g)</th>
+                            <th>การเปลี่ยนแปลง</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const baseMagnetWeight = 150.00; 
+        let currentDirection = 'forward'; 
+        let isPowerOn = false;
+        let experimentCount = 0;
+
+        const paramB = document.getElementById('param-b');
+        const paramL = document.getElementById('param-l');
+        const paramI = document.getElementById('param-i');
+        
+        const valB = document.getElementById('val-b');
+        const valL = document.getElementById('val-l');
+        const valI = document.getElementById('val-i');
+        
+        const weightDisplay = document.getElementById('weight-display');
+        const btnRun = document.getElementById('btn-run');
+        const btnLog = document.getElementById('btn-add-log');
+        
+        const magnetBox = document.getElementById('magnet-box');
+        const fieldLines = document.getElementById('field-lines');
+        const wireLine = document.getElementById('wire-line');
+        
+        const arrowWire = document.getElementById('arrow-wire');
+        const arrowMagnet = document.getElementById('arrow-magnet');
+        
+        const wireArrowHeadUp = document.getElementById('wire-arrow-head');
+        const wireArrowHeadDown = document.getElementById('wire-arrow-head-down');
+        const magnetArrowHeadUp = document.getElementById('magnet-arrow-head-up');
+        const magnetArrowHeadDown = document.getElementById('magnet-arrow-head');
+
+        function updateParameters() {
+            const bVal = parseFloat(paramB.value);
+            const lVal = parseFloat(paramL.value);
+            const iVal = isPowerOn ? parseFloat(paramI.value) : 0.0;
+
+            valB.innerText = bVal.toFixed(2) + " T";
+            valL.innerText = lVal.toFixed(1) + " cm";
+            valI.innerText = parseFloat(paramI.value).toFixed(1) + " A";
+
+            const magnetWidth = 220 + (lVal * 45); 
+            magnetBox.style.width = magnetWidth + "px";
+            fieldLines.style.width = (magnetWidth - 200) + "px";
+
+            calculatePhysics(bVal, lVal, iVal);
+        }
+
+        function setDirection(dir) {
+            if(isPowerOn) return; 
+            currentDirection = dir;
+            document.getElementById('dir-forward').classList.remove('active');
+            document.getElementById('dir-backward').classList.remove('active');
+            
+            if(dir === 'forward') {
+                document.getElementById('dir-forward').classList.add('active');
+                wireLine.innerText = "";
+            } else {
+                document.getElementById('dir-backward').classList.add('active');
+                wireLine.innerText = "";
+            }
+            updateParameters();
+        }
+
+        function calculatePhysics(B, L_cm, I) {
+            const L_m = L_cm / 100; 
+            const force = I * L_m * B; 
+            const g = 9.80665; 
+            const massDelta_g = (force / g) * 1000; 
+
+            let finalWeight = baseMagnetWeight;
+            
+            if (I > 0 && force > 0) {
+                wireLine.classList.add('active');
+                if (currentDirection === 'forward') {
+                    // น้ำหนักเพิ่มขึ้น: แรงกดลงตาชั่ง (ปฏิกิริยา) / แรงแม่เหล็กดันลวดชี้ขึ้น
+                    finalWeight = baseMagnetWeight + massDelta_g;
+                    wireLine.innerText = "⊗"; 
+                    showArrows(true, 'forward');
+                } else {
+                    // น้ำหนักลดลง: แรงยกแม่เหล็กขึ้น (ปฏิกิริยา) / แรงแม่เหล็กดันลวดชี้ลง
+                    finalWeight = baseMagnetWeight - massDelta_g;
+                    wireLine.innerText = "⊙";
+                    showArrows(true, 'backward');
+                }
+            } else {
+                wireLine.innerText = "";
+                showArrows(false);
+                wireLine.classList.remove('active');
+            }
+
+            weightDisplay.innerText = finalWeight.toFixed(2) + " g";
+        }
+
+        function showArrows(visible, direction = 'forward') {
+            if(!visible) {
+                arrowWire.style.display = 'none';
+                arrowMagnet.style.display = 'none';
+                return;
+            }
+
+            arrowWire.style.display = 'flex';
+            arrowMagnet.style.display = 'flex';
+
+            const wireStem = arrowWire.querySelector('.arrow-stem');
+            const magnetStem = arrowMagnet.querySelector('.arrow-stem');
+
+            if(direction === 'forward') {
+                // เคสน้ำหนักเพิ่ม: F_B ดันลวดขึ้นบน, แรงปฏิกิริยากดแม่เหล็กลงล่าง
+                arrowWire.style.top = "120px";
+                wireArrowHeadUp.style.display = "block";
+                wireArrowHeadDown.style.display = "none";
+                wireStem.style.order = "2";
+                wireArrowHeadUp.style.order = "1";
+
+                arrowMagnet.style.bottom = "145px";
+                magnetArrowHeadUp.style.display = "none";
+                magnetArrowHeadDown.style.display = "block";
+                magnetStem.style.order = "1";
+                magnetArrowHeadDown.style.order = "2";
+            } else {
+                // เคสน้ำหนักลด: F_B ดันลวดลงล่าง, แรงปฏิกิริยายกแม่เหล็กขึ้นบน
+                arrowWire.style.top = "120px";
+                wireArrowHeadUp.style.display = "none";
+                wireArrowHeadDown.style.display = "block";
+                wireStem.style.order = "1";
+                wireArrowHeadDown.style.order = "2";
+
+                arrowMagnet.style.bottom = "145px";
+                magnetArrowHeadUp.style.display = "block";
+                magnetArrowHeadDown.style.display = "none";
+                magnetStem.style.order = "2";
+                magnetArrowHeadUp.style.order = "1";
+            }
+        }
+
+        function toggleSimulation() {
+            if (!isPowerOn) {
+                isPowerOn = true;
+                btnRun.innerText = "🛑 เปิดสวิตช์ตัดไฟ";
+                btnRun.style.background = "#ef4444"; 
+                btnLog.disabled = false;
+                
+                paramB.disabled = true;
+                paramL.disabled = true;
+                paramI.disabled = true;
+            } else {
+                isPowerOn = false;
+                btnRun.innerText = "⚡ สับสวิตช์จ่ายไฟ";
+                btnRun.style.background = "#10b981";
+                
+                paramB.disabled = false;
+                paramL.disabled = false;
+                paramI.disabled = false;
+            }
+            updateParameters();
+        }
+
+        function logData() {
+            experimentCount++;
+            const B = parseFloat(paramB.value);
+            const L = parseFloat(paramL.value);
+            const I = parseFloat(paramI.value);
+            const L_m = L / 100;
+            const force = I * L_m * B;
+            
+            const currentWeight = weightDisplay.innerText;
+            const directionTxt = currentDirection === 'forward' ? "พุ่งเข้า (⊗)" : "พุ่งออก (⊙)";
+            
+            let changeBadge = `<span class="badge badge-stable">คงที่</span>`;
+            if (I > 0) {
+                changeBadge = currentDirection === 'forward' ? 
+                    `<span class="badge badge-up">เพิ่มขึ้น (+${(parseFloat(currentWeight)-baseMagnetWeight).toFixed(2)}g)</span>` : 
+                    `<span class="badge badge-down">ลดลง (-${(baseMagnetWeight-parseFloat(currentWeight)).toFixed(2)}g)</span>`;
+            }
+
+            const tbody = document.getElementById('log-table-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${experimentCount}</b></td>
+                <td>${B.toFixed(2)}</td>
+                <td>${L.toFixed(1)}</td>
+                <td>${I.toFixed(1)}</td>
+                <td>${directionTxt}</td>
+                <td style="font-family: monospace; font-weight: bold; color: #2563eb;">${force.toFixed(5)} N</td>
+                <td style="font-family: monospace; font-weight: bold;">${currentWeight}</td>
+                <td>${changeBadge}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function resetLab() {
+            isPowerOn = false;
+            currentDirection = 'forward';
+            
+            paramB.disabled = false;
+            paramL.disabled = false;
+            paramI.disabled = false;
+            
+            paramB.value = "0.15";
+            paramL.value = "3.0";
+            paramI.value = "0.0";
+            
+            document.getElementById('dir-forward').classList.add('active');
+            document.getElementById('dir-backward').classList.remove('active');
+            
+            btnRun.innerText = "⚡ สับสวิตช์จ่ายไฟ";
+            btnRun.style.background = "#10b981";
+            btnLog.disabled = true;
+            
+            updateParameters();
+        }
+
+        paramB.addEventListener('input', updateParameters);
+        paramL.addEventListener('input', updateParameters);
+        paramI.addEventListener('input', updateParameters);
+
+        window.addEventListener('resize', updateParameters);
+        setTimeout(updateParameters, 100);
+    </script>
+</body>
+</html>
