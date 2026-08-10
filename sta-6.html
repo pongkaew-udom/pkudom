@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: การสร้างกล้องดูดาว</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .control-group label span.value {
+            color: var(--primary-accent);
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-reset {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-reset:hover { background: #cbd5e1; }
+
+        .btn-log {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-log:hover { opacity: 0.9; }
+
+        .lab-space {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 16px;
+            min-height: 540px;
+            border: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .viewfinder-section {
+            width: 100%;
+            height: 180px;
+            background: #020617;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 4px solid #475569;
+        }
+
+        .view-box {
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+
+        .view-box h4 {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .circle-preview {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid #64748b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .target-object {
+            font-size: 2.5rem;
+            transition: transform 0.2s, filter 0.2s;
+            user-select: none;
+        }
+
+        .optical-bench {
+            width: 100%;
+            height: 260px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            position: relative;
+            border: 2px dashed #cbd5e1;
+            margin-top: auto;
+            overflow: hidden;
+        }
+
+        .ruler-scale {
+            position: absolute;
+            bottom: 10px;
+            left: 5%;
+            width: 90%;
+            height: 20px;
+            border-top: 2px solid #64748b;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #64748b;
+            padding-top: 4px;
+            z-index: 4;
+        }
+
+        .optic-axis {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            border-top: 2px dashed #94a3b8;
+            z-index: 1;
+        }
+
+        .lens-mount {
+            position: absolute;
+            top: 0;
+            width: 60px;
+            height: 100%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 30px;
+            z-index: 5;
+        }
+
+        .lens-holder {
+            width: 6px;
+            background: #475569;
+            position: absolute;
+            bottom: 30px;
+            left: calc(50% - 3px);
+            height: calc(50% - 30px); 
+            z-index: 5;
+        }
+
+        .glass-lens {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(147, 197, 253, 0.4);
+            border: 2px solid #3b82f6;
+            border-radius: 50% / 15%;
+            box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
+            z-index: 6;
+        }
+
+        .mount-base {
+            width: 65px;
+            height: 18px;
+            background: #1e293b;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: absolute;
+            bottom: 30px;
+            z-index: 7;
+        }
+
+        .ray-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .focus-status-badge {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .bottom-container {
+            max-width: 1400px;
+            margin: 25px auto 0 auto;
+            width: 100%;
+        }
+
+        .table-responsive {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ห้องปฏิบัติการเสมือนจริง: การสร้างกล้องดูดาว (Telescope Assembly Lab)</h1>
+        <p>ศึกษาการจัดวางระบบเลนส์นูนคู่เพื่อสร้างกล้องดูดาวแบบเคปเลอร์ ตรวจสอบความยาวโฟกัส (fo, fe) ระยะห่าง (L) และคำนวณกำลังขยาย (M)</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Column: Controls -->
+        <div class="card">
+            <div class="card-title">⚙️ ตั้งค่าและเลื่อนระยะเลนส์</div>
+
+            <!-- Focal Length Objective -->
+            <div class="control-group">
+                <label>โฟกัสเลนส์วัตถุ (fo : ทางยาวโฟกัสสูง)
+                    <span class="value" id="val-fo">80 cm</span>
+                </label>
+                <input type="range" id="param-fo" min="50" max="100" step="5" value="80">
+            </div>
+
+            <!-- Focal Length Eyepiece -->
+            <div class="control-group">
+                <label>โฟกัสเลนส์ตา (fe : ขนาดสั้นแบบใช้งานจริง)
+                    <span class="value" id="val-fe">2 cm</span>
+                </label>
+                <input type="range" id="param-fe" min="1" max="4" step="0.5" value="2">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 20px;">
+
+            <!-- Lens Position Slider -->
+            <div class="control-group">
+                <label>ตำแหน่งติดตั้งเลนส์ตา (ขวา)
+                    <span class="value" id="val-pos-fe">82.0 cm</span>
+                </label>
+                <input type="range" id="param-pos-fe" min="50" max="115" step="0.5" value="82">
+            </div>
+
+            <!-- Readout metrics -->
+            <div class="control-group" style="background: var(--bg-main); padding: 12px; border-radius: 8px; font-size: 0.85rem; line-height: 1.6;">
+                <div>• ระยะห่างระหว่างเลนส์จริง (L): <span id="lbl-info-l" style="font-weight:bold; color:var(--primary-accent);">82.0 cm</span></div>
+                <div>• ระยะโฟกัสรวมที่ชัดเจน (fo + fe): <span id="lbl-info-ideal" style="font-weight:bold;">82.0 cm</span></div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-container">
+                <button class="btn-reset" onclick="resetLab()">🔄 รีเซ็ต</button>
+                <button class="btn-log" onclick="logData()">📥 บันทึกผลการทดลอง</button>
+            </div>
+        </div>
+
+        <!-- Right Column: Visualizer Space -->
+        <div class="card" style="padding: 20px;">
+            <div class="card-title" style="position: relative;">
+                🔬 ระบบจำลองทางทัศนศาสตร์ (Optical Bench Visualizer)
+                <div id="focus-badge" class="focus-status-badge">ชัดเจนสมบูรณ์</div>
+            </div>
+            
+            <div class="lab-space">
+                <!-- ส่วนบน: ช่องมองภาพจำลองดวงจันทร์ -->
+                <div class="viewfinder-section">
+                    <div class="view-box">
+                        <h4>วัตถุจริงระยะไกล (มองด้วยตาเปล่า)</h4>
+                        <div class="circle-preview">
+                            <div class="target-object" style="transform: scale(1);">🌕</div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-box">
+                        <h4>ภาพที่มองผ่านกล้องดูดาว (Telescope View)</h4>
+                        <div class="circle-preview" style="border-color: var(--primary-accent);">
+                            <div id="telescope-image" class="target-object">🌕</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนล่าง: รางออปติกพร้อมเลนส์และ SVG ลากเส้นแสง -->
+                <div class="optical-bench" id="bench-area">
+                    <div class="optic-axis"></div>
+                    
+                    <svg class="ray-svg-layer" id="ray-svg">
+                        <!-- เส้นประแนวตั้งผ่ากลางเลนส์วัตถุ -->
+                        <line id="center-line-obj" x1="0" y1="0" x2="0" y2="100%" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.7" />
+                        <!-- เส้นประแนวตั้งผ่ากลางเลนส์ตา -->
+                        <line id="center-line-eye" x1="0" y1="0" x2="0" y2="100%" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.7" />
+
+                        <!-- รังสีแสงสีแดงผ่านเลนส์ทั้งสองตามหลักฟิสิกส์ -->
+                        <path id="ray-top-path" d="" fill="none" stroke="rgba(239, 68, 68, 0.9)" stroke-width="2.5"/>
+                        <path id="ray-bottom-path" d="" fill="none" stroke="rgba(239, 68, 68, 0.9)" stroke-width="2.5"/>
+                    </svg>
+
+                    <!-- เลนส์วัตถุ (Objective Lens) ล็อกตำแหน่งไว้ทางซ้าย (สเกล 10%) -->
+                    <div class="lens-mount" id="mount-obj" style="left: 10%;">
+                        <div class="lens-holder"></div>
+                        <div class="glass-lens" id="glass-obj" style="width: 28px; height: 120px;"></div>
+                        <div class="mount-base">เลนส์วัตถุ (fo)</div>
+                    </div>
+
+                    <!-- เลนส์ตา (Eyepiece Lens) เลื่อนแกน X ตามการปรับสไลเดอร์ -->
+                    <div class="lens-mount" id="mount-eye">
+                        <div class="lens-holder"></div>
+                        <div class="glass-lens" id="glass-eye" style="width: 14px; height: 50px;"></div>
+                        <div class="mount-base">เลนส์ตา (fe)</div>
+                    </div>
+
+                    <!-- ไม้บรรทัดวัดระยะบนรางสูงสุด 120 cm -->
+                    <div class="ruler-scale">
+                        <span>0 cm</span>
+                        <span>20 cm</span>
+                        <span>40 cm</span>
+                        <span>60 cm</span>
+                        <span>80 cm</span>
+                        <span>100 cm</span>
+                        <span>120 cm</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Container: Table Log -->
+    <div class="bottom-container">
+        <div class="card">
+            <div class="card-title">📊 ตารางบันทึกผลการทดลอง: การหาตำแหน่งโฟกัสและกำลังขยาย</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>ความยาวโฟกัสเลนส์วัตถุ fo (cm)</th>
+                            <th>ความยาวโฟกัสเลนส์ตา fe (cm)</th>
+                            <th>ระยะห่างระหว่างเลนส์ L (cm)</th>
+                            <th>สถานะความคมชัดของภาพ</th>
+                            <th>กำลังขยายจากทฤษฎี (fo / fe)</th>
+                            <th>ลักษณะภาพที่ปรากฏผ่านกล้อง</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let experimentCount = 0;
+
+        const paramFo = document.getElementById('param-fo');
+        const paramFe = document.getElementById('param-fe');
+        const paramPosFe = document.getElementById('param-pos-fe');
+
+        const valFo = document.getElementById('val-fo');
+        const valFe = document.getElementById('val-fe');
+        const valPosFe = document.getElementById('val-pos-fe');
+
+        const lblInfoL = document.getElementById('lbl-info-l');
+        const lblInfoIdeal = document.getElementById('lbl-info-ideal');
+        
+        const mountObj = document.getElementById('mount-obj');
+        const mountEye = document.getElementById('mount-eye');
+        const glassObj = document.getElementById('glass-obj');
+        const glassEye = document.getElementById('glass-eye');
+        
+        const telescopeImage = document.getElementById('telescope-image');
+        const focusBadge = document.getElementById('focus-badge');
+
+        const centerLineObj = document.getElementById('center-line-obj');
+        const centerLineEye = document.getElementById('center-line-eye');
+        const rayTopPath = document.getElementById('ray-top-path');
+        const rayBottomPath = document.getElementById('ray-bottom-path');
+        const benchArea = document.getElementById('bench-area');
+
+        function updateTelescopeSystem() {
+            const fo = parseFloat(paramFo.value);
+            const fe = parseFloat(paramFe.value);
+            const posFe = parseFloat(paramPosFe.value);
+            
+            valFo.innerText = fo + " cm";
+            valFe.innerText = fe + " cm";
+            valPosFe.innerText = posFe.toFixed(1) + " cm";
+
+            const actualL = posFe; 
+            const idealL = fo + fe;
+
+            lblInfoL.innerText = actualL.toFixed(1) + " cm";
+            lblInfoIdeal.innerText = idealL.toFixed(1) + " cm";
+
+            const objHeight = 120;
+            const eyeHeight = 50;
+            
+            const startPct = 10; 
+            const endPct = 90;   
+            const totalRange = endPct - startPct;
+            
+            const objLeftPct = startPct;
+            // คำนวณตามสเกลความยาวรางใหม่สูงสุด 120 cm
+            const eyeLeftPct = startPct + (posFe / 120) * totalRange;
+            
+            mountObj.style.left = `calc(${objLeftPct}% - 30px)`;
+            mountEye.style.left = `calc(${eyeLeftPct}% - 30px)`;
+
+            const diff = Math.abs(actualL - idealL);
+            let blurAmount = 0;
+
+            if (diff < 0.6) {
+                focusBadge.innerText = "ชัดเจนสมบูรณ์";
+                focusBadge.style.backgroundColor = "var(--success)";
+                focusBadge.style.color = "white";
+                blurAmount = 0;
+            } else if (diff < 3.0) {
+                focusBadge.innerText = "ใกล้เคียง (เบลอเล็กน้อย)";
+                focusBadge.style.backgroundColor = "#fef08a";
+                focusBadge.style.color = "#a16207";
+                blurAmount = diff * 1.5;
+            } else {
+                focusBadge.innerText = "ภาพเบลอหลุดโฟกัส";
+                focusBadge.style.backgroundColor = "#fee2e2";
+                focusBadge.style.color = "var(--danger)";
+                blurAmount = Math.min(15, diff * 1.8);
+            }
+
+            // คำนวณการปรับขนาดของวัตถุตามสเกลที่แท้จริง
+            const magnification = fo / fe;
+            
+            // ใช้ตัวคูณ CSS scale เพื่อสร้างอัตราส่วนภาพดวงจันทร์ให้ขยายใหญ่ขึ้นอย่างมีนัยสำคัญ
+            // นำกำลังขยายหาร 12 เพื่อให้ขนาดพรีวิวแสดงผลในกรอบวงกลมได้พอดีและสมจริง
+            let displayScale = magnification / 12;
+            if (displayScale < 1.2) displayScale = 1.2; 
+            
+            if(diff >= 3.0) {
+                displayScale = Math.max(1.0, displayScale - (diff * 0.05));
+            }
+
+            telescopeImage.style.filter = `blur(${blurAmount}px)`;
+            // ภาพจากกล้องเคปเลอร์จะเป็นภาพจริงหัวกลับ (ติดลบค่า scale)
+            telescopeImage.style.transform = `scale(${-displayScale})`;
+
+            drawRayTracing(objLeftPct, eyeLeftPct, fo, fe, actualL, idealL, objHeight, eyeHeight);
+        }
+
+        function drawRayTracing(objLeftPct, eyeLeftPct, fo, fe, actualL, idealL, objHeight, eyeHeight) {
+            const w = benchArea.clientWidth;
+            const h = benchArea.clientHeight;
+            const midY = h / 2; 
+            
+            const xObj = (objLeftPct / 100) * w;
+            const xEye = (eyeLeftPct / 100) * w;
+            
+            centerLineObj.setAttribute('x1', xObj);
+            centerLineObj.setAttribute('x2', xObj);
+            centerLineEye.setAttribute('x1', xEye);
+            centerLineEye.setAttribute('x2', xEye);
+            
+            const hObjOffset = objHeight * 0.35; 
+
+            const totalRangePct = 90 - 10;
+            const xFocal = xObj + ((fo / 120) * (totalRangePct / 100) * w);
+
+            const slope = hObjOffset / (xFocal - xObj);
+            const yEyeOffsetAtEyepiece = slope * (xEye - xFocal);
+
+            // --- วาดเส้นรังสีด้านบน ---
+            let dTop = `M 0,${midY - hObjOffset} L ${xObj},${midY - hObjOffset} L ${xFocal},${midY} L ${xEye},${midY + yEyeOffsetAtEyepiece}`;
+            
+            if (Math.abs(actualL - idealL) < 0.6) {
+                dTop += ` L ${w},${midY + yEyeOffsetAtEyepiece}`;
+            } else {
+                const factor = (actualL - idealL) * 0.8;
+                dTop += ` L ${w},${midY + yEyeOffsetAtEyepiece - factor}`;
+            }
+            rayTopPath.setAttribute('d', dTop);
+
+            // --- วาดเส้นรังสีด้านล่าง ---
+            let dBottom = `M 0,${midY + hObjOffset} L ${xObj},${midY + hObjOffset} L ${xFocal},${midY} L ${xEye},${midY - yEyeOffsetAtEyepiece}`;
+            
+            if (Math.abs(actualL - idealL) < 0.6) {
+                dBottom += ` L ${w},${midY - yEyeOffsetAtEyepiece}`;
+            } else {
+                const factor = (actualL - idealL) * 0.8;
+                dBottom += ` L ${w},${midY - yEyeOffsetAtEyepiece + factor}`;
+            }
+            rayBottomPath.setAttribute('d', dBottom);
+        }
+
+        function logData() {
+            experimentCount++;
+            const fo = parseFloat(paramFo.value);
+            const fe = parseFloat(paramFe.value);
+            const L = parseFloat(paramPosFe.value);
+            const idealL = fo + fe;
+            const diff = Math.abs(L - idealL);
+            
+            let focusResult = "ภาพหลุดโฟกัส (เบลอ)";
+            if (diff < 0.6) focusResult = "ชัดเจนสมบูรณ์";
+            else if (diff < 3.0) focusResult = "เบลอเล็กน้อย";
+
+            const magTh = (fo / fe).toFixed(1);
+            const imageNature = "ภาพหัวกลับ เห็นรายละเอียดดวงจันทร์เด่นชัด ขยาย " + magTh + " เท่า";
+
+            const tbody = document.getElementById('log-table-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${experimentCount}</b></td>
+                <td>${fo}</td>
+                <td>${fe}</td>
+                <td style="font-family: monospace; font-weight: bold; color: var(--primary-accent);">${L.toFixed(1)}</td>
+                <td>${focusResult}</td>
+                <td style="font-family: monospace; font-weight: bold; color: var(--success);">${magTh} x</td>
+                <td>${diff < 0.6 ? imageNature : "ภาพมัว แสงไม่ขนานเข้าสู่ตา"}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function resetLab() {
+            paramFo.value = "80";
+            paramFe.value = "2";
+            paramPosFe.value = "82";
+            updateTelescopeSystem();
+        }
+
+        paramFo.addEventListener('input', updateTelescopeSystem);
+        paramFe.addEventListener('input', updateTelescopeSystem);
+        paramPosFe.addEventListener('input', updateTelescopeSystem);
+
+        window.addEventListener('resize', updateTelescopeSystem);
+        setTimeout(updateTelescopeSystem, 200);
+    </script>
+</body>
+</html>
