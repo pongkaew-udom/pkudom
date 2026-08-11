@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: การทดลองหยดน้ำมันของมิลลิแกน</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .control-group label span.value {
+            color: var(--primary-accent);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .step-btns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .btn-step {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 0;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-step:hover {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button.action-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-spray { background: var(--primary-accent); color: white; width: 100%; grid-column: span 2; }
+        .btn-spray:hover { opacity: 0.9; }
+        .btn-reset { background: #e2e8f0; color: var(--text-main); }
+        .btn-reset:hover { background: #cbd5e1; }
+        .btn-log { background: var(--success); color: white; }
+        .btn-log:hover { opacity: 0.9; }
+
+        .visual-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .visual-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .lab-space {
+            display: flex;
+            flex-direction: column;
+            background: #090d16;
+            border-radius: 12px;
+            height: 380px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 3px solid #1e293b;
+        }
+
+        .lab-subtitle {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            z-index: 5;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .viewfinder {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 8px solid #334155;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #091224 0%, #020617 100%);
+            box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.9);
+            cursor: pointer;
+        }
+
+        canvas {
+            position: absolute;
+        }
+
+        .info-box {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-accent);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.83rem;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        .formula {
+            text-align: center;
+            font-family: monospace;
+            font-weight: bold;
+            background: #e2e8f0;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 6px 0;
+            color: #1e293b;
+        }
+
+        .status-indicator {
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .bottom-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .table-responsive {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.82rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 10px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+            text-align: center;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .status-hover { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ห้องปฏิบัติการเสมือนจริง: การทดลองหยดน้ำมันของมิลลิแกน</h1>
+        <p>วัดประจุไฟฟ้าของอิเล็กตรอนโดยใช้สมดุลแรงทางไฟฟ้าและแรงโน้มถ่วง (Classic Millikan Apparatus)</p>
+    </header>
+
+    <div class="main-container">
+        <!-- แผงควบคุมระบบ (ซ้าย) -->
+        <div class="card">
+            <div class="card-title">⚙️ แผงควบคุมการทดลอง (Control Panel)</div>
+
+            <div class="btn-container" style="margin-bottom: 12px;">
+                <button class="action-btn btn-spray" onclick="sprayOil()">💨 พ่นละอองฝอยน้ำมัน (Spray Fine Mist)</button>
+            </div>
+
+            <!-- ปรับความต่างศักย์ V -->
+            <div class="control-group">
+                <label>ความต่างศักย์ไฟฟ้า (V)
+                    <span class="value" id="val-v">280 V</span>
+                </label>
+                <input type="range" id="param-v" min="0" max="1000" step="1" value="280" oninput="updateControls()">
+                
+                <div class="step-btns">
+                    <button class="btn-step" onclick="changeVoltage(-10)">-10V</button>
+                    <button class="btn-step" onclick="changeVoltage(-1)">-1V</button>
+                    <button class="btn-step" onclick="changeVoltage(1)">+1V</button>
+                    <button class="btn-step" onclick="changeVoltage(10)">+10V</button>
+                </div>
+            </div>
+
+            <!-- เลือกทิศทางขั้วสนามไฟฟ้า -->
+            <div class="control-group">
+                <label>ทิศทางขั้วแผ่นโลหะคู่ขนาน</label>
+                <select id="param-polarity" onchange="updateControls()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
+                    <option value="top-pos">แผ่นบน (+) / แผ่นล่าง (-)</option>
+                    <option value="top-neg">แผ่นบน (-) / แผ่นล่าง (+)</option>
+                </select>
+            </div>
+
+            <div class="status-indicator" id="live-status">
+                สถานะ: ยังไม่ได้พ่นน้ำมัน
+            </div>
+
+            <div class="btn-container">
+                <button class="action-btn btn-reset" onclick="resetLab()">🔄 รีเซ็ตแล็บ</button>
+                <button class="action-btn btn-log" onclick="logData()">📥 บันทึกการวัด</button>
+            </div>
+
+            <div class="info-box">
+                <div style="font-weight: bold; color: var(--primary);">💡 คำแนะนำการใช้งาน:</div>
+                <p>1. กดพ่นละอองฝอย แล้วสามารถ <b>"คลิกที่หยดน้ำมัน"</b> ในช่องมองเพื่อเลือกหยดที่ต้องการได้</p>
+                <p>2. ปรับความต่างศักย์ $V$ ให้หยดน้ำมันที่เลือก (สีฟ้า) หยุดนิ่งหรือขยับช้ามาก</p>
+                <p>3. เมื่อหยดสีฟ้าอยู่ใน <b>แถบพื้นที่วัดสีเขียว</b> จะสามารถกดบันทึกผลได้ทันที</p>
+                <div class="formula">q = (m · g · d) / V</div>
+            </div>
+        </div>
+
+        <!-- แผงแสดงผลจำลองภาพ (ขวา) -->
+        <div class="card" style="padding: 20px;">
+            <div class="card-title">🔬 ภาพจำลองอุปกรณ์และช่องมองกล้องไมโครเมตร (Microscope View)</div>
+            
+            <div class="visual-workspace">
+                <div class="lab-space">
+                    <div class="lab-subtitle">Apparatus Schematic (Side Cut)</div>
+                    <canvas id="setupCanvas" width="380" height="360"></canvas>
+                </div>
+
+                <div class="lab-space">
+                    <div class="lab-subtitle">Microscope Viewfinder (คลิกเลือกหยดน้ำมันได้)</div>
+                    <div class="viewfinder" id="viewfinder-container">
+                        <canvas id="viewCanvas" width="320" height="320"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ตารางบันทึกผลการทดลอง (ล่าง) -->
+    <div class="bottom-container">
+        <div class="card">
+            <div class="card-title">📊 ตารางวิเคราะห์คำนวณประจุอิเล็กตรอน (Experimental Data Table)</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>รัศมีหยดน้ำมัน r (µm)</th>
+                            <th>มวล m (kg)</th>
+                            <th>ความต่างศักย์ V (Volts)</th>
+                            <th>แรงโน้มถ่วง Fg (N)</th>
+                            <th>แรงไฟฟ้า Fe (N)</th>
+                            <th>สถานะในกล้อง</th>
+                            <th>ประจุที่คำนวณได้ q (C)</th>
+                            <th>จำนวนประจุ (n)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const g = 9.81; 
+        const e_charge = 1.602e-19; 
+        const d_distance = 0.016; 
+        const air_viscosity = 1.81e-5; 
+        const oil_density = 886; 
+
+        let drops = [];
+        let logCount = 0;
+        let selectedDropIndex = -1;
+        let isSpraying = false;
+
+        const setupCanvas = document.getElementById('setupCanvas');
+        const ctxSetup = setupCanvas.getContext('2d');
+        const viewCanvas = document.getElementById('viewCanvas');
+        const ctxView = viewCanvas.getContext('2d');
+
+        class OilDrop {
+            constructor() {
+                this.x = 190 + (Math.random() - 0.5) * 40; 
+                this.y = 50 + Math.random() * 25; 
+                
+                this.vy = 0; 
+                this.vx = (Math.random() - 0.5) * 0.000005;
+
+                this.r = (0.8 + Math.random() * 1.0) * 1e-6; 
+                this.mass = (4/3) * Math.PI * Math.pow(this.r, 3) * oil_density;
+                
+                let randType = Math.random();
+                if (randType < 0.25) {
+                    this.n = Math.floor(Math.random() * 5) + 1;
+                } else if (randType < 0.65) {
+                    this.n = Math.floor(Math.random() * 20) + 6;
+                } else {
+                    this.n = Math.floor(Math.random() * 55) + 26;
+                }
+                
+                this.q = -1 * this.n * e_charge;
+                
+                // คำนวณพิกัดจอสำหรับคลิกเลือก
+                this.renderX = 160;
+                this.renderY = 160;
+            }
+
+            update(voltage, polarity) {
+                if (this.y < 110) {
+                    this.y += 0.3;
+                    this.x += this.vx * 1000;
+                    return;
+                }
+
+                let E = voltage / d_distance;
+                if (polarity === 'top-neg') E = -E;
+
+                const Fg = this.mass * g;
+                const Fe = this.q * E; 
+                
+                const F_net = Fg + Fe;
+                const k = 6 * Math.PI * air_viscosity * this.r;
+                
+                const v_terminal = F_net / k; 
+                this.vy += (v_terminal - this.vy) * 0.03;
+                this.y += this.vy * 4000; 
+
+                if (this.y < 110) { 
+                    this.y = 110; 
+                    if (this.vy < 0) this.vy = 0; 
+                }
+                if (this.y > 235) { 
+                    this.y = 235; 
+                    if (this.vy > 0) this.vy = 0; 
+                }
+
+                this.renderY = 320 - ((this.y - 100) / 135) * 280 - 20; 
+                this.renderX = 160 + (this.x - 190) * 2.8;
+            }
+        }
+
+        function sprayOil() {
+            drops = [];
+            isSpraying = true;
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    drops.push(new OilDrop());
+                    if (selectedDropIndex === -1) {
+                        selectedDropIndex = 0;
+                    }
+                }, i * 30);
+            }
+
+            setTimeout(() => { isSpraying = false; }, 600);
+        }
+
+        // ระบบคลิกเลือกหยดน้ำมันบน Viewfinder
+        viewCanvas.addEventListener('click', (e) => {
+            if (drops.length === 0) return;
+
+            const rect = viewCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            let minDistance = 999;
+            let closestIndex = -1;
+
+            drops.forEach((drop, idx) => {
+                let dist = Math.hypot(drop.renderX - clickX, drop.renderY - clickY);
+                if (dist < minDistance && dist < 30) { // คลิกในระยะ 30px
+                    minDistance = dist;
+                    closestIndex = idx;
+                }
+            });
+
+            if (closestIndex !== -1) {
+                selectedDropIndex = closestIndex;
+            }
+        });
+
+        function changeVoltage(delta) {
+            const slider = document.getElementById('param-v');
+            let newVal = parseInt(slider.value) + delta;
+            if (newVal < 0) newVal = 0;
+            if (newVal > 1000) newVal = 1000;
+            slider.value = newVal;
+            updateControls();
+        }
+
+        function updateControls() {
+            const v = document.getElementById('param-v').value;
+            document.getElementById('val-v').innerText = v + " V";
+        }
+
+        function drawSetupSchematic() {
+            ctxSetup.clearRect(0, 0, setupCanvas.width, setupCanvas.height);
+
+            ctxSetup.strokeStyle = "#334155";
+            ctxSetup.lineWidth = 3;
+            ctxSetup.strokeRect(50, 30, 280, 270);
+
+            ctxSetup.fillStyle = "#94a3b8";
+            ctxSetup.fillRect(175, 10, 30, 35);
+            ctxSetup.fillStyle = "#cbd5e1";
+            ctxSetup.fillRect(182, 45, 16, 15);
+            ctxSetup.fillStyle = "#ef4444";
+            ctxSetup.fillRect(165, 5, 50, 8);
+            ctxSetup.fillStyle = "#f8fafc";
+            ctxSetup.font = "bold 10px Sarabun";
+            ctxSetup.fillText("Atomizer", 170, 28);
+
+            if (isSpraying) {
+                ctxSetup.fillStyle = "rgba(56, 189, 248, 0.3)";
+                ctxSetup.beginPath();
+                ctxSetup.arc(190, 70, 20, 0, Math.PI * 2);
+                ctxSetup.fill();
+            }
+
+            const polarity = document.getElementById('param-polarity').value;
+            const topColor = polarity === 'top-pos' ? "#ef4444" : "#2563eb";
+            const botColor = polarity === 'top-pos' ? "#2563eb" : "#ef4444";
+
+            ctxSetup.fillStyle = topColor;
+            ctxSetup.fillRect(80, 100, 95, 10);
+            ctxSetup.fillRect(205, 100, 95, 10);
+            ctxSetup.fillStyle = "#f59e0b";
+            ctxSetup.font = "10px Sarabun";
+            ctxSetup.fillText("Pinhole 🎯", 170, 93);
+
+            ctxSetup.fillStyle = botColor;
+            ctxSetup.fillRect(80, 240, 220, 10);
+
+            ctxSetup.fillStyle = "#ffffff";
+            ctxSetup.font = "bold 11px Sarabun";
+            ctxSetup.fillText(polarity === 'top-pos' ? "(+) Pole" : "(-) Pole", 25, 108);
+            ctxSetup.fillText(polarity === 'top-pos' ? "(-) Pole" : "(+) Pole", 25, 248);
+
+            ctxSetup.fillStyle = "#475569";
+            ctxSetup.fillRect(330, 160, 20, 120);
+            ctxSetup.fillRect(300, 165, 40, 10);
+            
+            let grad = ctxSetup.createLinearGradient(300, 150, 300, 190);
+            grad.addColorStop(0, '#94a3b8');
+            grad.addColorStop(0.5, '#cbd5e1');
+            grad.addColorStop(1, '#475569');
+            ctxSetup.fillStyle = grad;
+            ctxSetup.fillRect(280, 155, 60, 30);
+            
+            ctxSetup.fillStyle = "#0f172a";
+            ctxSetup.fillRect(265, 160, 15, 20);
+
+            ctxSetup.fillStyle = "#38bdf8";
+            ctxSetup.font = "bold 10px Sarabun";
+            ctxSetup.fillText("Microscope Optics", 270, 202);
+
+            drops.forEach((drop) => {
+                ctxSetup.beginPath();
+                ctxSetup.arc(drop.x, drop.y, 1.8, 0, Math.PI * 2);
+                ctxSetup.fillStyle = "rgba(56, 189, 248, 0.8)";
+                ctxSetup.fill();
+            });
+        }
+
+        function drawViewfinder() {
+            ctxView.clearRect(0, 0, viewCanvas.width, viewCanvas.height);
+
+            const v = parseFloat(document.getElementById('param-v').value);
+            const polarity = document.getElementById('param-polarity').value;
+
+            let bgGrad = ctxView.createRadialGradient(160, 160, 10, 160, 160, 160);
+            bgGrad.addColorStop(0, '#0f172a');
+            bgGrad.addColorStop(0.8, '#020617');
+            bgGrad.addColorStop(1, '#000000');
+            ctxView.fillStyle = bgGrad;
+            ctxView.fillRect(0, 0, viewCanvas.width, viewCanvas.height);
+
+            // แถบสีเขียวขยายกว้างขึ้น (ช่วง -1.0 mm ถึง +1.0 mm -> y = 120 ถึง 200)
+            ctxView.fillStyle = "rgba(16, 185, 129, 0.18)";
+            ctxView.fillRect(0, 120, 320, 80);
+            ctxView.strokeStyle = "rgba(16, 185, 129, 0.6)";
+            ctxView.lineWidth = 1.5;
+            ctxView.beginPath();
+            ctxView.moveTo(0, 120); ctxView.lineTo(320, 120);
+            ctxView.moveTo(0, 200); ctxView.lineTo(320, 200);
+            ctxView.stroke();
+
+            ctxView.fillStyle = "rgba(16, 185, 129, 0.9)";
+            ctxView.font = "bold 10px Sarabun";
+            ctxView.fillText("MEASUREMENT ZONE (โซนวัดค่า)", 10, 135);
+
+            // สเกลไมโครเมตร
+            ctxView.strokeStyle = "rgba(16, 185, 129, 0.35)";
+            ctxView.lineWidth = 1;
+            
+            ctxView.beginPath();
+            ctxView.moveTo(160, 0); ctxView.lineTo(160, 320);
+            ctxView.moveTo(0, 160); ctxView.lineTo(320, 160);
+            ctxView.stroke();
+
+            ctxView.fillStyle = "rgba(16, 185, 129, 0.6)";
+            ctxView.font = "10px monospace";
+            for (let y = 20; y <= 300; y += 20) {
+                ctxView.beginPath();
+                ctxView.moveTo(152, y); ctxView.lineTo(168, y);
+                ctxView.stroke();
+                if (y % 40 === 0 && y !== 160) {
+                    let mmLabel = ((160 - y) / 40).toFixed(1);
+                    ctxView.fillText((mmLabel > 0 ? "+" : "") + mmLabel + " mm", 172, y + 4);
+                }
+            }
+
+            drops.forEach((drop, idx) => {
+                drop.update(v, polarity);
+
+                let isSelected = (idx === selectedDropIndex);
+                let radius = isSelected ? 7 : 3.5;
+
+                let glow = ctxView.createRadialGradient(
+                    drop.renderX, drop.renderY, 0.5,
+                    drop.renderX, drop.renderY, radius
+                );
+
+                if (isSelected) {
+                    glow.addColorStop(0, '#ffffff');
+                    glow.addColorStop(0.4, '#38bdf8');
+                    glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+                } else {
+                    glow.addColorStop(0, '#ffffff');
+                    glow.addColorStop(0.5, '#f59e0b');
+                    glow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+                }
+
+                ctxView.beginPath();
+                ctxView.arc(drop.renderX, drop.renderY, radius, 0, Math.PI * 2);
+                ctxView.fillStyle = glow;
+                ctxView.fill();
+
+                ctxView.beginPath();
+                ctxView.arc(drop.renderX, drop.renderY, isSelected ? 2 : 1, 0, Math.PI * 2);
+                ctxView.fillStyle = "#ffffff";
+                ctxView.fill();
+            });
+
+            updateStatusGauge();
+
+            let glassGrad = ctxView.createLinearGradient(0, 0, 320, 320);
+            glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.06)');
+            glassGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+            glassGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+            ctxView.fillStyle = glassGrad;
+            ctxView.fillRect(0, 0, 320, 320);
+        }
+
+        function updateStatusGauge() {
+            const statusEl = document.getElementById('live-status');
+            if (drops.length === 0 || selectedDropIndex === -1) {
+                statusEl.innerText = "สถานะ: ยังไม่ได้พ่นน้ำมัน";
+                statusEl.style.background = "#f1f5f9";
+                statusEl.style.color = "#334155";
+                return;
+            }
+
+            const drop = drops[selectedDropIndex];
+            const speed = Math.abs(drop.vy);
+            const inZone = (drop.renderY >= 120 && drop.renderY <= 200);
+
+            // ขยายขีดจำกัดความเร็วให้ยืดหยุ่นง่ายขึ้น (0.000008)
+            if (speed < 0.000008 && inZone) {
+                statusEl.innerText = "🎯 หยดสีฟ้า: หยุดนิ่งในแถบวัด! (พร้อมบันทึกผล)";
+                statusEl.style.background = "#d1fae5";
+                statusEl.style.color = "#065f46";
+            } else if (speed < 0.000008 && !inZone) {
+                statusEl.innerText = "⚠️ หยดสีฟ้า: หยุดนิ่งแต่อยู่นอกแถบพื้นที่วัด";
+                statusEl.style.background = "#fef3c7";
+                statusEl.style.color = "#92400e";
+            } else if (drop.vy > 0) {
+                statusEl.innerText = "⬇️ หยดสีฟ้า: กำลังเคลื่อนลง";
+                statusEl.style.background = "#fee2e2";
+                statusEl.style.color = "#991b1b";
+            } else {
+                statusEl.innerText = "⬆️ หยดสีฟ้า: กำลังลอยขึ้น";
+                statusEl.style.background = "#dbeafe";
+                statusEl.style.color = "#1e40af";
+            }
+        }
+
+        function logData() {
+            if (drops.length === 0 || selectedDropIndex === -1) {
+                alert("กรุณากด 'พ่นละอองฝอยน้ำมัน' ก่อนทำการบันทึกผลครับ");
+                return;
+            }
+
+            const drop = drops[selectedDropIndex];
+            const speed = Math.abs(drop.vy);
+            const inZone = (drop.renderY >= 120 && drop.renderY <= 200);
+
+            if (speed >= 0.000008) {
+                alert("❌ ไม่สามารถบันทึกค่าได้!\n\nหยดน้ำมันสีฟ้ายังเคลื่อนที่เร็วเกินไป กรุณาปรับ V เพิ่ม/ลด เล็กน้อยเพื่อชะลอความเร็วให้นิ่งก่อนครับ");
+                return;
+            }
+
+            if (!inZone) {
+                alert("❌ ไม่สามารถบันทึกค่าได้!\n\nหยดน้ำมันสีฟ้าอยู่นอกแถบพื้นที่วัด (แถบสีเขียว) กรุณาปรับ V เพื่อเลื่อนหยดน้ำมันให้อยู่ในแถบสีเขียวก่อนครับ");
+                return;
+            }
+
+            const v = parseFloat(document.getElementById('param-v').value);
+            const polarity = document.getElementById('param-polarity').value;
+
+            const Fg = drop.mass * g;
+            let E = v / d_distance;
+            if (polarity === 'top-neg') E = -E;
+            const Fe = drop.q * E;
+
+            logCount++;
+            const tbody = document.getElementById('log-table-body');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td><b>${logCount}</b></td>
+                <td>${(drop.r * 1e6).toFixed(2)} µm</td>
+                <td>${drop.mass.toExponential(3)}</td>
+                <td>${v}</td>
+                <td>${Fg.toExponential(3)}</td>
+                <td>${Math.abs(Fe).toExponential(3)}</td>
+                <td><span class="status-badge status-hover">หยุดนิ่งในแถบวัด</span></td>
+                <td style="color:#2563eb; font-weight:bold;">${drop.q.toExponential(3)}</td>
+                <td style="background:#f0fdf4; font-weight:bold;">${drop.n} e</td>
+            `;
+            tbody.prepend(row);
+        }
+
+        function resetLab() {
+            drops = [];
+            selectedDropIndex = -1;
+            document.getElementById('log-table-body').innerHTML = "";
+            document.getElementById('param-v').value = 280;
+            logCount = 0;
+            updateControls();
+        }
+
+        function animate() {
+            drawSetupSchematic();
+            drawViewfinder();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateControls();
+            animate();
+        });
+    </script>
+</body>
+</html>
