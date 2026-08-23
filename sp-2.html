@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Advanced Light Spectrum Analysis</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary-color: #38bdf8;
+            --accent-color: #a855f7;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 950px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .title-card {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .title-card h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .title-card p {
+            color: #94a3b8;
+            font-size: 1.05rem;
+        }
+
+        /* Setup Diagram */
+        .viewport-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .lab-viewport {
+            height: 300px;
+            background: #05070c;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Spectrum Result Display */
+        .spectrum-display-box {
+            background: #000;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .spectrum-bar {
+            height: 65px;
+            width: 100%;
+            background: #000;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        .wavelength-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-family: monospace;
+            padding: 0 5px;
+        }
+
+        /* Intensity Graph Preview */
+        .graph-container {
+            height: 130px;
+            background: #090d16;
+            border-radius: 8px;
+            margin-top: 15px;
+            position: relative;
+            border: 1px solid #1e293b;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .select-group {
+            background: #0f172a;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #1e293b;
+            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .info-box {
+            background: #075985;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 4px 12px 12px 4px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            min-height: 150px;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-add { background: var(--primary-color); color: #0f172a; }
+        .btn-add:hover { background: #7dd3fc; transform: translateY(-1px); }
+        .btn-clear { background: #475569; color: white; }
+        .btn-clear:hover { background: #64748b; }
+
+        /* Table Style */
+        .table-card {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--primary-color);
+        }
+
+        .mini-spec-preview {
+            height: 22px;
+            width: 160px;
+            border-radius: 3px;
+            border: 1px solid #334155;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card title-card">
+        <h1>🔬 Virtual Lab: การวิเคราะห์สเปกตรัมของแสงจากหลอดไฟแบบต่างๆ</h1>
+        <p>ศึกษา ค้นหา และเปรียบเทียบความแตกต่างระหว่างแถบสเปกตรัมต่อเนื่องและเส้นสเปกตรัมแบบคมชัด (Sharp Line Spectrum)</p>
+    </div>
+
+    <!-- Left Side: Visualization -->
+    <div class="card viewport-container">
+        <h3>📡 ผังการจัดจำลองอุปกรณ์การทดลอง (Experiment Setup)</h3>
+        <div class="lab-viewport">
+            <svg id="lab-svg" width="100%" height="100%" viewBox="0 0 600 300">
+                <!-- แหล่งกำเนิดแสง -->
+                <g id="light-source" transform="translate(60, 150)">
+                    <circle cx="0" cy="0" r="25" fill="#334155" stroke="#475569" stroke-width="2"/>
+                    <circle id="bulb-glow" cx="0" cy="0" r="16" fill="#fef08a" opacity="0.9"/>
+                    <text x="0" y="40" fill="#94a3b8" font-size="11" text-anchor="middle" id="source-label">หลอดไฟ</text>
+                </g>
+
+                <!-- แผ่นสลิตเดี่ยว -->
+                <g transform="translate(180, 150)">
+                    <line x1="0" y1="-50" x2="0" y2="-8" stroke="#64748b" stroke-width="5"/>
+                    <line x1="0" y1="8" x2="0" y2="50" stroke="#64748b" stroke-width="5"/>
+                    <text x="0" y="65" fill="#94a3b8" font-size="11" text-anchor="middle">แผ่นสลิตแคบ (Slit)</text>
+                </g>
+
+                <!-- แผ่นเกรตติง -->
+                <g transform="translate(320, 150)">
+                    <rect x="-5" y="-40" width="10" height="80" fill="#475569" rx="2"/>
+                    <line x1="0" y1="-35" x2="0" y2="35" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2"/>
+                    <text x="0" y="55" fill="#94a3b8" font-size="11" text-anchor="middle">เกรตติง (Grating)</text>
+                </g>
+
+                <!-- ฉากรับแสง -->
+                <g transform="translate(520, 150)">
+                    <rect x="0" y="-85" width="15" height="170" fill="#1e293b" stroke="#334155"/>
+                    <text x="10" y="100" fill="#94a3b8" font-size="11" text-anchor="middle">ฉากรับภาพ</text>
+                </g>
+
+                <!-- ลำแสงพลวัต -->
+                <path id="ray-white" d="M 85 150 L 180 150 M 180 150 L 320 150" stroke="#fff" stroke-width="2" opacity="0.8"/>
+                
+                <!-- รังสีหักเหหลังผ่านเกรตติง -->
+                <g id="diffracted-rays" opacity="0.9"></g>
+            </svg>
+        </div>
+
+        <h3>🌈 ผลการแยกสเปกตรัมบนฉากรับภาพแบบความคมชัดสูง (Sharp Spectrum Output)</h3>
+        <div class="spectrum-display-box">
+            <div id="spectrum-render" class="spectrum-bar"></div>
+            <div class="wavelength-scale">
+                <span>400 nm (ม่วง)</span>
+                <span>450 nm</span>
+                <span>500 nm (เขียว)</span>
+                <span>550 nm</span>
+                <span>600 nm (เหลือง)</span>
+                <span>650 nm</span>
+                <span>700 nm (แดง)</span>
+            </div>
+        </div>
+
+        <!-- กราฟความเข้มแสง -->
+        <div class="graph-container">
+            <svg id="graph-svg" width="100%" height="100%" viewBox="0 0 550 130">
+                <text x="15" y="20" fill="#64748b" font-size="10">ความเข้มแสงสัมพัทธ์ (Relative Intensity)</text>
+                <path id="graph-line" d="" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+                <line x1="30" y1="115" x2="520" y2="115" stroke="#334155" stroke-width="1"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right Side: Controls & Info -->
+    <div class="card controls">
+        <div class="select-group">
+            <label for="light-selector">เลือกชนิดของหลอดไฟทดลอง</label>
+            <select id="light-selector">
+                <option value="incandescent">หลอดไฟแบบมีไส้ (Incandescent)</option>
+                <option value="hydrogen">หลอดบรรจุแก๊สไฮโดรเจน (Hydrogen Gas)</option>
+                <option value="sodium">หลอดไอโซเดียม (Sodium Vapor)</option>
+                <option value="mercury">หลอดไอปรอท (Mercury Vapor)</option>
+                <option value="neon">หลอดบรรจุแก๊สนีออน (Neon Gas)</option>
+                <option value="led">หลอดไฟขาว LED (White LED)</option>
+                <option value="fluorescent">หลอดฟลูออเรสเซนต์ (Fluorescent)</option>
+            </select>
+        </div>
+
+        <div class="info-box">
+            <b style="color: #f1f5f9; font-size: 1rem;">💡 ข้อมูลและหลักการทางฟิสิกส์:</b><br>
+            <p id="physics-desc" style="margin-top: 6px; color: #e2e8f0;"></p>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-add" id="btn-record">📥 บันทึกผลการทดลอง</button>
+            <button class="btn-clear" id="btn-clear">🗑️ ล้างข้อมูลตาราง</button>
+        </div>
+    </div>
+
+    <!-- Bottom: Table Data -->
+    <div class="card table-card">
+        <h3>📊 ตารางบันทึกผลการทดลองวิทยาศาสตร์</h3>
+        <table id="result-table">
+            <thead>
+                <tr>
+                    <th>ลำดับ</th>
+                    <th>ชนิดของแหล่งกำเนิดแสง</th>
+                    <th>ลักษณะของสเปกตรัมที่พบ</th>
+                    <th>ช่วงความยาวคลื่น / เส้นเด่นจำเพาะ (nm)</th>
+                    <th>แถบสีตัวอย่างสเปกตรัมที่บันทึก</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ผลการทดลองจะเพิ่มเข้ามาที่นี่แบบไดนามิก -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ข้อมูลจำลองสเปกตรัมแบบเส้นคมชัด (Sharp Linear Gradients) อ้างอิงตามทฤษฎีจริง
+    const spectrumData = {
+        incandescent: {
+            name: "หลอดไฟแบบมีไส้ (Incandescent)",
+            type: "สเปกตรัมต่อเนื่อง (Continuous Spectrum)",
+            desc: "เกิดจากการแผ่รังสีความร้อนของวัตถุดำ (Blackbody Radiation) ของไส้หลอดทังสเตนที่เป็นของแข็ง อิเล็กตรอนถูกกระตุ้นอย่างไม่จำกัดระดับพลังงาน แสงสเปกตรัมจึงเกาะกลุ่มต่อเนื่องเป็นแถบสีรุ้งไร้รอยต่อ ตั้งแต่ 400 ไปจนถึง 700 nm และแผ่เลยไปในย่านอินฟราเรดด้วย",
+            peaks: "แถบสีรุ้งต่อเนื่องเรียบเนียน (400 - 700 nm)",
+            style: "linear-gradient(to right, #7f00ff, #0000ff, #00ff00, #ffff00, #ff7f00, #ff0000)",
+            rayColors: ['#ff4500', '#f1c40f', '#00ff00', '#3498db', '#9b59b6'],
+            graphPath: "M 30 115 Q 150 50 300 25 T 520 15",
+            bgGlow: "#fde047"
+        },
+        hydrogen: {
+            name: "หลอดบรรจุแก๊สไฮโดรเจน (Hydrogen)",
+            type: "สเปกตรัมแบบเส้น (Line Spectrum)",
+            desc: "เกิดจากการลดระดับพลังงานของอิเล็กตรอนตามอนุกรมบัลเมอร์ (Balmer Series) ปลุกพลังงานเฉพาะตัวออกมาเป็นเส้นคมกริบ 4 เส้นเด่นชัด ได้แก่ เส้นสีแดงเด่น ($656.3\\text{ nm}$) แดงอมฟ้า ($486.1\\text{ nm}$) สีน้ำเงิน ($434.0\\text{ nm}$) และสีม่วง ($410.2\\text{ nm}$)",
+            peaks: "410 nm (ม่วง), 434 nm (น้ำเงิน), 486 nm (ฟ้า), 656 nm (แดง)",
+            // ใช้โครงสร้างสีตัดขอบศูนย์แบบคมชัด (0.5% width) เพื่อสร้างเส้นสเปกตรัมที่สมจริงแทนแถบหนา
+            style: "linear-gradient(to right, #000 0%, #000 3.8%, #7f00ff 4.1%, #000 4.4%, #000 11.2%, #0044ff 11.5%, #000 11.8%, #000 28.2%, #00ffff 28.7%, #000 29.2%, #000 84.8%, #ff0000 85.4%, #000 86.0%)",
+            rayColors: ['#7f00ff', '#0044ff', '#00ffff', '#ff0000'],
+            graphPath: "M 30 115 L 50 115 L 51 20 L 53 115 L 90 115 L 91 25 L 93 115 L 180 115 L 182 30 L 184 115 L 452 115 L 454 10 L 456 115 L 520 115",
+            bgGlow: "#bae6fd"
+        },
+        sodium: {
+            name: "หลอดไอโซเดียม (Sodium Vapor)",
+            type: "สเปกตรัมแบบเส้นเดี่ยวเด่น (Line Spectrum)",
+            desc: "หลอดไอโซเดียมมีเอกลักษณ์สำคัญคือการแผ่รังสีที่แหลมและสว่างจ้าที่สุดที่ระดับพลังงาน $3p \\rightarrow 3s$ ปรากฏเป็นเส้นสีเหลืองเข้มที่ใกล้กันมาก 2 เส้น (Sodium D-lines) ที่ความยาวคลื่นประมาณ $589\\text{ nm}$ ส่งผลให้แสงจากหลอดไฟประเภทนี้เป็นสีเหลืองโมโนโครมาติกค่อนข้างบริสุทธิ์",
+            peaks: "589 nm (เหลืองคู่สว่างจ้ามาก)",
+            style: "linear-gradient(to right, #000 0%, #000 62.5%, #ffcc00 63.2%, #ffcc00 63.8%, #000 64.5%)",
+            rayColors: ['#ffcc00'],
+            graphPath: "M 30 115 L 342 115 L 345 5 L 348 115 L 520 115",
+            bgGlow: "#f97316"
+        },
+        mercury: {
+            name: "หลอดไอปรอท (Mercury Vapor)",
+            type: "สเปกตรัมแบบเส้น (Line Spectrum)",
+            desc: "ไอปรอทเมื่อถูกกระตุ้นจะคายพลังงานเป็นสเปกตรัมเส้นที่มีความสว่างคมชัดสูงมากในย่านสีม่วง เขียว และเหลือง มักใช้เป็นสเกลอ้างอิงและใช้ทำระบบไฟส่องสว่างความสว่างสูง เส้นเด่นที่ตรวจพบคือ $436\\text{ nm}$ (ม่วงน้ำเงิน) $546\\text{ nm}$ (เขียวมรกต) และ $578\\text{ nm}$ (เหลืองคู่)",
+            peaks: "436 nm (ม่วงน้ำเงิน), 546 nm (เขียวสว่าง), 578 nm (เหลือง)",
+            style: "linear-gradient(to right, #000 0%, #000 11.5%, #7f00ff 12.0%, #000 12.5%, #000 48.2%, #00ff00 48.8%, #000 49.4%, #000 59.0%, #ffff00 59.5%, #000 60.0%)",
+            rayColors: ['#7f00ff', '#00ff00', '#ffff00'],
+            graphPath: "M 30 115 L 90 115 L 92 20 L 94 115 L 295 115 L 297 15 L 299 115 L 350 115 L 352 25 L 354 115 L 520 115",
+            bgGlow: "#e9d5ff"
+        },
+        neon: {
+            name: "หลอดบรรจุแก๊สนีออน (Neon)",
+            type: "สเปกตรัมแบบเส้นกระจุกหนาแน่น (Line Spectrum)",
+            desc: "แก๊สนีออนมีโครงสร้างอิเล็กตรอนหลายดวงและซับซ้อน เส้นสเปกตรัมส่วนใหญ่จึงเบียดเสียดกันอย่างหนาแน่นในย่านความยาวคลื่นแถบสีส้มและสีแดง (ระหว่าง 580 - 670 nm) ทำให้ตาของเราผสมผสานเส้นสเปกตรัมเหล่านี้และมองเห็นหลอดนีออนป้ายโฆษณาเป็นสีแดงเพลิงสว่างเด่น",
+            peaks: "กระจุกเส้นคมถี่ ย่านสีส้ม-แดง (580 - 670 nm)",
+            style: "linear-gradient(to right, #000 0%, #000 58%, #ffaa00 59%, #000 59.5%, #ff6600 61%, #000 61.5%, #ff3300 65%, #ff0000 67%, #000 68%, #ff0000 75%, #ff0000 80%, #000 82%)",
+            rayColors: ['#ffaa00', '#ff5500', '#ff0000'],
+            graphPath: "M 30 115 L 315 115 L 320 60 L 325 115 L 340 115 L 345 30 L 350 115 L 370 115 L 375 20 L 390 115 L 430 115 L 435 15 L 445 115 L 520 115",
+            bgGlow: "#fee2e2"
+        },
+        led: {
+            name: "หลอดไฟขาว LED (White LED)",
+            type: "สเปกตรัมกึ่งต่อเนื่องผสมผสาน (LED Spectrum)",
+            desc: "เทคโนโลยี LED สีขาวส่วนใหญ่ใช้อะตอมชิปสารกึ่งตัวนำเปล่งแสงสีน้ำเงินความเข้มสูง ($450\\text{ nm}$) จากนั้นแสงบางส่วนจะถูกสารเรืองแสงฟอสฟอร์ (Phosphor) ดูดซับแล้วเรืองแสงแผ่แถบกว้างสีเหลือง-เขียวต่อเนื่อง กราฟจึงมีสองส่วนคือ ยอดแหลมแคบสีน้ำเงินคู่กับภูเขาเตี้ยต่อเนื่องสีเหลือง",
+            peaks: "ยอดแคบยอดแหลมที่ 450 nm และแถบกว้างหนุนต่อเนื่องย่าน 500-650 nm",
+            style: "linear-gradient(to right, #000 0%, #000 15%, #0055ff 16.2%, #0077ff 16.8%, #0033aa 18%, #228822 25%, #888811 45%, #bb6611 65%, #aa2211 85%, #000 95%)",
+            rayColors: ['#0055ff', '#55aa22', '#eab308'],
+            graphPath: "M 30 115 L 110 115 L 115 10 L 125 90 Q 200 50 320 60 T 500 115",
+            bgGlow: "#ffffff"
+        },
+        fluorescent: {
+            name: "หลอดฟลูออเรสเซนต์ (Fluorescent)",
+            type: "เส้นสเปกตรัมซ้อนบนแถบจาง (Hybrid Spectrum)",
+            desc: "ภายในหลอดเกิดจากไอปรอทถูกกระตุ้นจนคายรังสี UV ออกมาตกกระทบสารเรืองแสงฟอสฟอร์ที่เคลือบผนังตึกหลอด ผลลัพธ์จึงพบเส้นสเปกตรัมที่คมกริบของไอปรอท (เช่น เส้นเขียว ส้ม) ปรากฏซ้อนทับอยู่บนแถบแสงกึ่งต่อเนื่องจาง ๆ ที่เกิดจากการแผ่ของฟอสฟอร์",
+            peaks: "เส้นคมปรอท (436, 546 nm) ปรากฏเด่นบนฐานแถบเรืองแสงกว้าง",
+            style: "linear-gradient(to right, #000 0%, #112244 10%, #7f00ff 12.0%, #113355 13%, #226644 40%, #00ff00 48.8%, #335533 51%, #ffff00 59.5%, #442222 70%)",
+            rayColors: ['#7f00ff', '#00ff00', '#ffff00'],
+            graphPath: "M 30 115 Q 80 100 90 115 L 92 15 L 94 115 Q 180 80 295 115 L 297 10 L 299 115 L 350 115 L 352 35 L 354 115 Q 420 90 520 115",
+            bgGlow: "#f0fdfa"
+        }
+    };
+
+    const lightSelector = document.getElementById('light-selector');
+    const bulbGlow = document.getElementById('bulb-glow');
+    const sourceLabel = document.getElementById('source-label');
+    const diffractedRays = document.getElementById('diffracted-rays');
+    const spectrumRender = document.getElementById('spectrum-render');
+    const graphLine = document.getElementById('graph-line');
+    const physicsDesc = document.getElementById('physics-desc');
+    const btnRecord = document.getElementById('btn-record');
+    const btnClear = document.getElementById('btn-clear');
+    const tableBody = document.querySelector('#result-table tbody');
+
+    let rowCount = 0;
+
+    function updateSimulation() {
+        const selected = lightSelector.value;
+        const data = spectrumData[selected];
+
+        // 1. ปรับสีลูกไฟจำลองและป้ายชื่อ
+        bulbGlow.setAttribute('fill', data.bgGlow);
+        sourceLabel.textContent = data.name.split(' (')[0];
+
+        // 2. ปรับเนื้อหาฟิสิกส์เชิงลึก
+        physicsDesc.innerHTML = data.desc;
+
+        // 3. ปรับสเปกตรัมผลลัพธ์แบบเส้นคมชัดสูง
+        spectrumRender.style.background = data.style;
+
+        // 4. ปรับเส้นกราฟจำลองขีดจำกัดความเข้มข้นสัมพัทธ์
+        graphLine.setAttribute('d', data.graphPath);
+
+        // 5. วาดรังสีแสงจำลองพุ่งออกไปพาดฉากรับ
+        let rayHtml = '';
+        let spreadY = [];
+        if (data.rayColors.length === 1) {
+            spreadY = [150];
+        } else if (data.rayColors.length === 3) {
+            spreadY = [110, 150, 190];
+        } else if (data.rayColors.length === 4) {
+            spreadY = [100, 130, 170, 200];
+        } else {
+            spreadY = [85, 115, 150, 185, 215];
+        }
+
+        data.rayColors.forEach((color, index) => {
+            const yEnd = spreadY[index] || 150;
+            rayHtml += `<line x1="320" y1="150" x2="520" y2="${yEnd}" stroke="${color}" stroke-width="1.8" />`;
+        });
+        diffractedRays.innerHTML = rayHtml;
+    }
+
+    function recordToTable() {
+        const selected = lightSelector.value;
+        const data = spectrumData[selected];
+        rowCount++;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><b>${rowCount}</b></td>
+            <td>${data.name}</td>
+            <td style="color: ${data.type.includes('ต่อเนื่อง') && !data.type.includes('กึ่ง') ? '#38bdf8' : '#c084fc'}; font-weight: bold;">${data.type}</td>
+            <td><code style="background: #0f172a; padding: 4px 8px; border-radius: 4px; color:#38bdf8;">${data.peaks}</code></td>
+            <td><div class="mini-spec-preview" style="background: ${data.style}"></div></td>
+        `;
+        tableBody.appendChild(row);
+    }
+
+    // สัญญาณ Event
+    lightSelector.addEventListener('change', updateSimulation);
+    btnRecord.addEventListener('click', recordToTable);
+    btnClear.addEventListener('click', () => {
+        tableBody.innerHTML = '';
+        rowCount = 0;
+    });
+
+    // เริ่มการทำงานแล็บเสมือนจริงครั้งแรก
+    updateSimulation();
+</script>
+
+</body>
+</html>
