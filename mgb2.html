@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สรุปงานวิจัย: Effect of density of state on isotope effect exponent</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm;
+            background-color: #fafbfc;
+        }
+        body {
+            font-family: 'Sarabun', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+            line-height: 1.4;
+            font-size: 10.5pt;
+            background-color: #fafbfc;
+        }
+        .header-container {
+            background-color: #1a365d;
+            color: #ffffff;
+            margin: 0 0 25px 0;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid #2b6cb0;
+            border-radius: 6px;
+        }
+        h1 {
+            font-size: 15pt;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        .meta-info {
+            font-size: 9.5pt;
+            color: #cbd5e0;
+            margin: 0;
+        }
+        h2 {
+            font-size: 12pt;
+            color: #2b6cb0;
+            margin: 22px 0 10px 0;
+            border-left: 4px solid #2b6cb0;
+            padding-left: 10px;
+            font-weight: bold;
+        }
+        p {
+            margin: 0 0 10px 0;
+            text-align: justify;
+            text-indent: 15px;
+        }
+        ul {
+            margin: 0 0 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: #ffffff;
+            font-size: 9.5pt;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #2b6cb0;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        tr:nth-child(even) {
+            background-color: #f7fafc;
+        }
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 8.5pt;
+            color: #a0aec0;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>สรุปงานวิจัย: ผลของความหนาแน่นสถานะต่อเลขชี้กำลังของผลไอโซโทปในตัวนำยิ่งยวดแบบสองแถบพลังงาน</h1>
+        <p class="meta-info">ตีพิมพ์ในวารสาร Physica C (2005) | คณะผู้วิจัย: มศว และ มหาวิทยาลัยหอการค้าไทย (P. Udomsamuthirun, et al.)</p>
+    </div>
+
+    <h2>1. บทนำและวัตถุประสงค์</h2>
+    <p>หนึ่งในคุณสมบัติที่น่าสนใจที่สุดของตัวนำยิ่งยวดคือ <span class="highlight">เลขชี้กำลังของผลไอโซโทป (Isotope Effect Exponent: <span class="math">&alpha;</span>)</span> ซึ่งตามทฤษฎี BCS ดั้งเดิมจะมีค่าคงที่เท่ากับ <span class="math">&alpha; = 0.5</span> สำหรับตัวนำยิ่งยวดทั่วไป ทว่าในตัวนำยิ่งยวดอุณหภูมิสูง (High-<span class="math">T_c</span>) และสาร <span class="highlight"><span class="math">MgB_2</span></span> ผลการทดลองพบว่าค่า <span class="math">&alpha;</span> มีค่าน้อยกว่า 0.5 อย่างเห็นได้ชัด (เช่น ใน <span class="math">MgB_2</span> มีค่าประมาณ 0.3) งานวิจัยนี้จึงมุ่งศึกษาและหาตัวแบบทางคณิตศาสตร์ที่แม่นยำเพื่ออธิบายปรากฏการณ์ดังกล่าว โดยทำการวิเคราะห์ผลของ **ความหนาแน่นสถานะ (Density of State: DOS)** 2 รูปแบบที่มีต่อค่า <span class="math">&alpha;</span> ภายใต้ระบบตัวนำยิ่งยวดแบบสองแถบพลังงาน (Two-band Superconductors) ในขอบเขตการจับคู่แบบอ่อน (Weak-coupling limit)</p>
+
+    <h2>2. แบบจำลองทางทฤษฎีและการคำนวณ</h2>
+    <p>คณะผู้วิจัยได้เริ่มต้นจากแบบจำลองสองแถบพลังงานของ Suhl และ Moskalenko โดยเพิ่มความสมจริงด้วยการกำหนดให้อันตรกิริยาการจับคู่ (Pairing Interaction) ในแต่ละแถบพลังงานประกอบด้วย 2 ส่วน คือ อันตรกิริยาระหว่างอิเล็กตรอนกับโฟนอน (Electron-Phonon) และอันตรกิริยาที่ไม่ใช่โฟนอน (Non-Electron-Phonon) จากนั้นทำการวิเคราะห์เปรียบเทียบรูปแบบของ DOS 2 ประเภท ได้แก่:</p>
+    <ul>
+        <li><span class="highlight">ความหนาแน่นสถานะคงที่ (Constant Density of State):</span> สมมติให้ DOS มีค่าสม่ำเสมอทั่วแถบพลังงาน</li>
+        <li><span class="highlight">ภาวะเอกฐานแบบแวนโฮฟ (van Hove Singularity: vHs DOS):</span> สมมติให้ DOS มีลักษณะเป็นยอดแหลมสูง ณ ระดับพลังงานจำเพาะ</li>
+    </ul>
+    <p>ผูษย์วิจัยได้สกัดสมการที่แน่นอน (Exact Formula) สำหรับคำนวณอุณหภูมิวิกฤต (<span class="math">T_c</span>) และค่าเลขชี้กำลังของผลไอโซโทป (<span class="math">&alpha;</span>) ของทั้งสองกรณี เพื่อนำไปพล็อตเชิงตัวเลขเปรียบเทียบกับข้อมูลที่ได้จากการทดลองจริง</p>
+
+    <h2>3. ผลการวิจัยและการค้นพบสำคัญ</h2>
+    <p>จากการทดสอบเชิงตัวเลขและเปรียบเทียบกับผลการทดลองในอดีต คณะผู้วิจัยได้ข้อสรุปที่สำคัญ 2 ประการดังนี้:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>รูปแบบความหนาแน่นสถานะ (DOS)</th>
+                <th>ความสามารถในการจับคู่กับข้อมูลทดลอง (Fitting Results)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="highlight">1. แบบค่าคงที่ (Constant DOS)</td>
+                <td>สามารถอธิบายและเข้ากันได้ดี (Fit) กับผลการทดลองจริงของทั้งสาร <span class="math">MgB_2</span> และสารตัวนำยิ่งยวดอุณหภูมิสูง (High-<span class="math">T_c</span>)</td>
+            </tr>
+            <tr>
+                <td class="highlight">2. แบบแวนโฮฟ (van Hove Singularity)</td>
+                <td>สามารถเข้ากันได้ดีเฉพาะกับสารตัวนำยิ่งยวดอุณหภูมิสูงบางชนิด แต่**ไม่สามารถ**ใช้อธิบายพฤติกรรมของสาร <span class="math">MgB_2</span> ได้</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li><span class="highlight">ผลกระทบระหว่างแถบพลังงาน (Interband Interaction):</span> ผลการคำนวณชี้ชัดว่า อันตรกิริยาของอิเล็กตรอน-โฟนอน**ระหว่างแถบพลังงาน (Interband)** มีผลต่อการเปลี่ยนแปลงของค่าเลขชี้กำลังของผลไอโซโทป (<span class="math">&alpha;</span>) มากกว่าอันตรกิริยาภายในแถบพลังงานของตัวเอง (Intraband)</li>
+        <li><span class="highlight">พฤติกรรมในแบบจำลอง Constant DOS:</span> เมื่ออันตรกิริยาระหว่างแถบพลังงานเพิ่มขึ้น ค่า <span class="math">&alpha;</span> จะมีแนวโน้มเพิ่มขึ้นตามไปด้วย และค่า <span class="math">&alpha;</span> จะวิ่งเข้าสู่ 0.5 ที่ระดับอุณหภูมิวิกฤต (<span class="math">T_c</span>) ต่ำ ๆ ซึ่งสอดคล้องตามทฤษฎีทางฟิสิกส์</li>
+    </ul>
+
+    <h2>4. บทสรุป</h2>
+    <p>งานวิจัยนี้ประสบความสำเร็จในการพิสูจน์ว่า ตัวแบบตัวนำยิ่งยวดสองแถบพลังงานที่มี **ความหนาแน่นสถานะคงที่ (Constant DOS)** ร่วมกับการพิจารณาอันตรกิริยาระหว่างแถบพลังงาน เป็นตัวแบบที่มีประสิทธิภาพและแม่นยำที่สุดในการอธิบายค่าเลขชี้กำลังของผลไอโซโทปที่ผิดปกติในสาร <span class="math">MgB_2</span> ซึ่งช่วยให้เหล่านักฟิสิกส์มีความเข้าใจเกี่ยวกับกลไกเชิงลึกของตัวนำยิ่งยวดชนิดใหม่ ๆ ได้ดียิ่งขึ้น</p>
+
+    <div class="footer">
+        ที่มา: สรุปและเรียบเรียงภาษาให้เข้าใจง่ายจากเอกสารวิจัยต้นฉบับภาษาอังกฤษ (Physica C, 2005, 149-154)
+    </div>
+
+</body>
+</html>
