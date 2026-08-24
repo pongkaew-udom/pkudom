@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สรุปงานวิจัย: การประยุกต์ใช้เซนเซอร์วัดสนามแม่เหล็กบนสมาร์ตโฟน</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 15mm;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            font-size: 10.5pt;
+        }
+        .header-container {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 16pt;
+            margin: 0 0 6px 0;
+            font-weight: bold;
+            line-height: 1.3;
+            text-align: center;
+        }
+        .meta-text {
+            font-size: 9pt;
+            text-align: center;
+            opacity: 0.85;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 6px;
+            margin-top: 6px;
+        }
+        h2 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            border-left: 3.5px solid #2563eb;
+            padding-left: 6px;
+        }
+        p {
+            margin: 0 0 8px 0;
+            text-align: justify;
+        }
+        .summary-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 10pt;
+        }
+        .flex-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .flex-child {
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .math-style {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        ul {
+            margin: 0 0 8px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        .footer-text {
+            font-size: 8pt;
+            color: #64748b;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>สรุปงานวิจัยย่อ: การประยุกต์ใช้เซนเซอร์วัดสนามแม่เหล็กบนสมาร์ตโฟนเพื่อวัดกระแสไฟฟ้าสลับของเครื่องใช้ไฟฟ้า</h1>
+        <div class="meta-text">
+            <strong>บทความ:</strong> Apply a smartphone's magnetometer to measure the AC current of electrical equipment<br>
+            <strong>ตีพิมพ์ใน:</strong> The Physics Teacher (Feb 2025) | <strong>คณะผู้เขียน:</strong> ปฐม วงศ์วิจิตร, พงษ์แก้ว อุดมสมุทรหิรัญ และคณะ (มศว และ มรภ.สุราษฎร์ธานี)
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <strong>หัวใจสำคัญของงานวิจัย (Abstract):</strong> งานวิจัยนี้นำเสนอวิธีการเรียนรู้ฟิสิกส์เชิงปฏิบัติโดยการเปลี่ยนสมาร์ตโฟนให้เป็นเครื่องมือวัดทางวิทยาศาสตร์ คณะผู้เขียนได้ใช้ <strong>เซนเซอร์วัดสนามแม่เหล็ก (Magnetometer)</strong> ที่มีอยู่บนสมาร์ตโฟนร่วมกับแอปพลิเคชัน <strong>Phyphox</strong> เพื่อวัดค่ากระแสไฟฟ้าสลับ (AC) ของเครื่องใช้ไฟฟ้าในบ้านผ่านกฎของแอมแปร์ แทนการใช้เครื่องมือราคาแพง ช่วยแก้ปัญหาการขาดแคลนอุปกรณ์ในห้องปฏิบัติการและทำให้นักเรียนเข้าใจฟิสิกส์ในชีวิตประจำวันได้ง่ายขึ้น
+    </div>
+
+    <h2>1. หลักการทางทฤษฎี</h2>
+    <p>
+        ตามกฎของแอมแปร์ (Ampere's Law) สนามแม่เหล็ก (<span class="math-style">B</span>) ที่เกิดขึ้นรอบลวดตัวนำที่มีกระแสไฟฟ้า (<span class="math-style">I</span>) ไหลผ่าน จะแปรผันตรงกับความเข้มของกระแสไฟฟ้า และแปรผกผันกับระยะห่างจากเส้นลวด (<span class="math-style">r</span>) ตามสมการ <span class="math-style">B = &mu;<sub>0</sub>I / 2&pi;r</span> จากความสัมพันธ์ที่เป็นเส้นตรงนี้ ทำให้เราสามารถคำนวณย้อนกลับเพื่อหาค่ากระแสไฟฟ้าของเครื่องใช้ไฟฟ้าได้จากการวัดขนาดของสนามแม่เหล็กที่เกิดขึ้นรอบสายไฟ
+    </p>
+
+    <h2>2. การจัดเตรียมชุดทดลอง (Experimental Setup)</h2>
+    <ul>
+        <li><strong>อุปกรณ์:</strong> ใช้ iPhone 7 Plus ติดตั้งแอปพลิเคชัน Phyphox ในโหมด "Magnetometer" เพื่อบันทึกค่าสนามแม่เหล็ก 3 มิติในหน่วยไมโครเทสลา (&mu;T)</li>
+        <li><strong>การตัดสัญญาณรบกวน:</strong> เนื่องจากสายไฟทั่วไปมีสายคู่ (กระแสไหลไป-กลับทำให้อัตราเฉลี่ยสนามแม่เหล็กเป็นศูนย์) คณะผู้จัยจึงแยกสายไฟออกจากกันเป็นระยะ 10 ซม. และจัดวางสายไฟในแนวทิศเหนือ-ใต้ เพื่อลดการแทรกสอดของสนามแม่เหล็กโลกและสัญญาณรบกวนโดยรอบ</li>
+        <li><strong>สมการปรับเทียบ (Calibration):</strong> ผลการทดลองหาความสัมพันธ์เส้นตรงระหว่างกระแสไฟฟ้าและสนามแม่เหล็กที่ระยะห่างต่างกัน ได้สมการแม่นยำสูง (<span class="math-style">R<sup>2</sup> &approx; 0.99</span>) คือ:
+            <br>&bull; ระยะ 1 ซม.: <span class="math-style">I = (B + 2.6 &mu;T) / 29.9</span>
+            <br>&bull; ระยะ 2 ซม.: <span class="math-style">I = (B - 0.58 &mu;T) / 4.95</span>
+        </li>
+    </ul>
+
+    <h2>3. วิธีการเก็บข้อมูลและวิเคราะห์ผล</h2>
+    <p>
+        ผู้วัดจะวางสมาร์ตโฟนตั้งฉากกับแนวเส้นลวดที่ระยะ 1 และ 2 เซนติเมตร สัญญาณสนามแม่เหล็กสลับที่ได้จะมีลักษณะเป็นคลื่นไซน์ (Sine wave) จากนั้นทำการอ่านค่าสูงสุด (<span class="math-style">B<sub>x</sub><sup>max</sup></span>) และต่ำสุด (<span class="math-style">B<sub>x</sub><sup>min</sup></span>) ในช่วงเวลา 60 วินาที เพื่อคำนวณหาแอมพลิจูดของสนามแม่เหล็กสุทธิจากสมการ <span class="math-style">B<sub>x</sub> = |B<sub>x</sub><sup>max</sup> - B<sub>x</sub><sup>min</sup>| / 2</span> แล้วนำไปแปลงเป็นค่ากระแสไฟฟ้า
+    </p>
+
+    <h2>4. ผลการทดลองและการเปรียบเทียบ</h2>
+    <div class="flex-container">
+        <div class="flex-child">
+            <strong>ความแม่นยำสูง:</strong> เมื่อนำค่ากระแสไฟฟ้าที่วัดได้จากสมาร์ตโฟนไปเปรียบเทียบกับเครื่องมือมาตรฐานอย่าง มัลติมิเตอร์ (Multimeter) และ แคลมป์มิเตอร์ (Clamp meter) พบว่ามีค่าใกล้เคียงกันมาก โดยมีเปอร์เซ็นต์ความแตกต่าง (Percentage Difference) อยู่ในเกณฑ์ต่ำเพียงประมาณ 1% - 5.8% เท่านั้น
+        </div>
+        <div class="flex-child">
+            <strong>ข้อแนะนำในการปฏิบัติ:</strong> การวัดที่ระยะห่าง 1 เซนติเมตร จะให้ความแม่นยำและเสถียรภาพมากกว่าระยะ 2 เซนติเมตร เนื่องจากสัญญาณสนามแม่เหล็กมีความเข้มสูงกว่า ทำให้เซนเซอร์ของสมาร์ตโฟนตรวจจับได้ง่ายและลดผลกระทบจากสัญญาณรบกวน (Noise) โดยรอบได้ดีกว่า
+        </div>
+    </div>
+
+    <h2>5. บทสรุปและการนำไปประยุกต์ใช้</h2>
+    <p>
+        งานวิจัยนี้พิสูจน์ว่าเซนเซอร์วัดสนามแม่เหล็กบนสมาร์ตโฟนสามารถนำมาใช้เป็นเครื่องมือทางเลือกในการวัดกระแสไฟฟ้าสลับได้อย่างมีประสิทธิภาพ แนวคิดนี้สามารถนำไปขยายผลเพื่อใช้วัดกระแสไฟฟ้าในสายไฟแรงสูง หรืออุปกรณ์ไฟฟ้าที่มีความอันตรายเกินกว่าจะเข้าใกล้ได้ ช่วยเชื่อมโยงความรู้ฟิสิกส์ที่เป็นนามธรรมเข้ากับการทดลองจริง และส่งเสริมประสบการณ์การเรียนรู้เชิงรุกที่สนุกสนานให้แก่นักเรียน
+    </p>
+
+    <div class="footer-text">
+        จัดทำสรุปความยาว 1 หน้ากระดาษ A4 เพื่อความกระชับและเข้าใจง่าย | แหล่งข้อมูลอ้างอิง: DOI: 10.1119/5.0233097
+    </div>
+
+</body>
+</html>
