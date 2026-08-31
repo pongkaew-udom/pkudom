@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Virtual Lab: การหาจุดศูนย์ถ่วง (CG)</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --bg: #f4f6f7;
+            --panel-bg: #ffffff;
+            --border: #bdc3c7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lab-container {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        h1 { color: var(--primary); font-size: 26px; }
+        .subtitle { color: #555; font-size: 14px; margin-top: 5px; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+        }
+
+        .sim-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .canvas-container {
+            width: 450px;
+            height: 450px;
+            background: #ffffff;
+            border: 2px dashed #95a5a6;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* อนิเมชันให้วัตถุหมุนเอียงเข้าหาแนวดิ่งอย่างนุ่มนวล */
+        #dynamicObjectGroup {
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .control-panel {
+            background: #fafbfc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 15px;
+            font-family: inherit;
+            background-color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-primary:disabled { background: #bdc3c7; cursor: not-allowed; }
+        
+        .btn-accent { background: #9b59b6; color: white; }
+        .btn-accent:hover { background: #8e44ad; }
+        .btn-accent:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-success:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        .btn-save { background: #f39c12; color: white; }
+        .btn-save:hover { background: #d35400; }
+        .btn-save:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        .btn-danger { background: var(--accent); color: white; }
+        .btn-danger:hover { background: #c0392b; }
+
+        .status-box {
+            background: #e8f4f8;
+            padding: 14px;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .table-section {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14.5px;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th { background: var(--primary); color: white; font-weight: 600; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        
+        .btn-clear-row {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .btn-clear-row:hover { text-decoration: underline; }
+
+        .hint-text {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="lab-container">
+    <header>
+        <h1>ห้องปฏิบัติการฟิสิกส์เสมือนจริง (Virtual Lab)</h1>
+        <div class="subtitle">การจำลองหาจุดศูนย์ถ่วงด้วยเทคนิคเส้นดิ่งแขวนภายใต้แรงโน้มถ่วงของโลก (Plumb-line Mechanics Simulator)</div>
+    </header>
+
+    <div class="main-layout">
+        <div class="sim-section">
+            <div class="canvas-container" id="canvasFrame">
+                <svg id="simSvg" viewBox="0 0 450 450">
+                    <!-- Grid System -->
+                    <g stroke="#f0f0f0" stroke-width="1">
+                        <line x1="50" y1="0" x2="50" y2="450"/><line x1="100" y1="0" x2="100" y2="450"/>
+                        <line x1="150" y1="0" x2="150" y2="450"/><line x1="200" y1="0" x2="200" y2="450"/>
+                        <line x1="250" y1="0" x2="250" y2="450"/><line x1="300" y1="0" x2="300" y2="450"/>
+                        <line x1="350" y1="0" x2="350" y2="450"/><line x1="400" y1="0" x2="400" y2="450"/>
+                        <line x1="0" y1="50" x2="450" y2="50"/><line x1="0" y1="100" x2="450" y2="100"/>
+                        <line x1="0" y1="150" x2="450" y2="150"/><line x1="0" y1="200" x2="450" y2="200"/>
+                        <line x1="0" y1="250" x2="450" y2="250"/><line x1="0" y1="300" x2="450" y2="300"/>
+                        <line x1="0" y1="350" x2="450" y2="350"/><line x1="0" y1="400" x2="450" y2="400"/>
+                    </g>
+                    
+                    <!-- เส้นดิ่งลูกตุ้มหลัก (คงที่ในแนวแกน X=225 แขวนจากหมุดลงมาตรงๆ ตลอดเวลา) -->
+                    <g id="plumbLineComponent">
+                        <line x1="225" y1="120" x2="225" y2="420" stroke="#3498db" stroke-width="2" stroke-dasharray="4,4"/>
+                        <circle cx="225" cy="420" r="10" fill="#e74c3c" stroke="#34495e" stroke-width="1.5"/>
+                    </g>
+
+                    <!-- กลุ่มวัตถุเคลื่อนไหวตามแรงโน้มถ่วง -->
+                    <g id="dynamicObjectGroup">
+                        <!-- ตัวเนื้อวัตถุ -->
+                        <g id="shapeContainer"></g>
+                        <!-- แนวเส้นดิ่งสีแดงที่จะเกาะติดไปตามเนื้อวัตถุอย่างถาวร -->
+                        <g id="persistentLinesGroup"></g>
+                        <!-- แสดงจุด CG เมื่อสำเร็จการทดลอง -->
+                        <circle id="cgPoint" cx="0" cy="0" r="6" fill="#fc5c65" stroke="#fff" stroke-width="2" style="display: none;"/>
+                        <text id="cgText" font-family="sans-serif" font-size="13" font-weight="bold" fill="#fc5c65" style="display: none;">จุด CG</text>
+                    </g>
+
+                    <!-- หมุดแขวนคงที่ (Fixed Pivot Pin ที่ยึดวัตถุไว้ที่จุดกลางกระดาน) -->
+                    <circle cx="225" cy="120" r="6" fill="#2c3e50" stroke="#fff" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <div class="hint-text">* เส้นดิ่งลูกตุ้ม (สีฟ้าครึ้มหมุดแดง) จะทิ้งตัวลงตรงๆ ตลอดเวลาตามแรงโน้มถ่วงโลก</div>
+        </div>
+
+        <div class="control-panel">
+            <div>
+                <div class="control-group">
+                    <label for="objectSelect">เลือกชิ้นงานทดลอง:</label>
+                    <select id="objectSelect" onchange="initLabEnvironment()">
+                        <option value="0" selected>ตัวเลข 0</option>
+                        <option value="1">ตัวเลข 1</option>
+                        <option value="2">ตัวเลข 2</option>
+                        <option value="3">ตัวเลข 3</option>
+                        <option value="4">ตัวเลข 4</option>
+                        <option value="5">ตัวเลข 5</option>
+                        <option value="6">ตัวเลข 6</option>
+                        <option value="7">ตัวเลข 7</option>
+                        <option value="8">ตัวเลข 8</option>
+                        <option value="9">ตัวเลข 9</option>
+                        <option value="bird">นกสมดุล (Balancing Bird)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>ขั้นตอนการทดลอง (ตามภาพลำดับเหตุการณ์):</label>
+                    <button id="btnSwing" class="btn btn-primary" onclick="executeSwingToVertical()">1. ปล่อยวัตถุเอียงเข้าหาแนวดิ่ง (ภาพกลาง)</button>
+                    <button id="btnDraw" class="btn btn-success" onclick="executeDrawLine()" disabled>2. ลากเส้นแนวแรงบนชิ้นงาน (ภาพขวา)</button>
+                    <button id="btnNextPin" class="btn btn-accent" onclick="executeNextPin()" disabled>3. เปลี่ยนรูเจาะถัดไป</button>
+                    <button id="btnSave" class="btn btn-save" onclick="saveDataToTable()" disabled>4. บันทึกผลการทดลอง</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <button id="btnReset" class="btn btn-danger" onclick="resetCurrentState()">รีเซ็ตชิ้นงาน (Reset)</button>
+                <div class="status-box" id="statusBox">
+                    <strong>สถานะ:</strong> กำลังโหลด...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h2>ตารางบันทึกผลการทดลอง</h2>
+        <table id="labResultsTable">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">วัตถุชิ้นงาน</th>
+                    <th style="width: 15%;">จำนวนจุดแขวน (เส้น)</th>
+                    <th style="width: 45%;">พฤติกรรมการจัดวางตำแหน่งและการซ้อนทับกันของแนวแรง</th>
+                    <th style="width: 20%;">สรุปผลตำแหน่งจุด CG</th>
+                    <th style="width: 10%;">การจัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const physicsDatabase = {
+        "0": { name: "ตัวเลข 0", path: "M -35,-55 L 35,-55 L 35,55 L -35,55 Z M -15,-30 L -15,30 L 15,30 L 15,-30 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 0, y: 0}, pins: [{x: -35, y: -55}, {x: 35, y: -55}, {x: -35, y: 55}] },
+        "1": { name: "ตัวเลข 1", path: "M -10,-55 L 20,-55 L 20,55 L 0,55 L 0,-35 L -15,-35 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 5, y: 0}, pins: [{x: -10, y: -55}, {x: 20, y: 55}, {x: 0, y: -35}] },
+        "2": { name: "ตัวเลข 2", path: "M -30,-50 C -30,-80 35,-80 35,-50 C 35,-20 -25,0 -25,25 L 35,25 L 35,50 L -35,50 L -35,20 C -35,-10 25,-20 25,-50 C 25,-60 -20,-60 -20,-50 Z", color: "#3498db", stroke: "#2980b9", cg: {x: -3, y: 3}, pins: [{x: -30, y: -50}, {x: 35, y: 50}, {x: -35, y: 50}] },
+        "3": { name: "ตัวเลข 3", path: "M -30,-50 L 30,-50 L 5,-10 L 25,-10 C 25,25 -25,60 -30,40 L -30,15 L -5,15 C 5,15 10,0 0,-10 L -20,-10 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 2, y: -2}, pins: [{x: -30, y: -50}, {x: 30, y: -50}, {x: -30, y: 40}] },
+        "4": { name: "ตัวเลข 4", path: "M 15,-55 L 15,10 L 35,10 L 35,30 L 15,30 L 15,55 L -10,55 L -10,30 L -35,30 L -35,5 L 15,-55 Z M -10,10 L 15,10 L 15,-25 Z", color: "#3498db", stroke: "#2980b9", cg: {x: -2, y: 10}, pins: [{x: 15, y: -55}, {x: 35, y: 30}, {x: -35, y: 30}] },
+        "5": { name: "ตัวเลข 5", path: "M -30,-50 L 30,-50 L 30,-25 L -10,-25 L -5,5 C 25,5 40,25 25,50 C 5,70 -30,55 -30,35 L -10,35 C -10,42 10,48 15,35 C 20,22 5,18 -5,18 L -25,18 Z", color: "#3498db", stroke: "#2980b9", cg: {x: -2, y: 2}, pins: [{x: -30, y: -50}, {x: 30, y: -50}, {x: -30, y: 35}] },
+        "6": { name: "ตัวเลข 6", path: "M 20,-55 C -10,-55 -35,-30 -35,10 C -35,45 -15,55 10,55 C 35,55 40,35 40,15 C 40,-5 20,-15 -10,-15 C -15,-15 -20,-13 -25,-10 C -22,-28 -10,-40 20,-40 Z M 8,10 C 18,10 22,18 22,25 C 22,35 12,42 -3,42 C -15,42 -22,32 -22,15 C -22,0 -5,10 8,10 Z", color: "#3498db", stroke: "#2980b9", cg: {x: -3, y: 12}, pins: [{x: 20, y: -55}, {x: 40, y: 15}, {x: -35, y: 10}] },
+        "7": { name: "ตัวเลข 7", path: "M -35,-50 L 35,-50 L 0,55 L -20,55 L 10,-30 L -35,-30 Z", color: "#3498db", stroke: "#2980b9", cg: {x: -5, y: -10}, pins: [{x: -35, y: -50}, {x: 35, y: -50}, {x: 0, y: 55}] },
+        "8": { name: "ตัวเลข 8", path: "M -35,-55 L 35,-55 L 35,55 L -35,55 Z M -15,-38 L -15,-10 L 15,-10 L 15,-38 Z M -15,10 L -15,38 L 15,38 L 15,10 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 0, y: 0}, pins: [{x: -35, y: -55}, {x: 35, y: -55}, {x: -35, y: 55}] },
+        "9": { name: "ตัวเลข 9", path: "M -20,55 C 10,55 35,30 35,-10 C 35,-45 15,-55 -10,-55 C -35,-55 -40,-35 -40,-15 C -40,5 -20,15 10,15 C 15,15 20,13 25,10 C 22,28 10,40 -20,40 Z M -8,-10 C -18,-10 -22,-18 -22,-25 C -22,-35 -12,-42 3,-42 C 15,-45 22,-32 22,-15 C 22,0 5,-10 -8,-10 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 3, y: -12}, pins: [{x: -20, y: 55}, {x: 35, y: -10}, {x: -40, y: -15}] },
+        "bird": { name: "นกสมดุล", path: "M -130,45 C -120,-35 -45,-25 -5,10 C -5,-15 -5,-15 -5,-15 L 0,22 L 5,-15 C 5,-15 5,-15 5,10 C 45,-25 120,-35 130,45 C 110,45 90,5 0,20 C -90,5 -110,45 -130,45 Z", color: "#3498db", stroke: "#2980b9", cg: {x: 0, y: 22}, pins: [{x: -130, y: 45}, {x: 130, y: 45}, {x: 0, y: -15}] }
+    };
+
+    let currentObjKey = "0";
+    let activePinIdx = 0;
+    let totalLinesDrawn = 0;
+    let currentAngleDegrees = 0;
+    let isBalanced = false;
+
+    window.onload = function() {
+        initLabEnvironment();
+    };
+
+    function initLabEnvironment() {
+        currentObjKey = document.getElementById("objectSelect").value;
+        activePinIdx = 0;
+        totalLinesDrawn = 0;
+
+        document.getElementById("persistentLinesGroup").innerHTML = "";
+        document.getElementById("cgPoint").style.display = "none";
+        document.getElementById("cgText").style.display = "none";
+        
+        setButtonsState(true, false, false, false);
+        
+        drawObjectGeometry();
+        applyInitialUnbalance(); 
+    }
+
+    function drawObjectGeometry() {
+        const obj = physicsDatabase[currentObjKey];
+        const shapeContainer = document.getElementById("shapeContainer");
+        shapeContainer.innerHTML = "";
+
+        const pathNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathNode.setAttribute("d", obj.path);
+        pathNode.setAttribute("fill", "#5fa3db");
+        pathNode.setAttribute("stroke", "#2980b9");
+        pathNode.setAttribute("stroke-width", "3");
+        shapeContainer.appendChild(pathNode);
+
+        obj.pins.forEach((pin, index) => {
+            const pinNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            pinNode.setAttribute("cx", pin.x);
+            pinNode.setAttribute("cy", pin.y);
+            pinNode.setAttribute("r", "6");
+            pinNode.setAttribute("fill", (index === activePinIdx) ? "#000000" : "#ffffff"); 
+            pinNode.setAttribute("stroke", "#2980b9");
+            pinNode.setAttribute("stroke-width", "1.5");
+            shapeContainer.appendChild(pinNode);
+        });
+    }
+
+    function applyInitialUnbalance() {
+        isBalanced = false;
+        const dynamicGroup = document.getElementById("dynamicObjectGroup");
+        const obj = physicsDatabase[currentObjKey];
+        const currentPin = obj.pins[activePinIdx];
+
+        currentAngleDegrees = 0; 
+        dynamicGroup.setAttribute("transform", `translate(225, 120) rotate(${currentAngleDegrees}) translate(${-currentPin.x}, ${-currentPin.y})`);
+        
+        updateStatusText(`[ภาพที่ 1 - ซ้าย] แขวนชิ้นงาน <strong>${obj.name}</strong> เข้ากับหมุดแล้ว เส้นดิ่งลูกตุ้มทิ้งตัวลงตรงๆ แต่ชิ้นงานยังไม่เอียงตัว -> กดปุ่ม <strong>"1. ปล่อยวัตถุเอียงเข้าหาแนวดิ่ง"</strong>`);
+    }
+
+    function executeSwingToVertical() {
+        const dynamicGroup = document.getElementById("dynamicObjectGroup");
+        const obj = physicsDatabase[currentObjKey];
+        const currentPin = obj.pins[activePinIdx];
+
+        const deltaX = obj.cg.x - currentPin.x;
+        const deltaY = obj.cg.y - currentPin.y;
+        
+        // หาจุดหมุนที่สมดุลเพื่อให้จุดศูนย์ถ่วง (CG) ทิ้งตัวลงมาตรงกับจุดศูนย์กลางของแกนโลก (แนวดิ่ง)
+        let angleRadians = Math.atan2(deltaX, deltaY);
+        currentAngleDegrees = angleRadians * (180 / Math.PI);
+
+        dynamicGroup.setAttribute("transform", `translate(225, 120) rotate(${currentAngleDegrees}) translate(${-currentPin.x}, ${-currentPin.y})`);
+        isBalanced = true;
+
+        setButtonsState(false, true, false, false);
+        updateStatusText(`[ภาพที่ 2 - กลาง] วัตถุเอียงตัวลงมาจนนิ่งสนิทเข้าสู่แนวสมดุลฟิสิกส์แล้ว (พื้นที่ซ้าย-ขวาสมดุลรอบเส้นดิ่ง) -> กดปุ่ม <strong>"2. ลากเส้นแนวแรงบนชิ้นงาน"</strong>`);
+    }
+
+    // 🌟 ส่วนที่ปรับปรุงแก้ไข: ปรับแต่งมุม Inverse Trigonometry ให้ทับเส้นดิ่งสากลโลกพอดี
+    function executeDrawLine() {
+        if (!isBalanced) return;
+
+        const obj = physicsDatabase[currentObjKey];
+        const currentPin = obj.pins[activePinIdx];
+
+        // แก้ไขเครื่องหมายมุมสำหรับการทำ Inverse Matrix เพื่อหาพิกัดภายในวัตถุ (Local Space) 
+        // เมื่อวัตถุโดนคำสั่งหมุนด้วยมุมบวก โครงสร้างเส้นข้างในกรุ๊ปต้องชดเชยด้วยมุมลบที่ถูกต้อง
+        const rad = -currentAngleDegrees * (Math.PI / 180);
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+
+        // จุดเริ่มต้นอยู่ที่รูเจาะสลักตัวปัจจุบัน (x1, y1)
+        const x1 = currentPin.x;
+        const y1 = currentPin.y;
+        
+        // กำหนดความยาวของเส้นที่จะลากตัดทะลุผ่านวัตถุลงมาด้านล่าง
+        const length = 400; 
+
+        // ใช้สูตร Vector Rotation: วาดเส้นดิ่งลงตรง ๆ (0, length) แล้วแปลงกลับเข้าสู่ตำแหน่งระนาบเอียงของวัตถุ
+        // x' = x*cos - y*sin -> (0 * cos) - (length * sin) = -length * sin
+        // y' = x*sin + y*cos -> (0 * sin) + (length * cos) = length * cos
+        const x2 = currentPin.x - (length * sin);
+        const y2 = currentPin.y + (length * cos);
+
+        const lineNode = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineNode.setAttribute("x1", x1);
+        lineNode.setAttribute("y1", y1);
+        lineNode.setAttribute("x2", x2);
+        lineNode.setAttribute("y2", y2);
+        lineNode.setAttribute("stroke", "#e74c3c"); 
+        lineNode.setAttribute("stroke-width", "3");
+
+        document.getElementById("persistentLinesGroup").appendChild(lineNode);
+        totalLinesDrawn++;
+
+        if (activePinIdx + 1 < obj.pins.length) {
+            setButtonsState(false, false, true, false);
+            updateStatusText(`[ภาพที่ 3 - ขวา] ลากเส้นแนวแรงสีแดงทับแนวเส้นดิ่งเรียบร้อยแล้ว -> กดปุ่ม <strong>"3. เปลี่ยนรูเจาะถัดไป"</strong>`);
+        } else {
+            setButtonsState(false, false, false, true);
+
+            const cgCircle = document.getElementById("cgPoint");
+            const cgTxt = document.getElementById("cgText");
+            cgCircle.setAttribute("cx", obj.cg.x);
+            cgCircle.setAttribute("cy", obj.cg.y);
+            cgTxt.setAttribute("x", obj.cg.x + 12);
+            cgTxt.setAttribute("y", obj.cg.y + 5);
+
+            cgCircle.style.display = "block";
+            cgTxt.style.display = "block";
+
+            updateStatusText(`<strong>สิ้นสุดการทดลอง:</strong> เส้นสีแดงทุกเส้นที่ลากมาจากแต่ละรู **ตัดซ้อนทับกันที่จุดเดียวกันพอดี** ซึ่งก็คือ <strong>จุดศูนย์ถ่วง (CG)</strong> ของวัตถุ`);
+        }
+    }
+
+    function executeNextPin() {
+        activePinIdx++;
+        drawObjectGeometry(); 
+        applyInitialUnbalance(); 
+
+        setButtonsState(true, false, false, false);
+    }
+
+    function saveDataToTable() {
+        const obj = physicsDatabase[currentObjKey];
+        const tableBody = document.getElementById("tableBody");
+
+        for (let row of tableBody.rows) {
+            if (row.cells[0].innerText === obj.name) {
+                alert("วัตถุนี้ถูกบันทึกผลไปเรียบร้อยแล้ว");
+                return;
+            }
+        }
+
+        const newRow = tableBody.insertRow();
+        newRow.insertCell(0).innerHTML = `<strong>${obj.name}</strong>`;
+        newRow.insertCell(1).innerText = totalLinesDrawn + " เส้นแนวแรง";
+        newRow.insertCell(2).innerText = "เมื่อปล่อยชิ้นงานให้ทิ้งตัวลงอย่างอิสระ เส้นแนวดิ่งที่ลากตัดผ่านจากรูเจาะแต่ละจุดจะวิ่งเข้าไปตัดกันซ้อนทับที่จุดเดียวกันเสมอ";
+        newRow.insertCell(3).innerText = (obj.name === "นกสมดุล") ? "อยู่บริเวณใต้จงอยปากพอดี" : "อยู่กึ่งกลางสมมาตรของรูปทรง";
+        
+        const deleteCell = newRow.insertCell(4);
+        deleteCell.innerHTML = `<button class="btn-clear-row" onclick="removeTableRow(this)">ลบข้อมูล</button>`;
+
+        document.getElementById("btnSave").disabled = true;
+        updateStatusText("บันทึกข้อมูลลงตารางเรียบร้อยแล้ว! สามารถสลับเปลี่ยนชิ้นงานอื่นด้านบนมาทดสอบต่อได้เลยครับ");
+    }
+
+    function setButtonsState(swing, draw, next, save) {
+        document.getElementById("btnSwing").disabled = !swing;
+        document.getElementById("btnDraw").disabled = !draw;
+        document.getElementById("btnNextPin").disabled = !next;
+        document.getElementById("btnSave").disabled = !save;
+    }
+
+    function removeTableRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function updateStatusText(text) {
+        document.getElementById("statusBox").innerHTML = `<strong>สถานะ:</strong> ${text}`;
+    }
+
+    function resetCurrentState() {
+        initLabEnvironment();
+    }
+</script>
+
+</body>
+</html>
