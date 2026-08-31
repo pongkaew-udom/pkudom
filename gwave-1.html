@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทฤษฎีและการตรวจวัดคลื่นความโน้มถ่วง (LIGO)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #38bdf8;
+            --accent-emerald: #34d399;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 2rem 1rem;
+            margin: 0;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            line-height: 1.3;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
+            text-indent: 2rem;
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background-color: rgba(56, 189, 248, 0.05);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.25rem 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .highlight-box p {
+            text-indent: 0;
+            margin-bottom: 0;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        .article-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-caption {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: -1.5rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-note {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="article-container">
+        <h1>เสียงกระซิบจากจักรวาล:<br>ทฤษฎีและการตรวจวัดคลื่นความโน้มถ่วง (LIGO)</h1>
+        
+        <!-- รูปภาพประกอบ 1: หลุมดำ/อวกาศ -->
+        <img class="article-image" src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=80" alt="Space Spacetime">
+        <div class="image-caption">ภาพจำลองความบิดเบี้ยวของอวกาศ-เวลาท่ามกลางกลุ่มดาวมหาศาล</div>
+
+        <p>ลองจินตนาการว่า ผืนอวกาศอันกว้างใหญ่ที่เราอาศัยอยู่ ไม่ใช่แค่ความว่างเปล่าที่นิ่งสนิท แต่เป็นเหมือน "ผืนผ้าใบที่สามารถยืดหดได้" ซึ่งนักฟิสิกส์เรียกสิ่งนี้ว่า อวกาศ-เวลา (Spacetime)</p>
+
+        <p>ย้อนกลับไปในปี ค.ศ. 1916 บุรุษผู้พลิกโฉมวงการวิทยาศาสตร์โลกอย่าง อัลเบิร์ต ไอน์สไตน์ (Albert Einstein) ได้นำเสนอทฤษฎีสัมพัทธภาพทั่วไป เขากล่าวว่าวัตถุใดๆ ก็ตามที่มีมวล จะทำให้ผืนผ้าใบแห่งอวกาศนี้โค้งงอลงไป เปรียบเหมือนเราวางลูกตุ้มเหล็กหนักๆ ลงบนเตียงสปริงอันนุ่มนวล และเมื่อใดก็ตามที่วัตถุมวลมหาศาลเหล่านั้นเกิดการเคลื่อนที่ด้วยความเร่งอย่างรุนแรง เช่น การเหวี่ยงคู่อย่างบ้าคลั่งของหลุมดำสองหลุมก่อนจะชนและรวมตัวกัน ซึ่งจะส่งแรงสั่นสะเทือนกระจายออกมาแบบรอบทิศทางในลักษณะของระลอกคลื่น สิ่งนี้เองที่เรียกว่า "คลื่นความโน้มถ่วง" (Gravitational Waves)</p>
+
+        <div class="highlight-box">
+            <p>แต่ทว่า คลื่นความโน้มถ่วงนี้เบาบางและตรวจจับได้ยากยิ่ง ไอน์สไตน์เองยังเคยคิดว่า มนุษย์เราอาจไม่มีวันสร้างเครื่องมือที่ละเอียดพอจะตรวจพบได้เลย เพราะเมื่อคลื่นนี้เดินทางมาถึงโลก จะทำให้สิ่งต่างๆ บนโลกเกิดการยืดและหดในระดับที่เล็กกว่าขนาดของอะตอมเสียอีก!</p>
+        </div>
+
+        <p>แต่ความพยายามของมนุษยชาติไม่เคยมีขีดจำกัด ในอีก 100 กว่าปีหลังจากนั้น ในปี ค.ศ. 2015 หอสังเกตการณ์คลื่นความโน้มถ่วงเลเซอร์อินเตอร์เฟอโรเวเตอร์ หรือที่เรารู้จักกันในชื่อ LIGO (Laser Interferometer Gravitational-Wave Observatory) ก็ได้ทำสิ่งที่โลกต้องจารึกไว้สำเร็จ</p>
+
+        <h2>LIGO ตรวจจับคลื่นที่มองไม่เห็นได้อย่างไร?</h2>
+        
+        <!-- รูปภาพประกอบ 2: แสงเลเซอร์และการวัดระยะ -->
+        <img class="article-image" src="https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1200&q=80" alt="Laser Experiment">
+        <div class="image-caption">ภาพจำลองการทำงานของลำแสงเลเซอร์ที่มีความแม่นยำสูงในห้องทดลองวิทยาศาสตร์ขั้นสูง</div>
+
+        <p>ความลับอยู่ที่ "ท่อสูญญากาศรูปตัว L" ขนาดมหึมาสองสายที่ทอดตัวยาวสายละ 4 กิโลเมตร ตั้งฉากซึ่งกันและกัน ภายในท่อนี้จะมีลำแสงเลเซอร์ที่มีความแม่นยำสูงถูกยิงออกไปพร้อมกัน เดินทางไปกระทบกระจกที่ปลายท่อแล้วสะท้อนกลับมาตัดกันที่จุดเริ่มต้น</p>
+
+        <p>ในสภาวะปกติ แสงเลเซอร์ที่สะท้อนกลับมาจากทั้งสองท่อจะเดินทางกลับมาถึงพร้อมกันและหักล้างกันจนมืดสนิทพอดี แต่เมื่อ "คลื่นความโน้มถ่วง" เดินทางผ่านโลกและตัดผ่านเครื่องตรวจจับนี้ ผืนอวกาศในแนวท่อสายหนึ่งจะถูกยืดออกเล็กน้อย ในขณะที่ท่ออีกสายหนึ่งจะถูกบีบให้หดสั้นลง แม้ว่าจะสั้นลงในระดับที่เล็กกว่าเศษหนึ่งส่วนล้านของโปรตอนก็ตาม!</p>
+
+        <p>ระยะทางที่เปลี่ยนไปเพียงนิดเดียวนี้ ทำให้แสงเลเซอร์จากท่อทั้งสองสายเดินทางกลับมาถึงไม่พร้อมกันอีกต่อไป แสงจึงไม่หักล้างกันร้อยเปอร์เซ็นต์ และเกิดเป็นสัญญาณแสงวาบขึ้นมาที่ฉากรับ สัญญาณแสงนั้นถูกแปลงออกมาเป็นคลื่นเสียงที่นักวิทยาศาสตร์เรียกว่า "เสียงจิ๊บ" (Chirp) ซึ่งเป็นเสียงบันทึกวินาทีประวัติศาสตร์ที่หลุมดำสองแห่งกลืนกินกันและกันที่ระยะห่างออกไปหลายพันล้านปีแสง</p>
+
+        <div class="footer-note">
+            คลังความรู้ฟิสิกส์ดาราศาสตร์ — ถอดความรู้เพื่อการศึกษาและการจำลองสถานการณ์เสมือนจริง โดย phudom virtual lab
+        </div>
+    </div>
+
+</body>
+</html>
