@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ขั้นตอนการทดลอง Virtual Physics Lab</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>ขั้นตอนการทดลองจำลองการสร้างปรากฏการณ์แสงบนท้องฟ้าผ่านระบบ Virtual Physics Lab</h1>
+        
+        <ol>
+            <li>
+                <strong>การเลือกเป้าหมายปรากฏการณ์ (Phenomenon Selection)</strong>
+                <p style="margin: 8px 0;">ในส่วน "🎯 1. เลือกเป้าหมายปรากฏการณ์" ให้เลือกปรากฏการณ์ทางแสงที่ต้องการสร้าง ได้แก่:</p>
+                <ul class="nested-list">
+                    <li>🌈 1. รุ้งกินน้ำ (Rainbow)</li>
+                    <li>☀️ 2. ซันด็อก (Sun Dog)</li>
+                    <li>☁️ 3. เมฆสีรุ้ง (Cloud Iridescence)</li>
+                    <li>⭕ 4. ทรงกลด (Solar Halo)</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การกำหนดเงื่อนไขสถานการณ์ (Scenario Settings)</strong>
+                <ul class="nested-list">
+                    <li><strong>เลือกชนิดของอนุภาคในอากาศ (Particle Type):</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>หยดน้ำทรงกลมขนาดใหญ่ (Raindrops > 0.5 mm)</li>
+                            <li>หยดน้ำขนาดจิ๋วสม่ำเสมอ (Cloud Droplets 2-5 µm)</li>
+                            <li>ผลึกน้ำแข็งหกเหลี่ยมทรงแผ่นเรียงแนวราบ (Flat Plates)</li>
+                            <li>ผลึกน้ำแข็งหกเหลี่ยมทรงแท่งสุ่มทิศทาง (Column Crystals)</li>
+                        </ul>
+                    </li>
+                    <li><strong>ปรับมุมสูงดวงอาทิตย์ (Sun Elevation):</strong> เลื่อนแถบปรับมุมช่วง 0 องศา ถึง 80 องศา</li>
+                    <li><strong>เลือกทิศทางการมองของผู้เรียน/คน (Observer Direction):</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>หันหลังให้ดวงอาทิตย์ (Look away from Sun)</li>
+                            <li>หันหน้าเข้าหา/มองใกล้ดวงอาทิตย์ (Look towards Sun)</li>
+                        </ul>
+                    </li>
+                    <li><strong>ปรับความหนาแน่น / ความสม่ำเสมออนุภาค (Uniformity):</strong> เลื่อนแถบระดับ 1 ถึง 10</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การทดสอบสถานการณ์และการสังเกตผล (Testing & Observation)</strong>
+                <ul class="nested-list">
+                    <li>กดปุ่ม "🧪 ทดสอบสถานการณ์" เพื่อประมวลผล</li>
+                    <li><strong>กรณีตั้งค่าถูกต้องตามหลักฟิสิกส์:</strong> ระบบจะแสดงภาพปรากฏการณ์บน "🏞️ ฉากจำลองบรรยากาศกลางแจ้ง" พร้อมข้อความแจ้งเตือนสีเขียวอธิบายสาเหตุการเกิดปรากฏการณ์</li>
+                    <li><strong>กรณีตั้งค่าไม่ถูกต้อง:</strong> ระบบจะแสดงข้อความแจ้งเตือนสีแดงในกล่องสถานะ เพื่อบอกสาเหตุที่ทำให้ไม่เกิดปรากฏการณ์นั้นๆ</li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

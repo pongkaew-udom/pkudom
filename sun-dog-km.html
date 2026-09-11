@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปรากฏการณ์ Sun Dog และคู่มือ Virtual Lab</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>ปรากฏการณ์ Sun Dog</h1>
+        <div class="article-box">
+            <p>ปรากฏการณ์ Sun Dog หรือ ซันด็อก (มีชื่อทางวิทยาศาสตร์ว่า Parhelion หรือ Mock Sun) คือ ปรากฏการณ์ทางทัศนศาสตร์ชั้นบรรยากาศ (Atmospheric Optics) ที่ทำให้เกิดภาพดวงอาทิตย์จำลอง หรือจุดสว่างคล้ายดวงอาทิตย์ขนาบอยู่ข้างดวงอาทิตย์จริง โดยเกิดขึ้นจากการหักเหและการสะท้อนของแสงอาทิตย์เมื่อเดินทางผ่านผลึกน้ำแข็งรูปแผ่นหกเหลี่ยม (Hexagonal Ice Crystals) ที่ล่องลอยอยู่ในเมฆชั้นสูงประเภทเซอรัส (Cirrus) หรือเซอโรสเตรตัส (Cirrostratus) ซึ่งผลึกน้ำแข็งเหล่านี้จะทำหน้าที่เสมือนปริซึมธรรมชาติ คอยเบี่ยงเบนทิศทางของแสงทำมุมประมาณ 22 องศา เกิดเป็นแถบแสงที่มีสเปกตรัมสีคล้ายรุ้งกินน้ำอยู่ทั้งสองฝั่งของดวงอาทิตย์ในแนวระนาบขนานกับขอบฟ้า โดยมักปรากฏสีแดงที่ขอบด้านในใกล้ดวงอาทิตย์ และไล่เป็นสีส้มจนถึงม่วงไปทางด้านนอก ปรากฏการณ์นี้จะสังเกตเห็นได้ชัดเจนที่สุดในช่วงเวลาที่ดวงอาทิตย์อยู่ต่ำใกล้ขอบฟ้า ทั้งในช่วงเช้าตรู่และช่วงเย็นก่อนดวงอาทิตย์ตก</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>ขั้นตอนการทดลองจำลองปรากฏการณ์ซันด็อก (Sun Dogs / Parhelia) ผ่านระบบ Virtual Lab</h2>
+        <ol>
+            <li>
+                <strong>การสังเกตพฤติกรรมแสงระดับจุลภาค (Micro View)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตหน้าจอจำลองส่วนบน "มุมมองจุลภาค: การหักเหของแสงผ่านผลึกน้ำแข็งหกเหลี่ยม" เพื่อศึกษาวิถีการเดินทางของรังสีแสงขาวขนานจากดวงอาทิตย์ตกกระทบเข้าสู่ผลึกน้ำแข็งทรงแผ่นหกเหลี่ยม (Plate Ice Crystal)</li>
+                    <li>สังเกตการกระจายของแสงเมื่อเกิดการหักเหขั้นต่ำ (Minimum Deviation) ทำมุมประมาณ 21.84° ถึง 22° ผ่านผลึกน้ำแข็ง ซึ่งทำให้แสงขาวแยกออกเป็นแถบสเปกตรัมสีต่างๆ (แดง, เหลือง, เขียว, น้ำเงิน)</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การปรับเปลี่ยนพารามิเตอร์ดวงอาทิตย์และบรรยากาศ</strong>
+                <ul class="nested-list">
+                    <li><strong>ปรับมุมความสูงดวงอาทิตย์ (Sun Elevation):</strong> เลื่อนแถบปรับค่าระหว่าง 0 ° - 45 ° เพื่อสังเกตการเปลี่ยนแปลงระดับความสูงของดวงอาทิตย์บนท้องฟ้า และการเพิ่มขึ้นของระยะห่างระหว่างซันด็อกกับดวงอาทิตย์จริง</li>
+                    <li><strong>ปรับการเรียงตัวราบของผลึก (Horizontal Alignment):</strong> เลื่อนแถบปรับระดับตั้งแต่น้อยสุดไปจนถึง "สมบูรณ์แบบ" เพื่อดูผลกระทบของการจัดเรียงตัวของผลึกน้ำแข็งในแนวระนาบต่อความคมชัดและรูปทรงของซันด็อก</li>
+                    <li><strong>ปรับความหนาแน่นเมฆซีร์รัส (Ice Crystal Density):</strong> เลื่อนแถบช่วง 10 % - 100 % เพื่อเพิ่มหรือลดปริมาณผลึกน้ำแข็งในชั้นบรรยากาศ</li>
+                    <li><strong>ปรับความสว่างและสเปกตรัมสี (Brightness):</strong> เลื่อนแถบช่วง 50 % - 250 % เพื่อปรับความเข้มแสงและการมองเห็นสีของซันด็อก</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การบันทึกและวิเคราะห์ผลการทดลอง (Macro View & Data Analysis)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตการแสดงผลบนหน้าจอ "มุมมองมหภาค" ที่เปลี่ยนแปลงไปตามค่าที่ปรับตั้ง ได้แก่ ตำแหน่งดวงอาทิตย์จริง, วงฮาโล 22°, เสาแสง (Sun Pillar), และดวงอาทิตย์ย่อย (Sun Dogs) ทั้งสองข้าง</li>
+                    <li>บันทึกข้อมูลที่คำนวณได้จากกล่อง "ข้อมูลการคำนวณทางทัศนศาสตร์" เช่น ค่าดรรชนีหักเหของน้ำแข็ง ช่วง 1.310 - 1.317 , มุมเบี่ยงเบนขั้นต่ำ และระยะห่างของซันด็อกจริงจากดวงอาทิตย์</li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

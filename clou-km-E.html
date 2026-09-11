@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Iridescence Phenomenon & Virtual Lab User Guide</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>Cloud Iridescence Phenomenon</h1>
+        <div class="article-box">
+            <p>The Cloud Iridescence phenomenon (or Irisation) is an atmospheric optical phenomenon that creates beautiful rainbow-like colors on clouds. It occurs due to the interference and diffraction of sunlight (or moonlight) as it passes through tiny, uniform water droplets or ice crystals in mid- and high-level clouds, such as Altocumulus, Cirrocumulus, or Pileus clouds. When light travels through these miniature water droplets or ice crystals, it diffracts and interferes, separating into various color spectrums. These mostly appear as irregular pastel color bands, such as pink, green, blue, and orange, arranged along the edges of the clouds. This phenomenon is most clearly visible when the cloud is moving near the position of the sun, with a thick cloud shadow helping to block the bright glare from the sun.</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>Experimental Steps for Cloud Iridescence Virtual Lab Simulation</h2>
+        <ol>
+            <li>
+                <strong>Observation and Study of Microscopic Diffraction Mechanism (Micro View)</strong>
+                <ul class="nested-list">
+                    <li>Observe the top simulation screen "1. Micro View: Diffraction and Refraction at Water Droplet" to study the trajectory of parallel white light rays from the sun as they strike and pass through spherical water droplets.</li>
+                    <li>Observe the behavior of light when diffraction and refraction occur at the edge of the water droplet, separating white light into various color spectrum bands (such as red and blue) at different diffraction angles based on wavelength.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Adjustment of Experimental Parameters and Variables</strong>
+                <ul class="nested-list">
+                    <li><strong>Adjust Rainbow Brightness/Intensity (Color Vibrance):</strong> Slide the control slider between 20% - 200% (default value: 140%) to increase or decrease the intensity and brightness of the rainbow bands.</li>
+                    <li><strong>Adjust Droplet Size (Droplet Radius <i>a</i>):</strong> Slide the droplet radius slider between 1.5 - 15.0 micrometers (default value: 4.5 micrometers) to observe changes in the light diffraction angle.</li>
+                    <li><strong>Adjust Droplet Size Uniformity (Size Uniformity):</strong> Slide the level adjustment from 1 - 10 (Very Low to Very High) to study the effects on sharpness and overlapping of rainbow bands.</li>
+                    <li><strong>Adjust Iridescent Cloud Size (Cloud Scale):</strong> Slide the control slider between 50% - 200% (default value: 110%) to expand or reduce the area of the Pileus cloud.</li>
+                    <li><strong>Adjust Cloud Density (Optical Density):</strong> Slide the control slider between 10% - 100% (default value: 25%) to observe translucency and light scattering within the cloud body.</li>
+                    <li><strong>Adjust Angular Distance from the Sun (Sun Angle):</strong> Slide the control slider between 3° - 35° (default value: 12°) to adjust the distance between the cloud and the sun.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Observation of Results and Optical Data Recording (Macro View & Data Analysis)</strong>
+                <ul class="nested-list">
+                    <li>Observe the changes on the bottom screen "2. Macro View: Glowing Iridescent Cloud Simulation and Bright Sun," which displays pastel iridescent cloud formations (pink, peach/orange, lime green, blue, lavender tones) appearing near the sun according to the set parameters.</li>
+                    <li>Record calculated results from the "Optical Calculation Data" box, including:
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>Refractive index of water (n = 1.333)</li>
+                            <li>First peak diffraction angle of red light (wavelength equal to 650 nanometers)</li>
+                            <li>Evaluate iridescence conditions from the status display box (e.g., sharp glowing pastel iridescence formed, faint overlapping rainbow colors, or no iridescence formed due to overly dense cloud)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

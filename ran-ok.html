@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Virtual Lab: Rainbow Optics & Physics Simulation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #12131C;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
+            color: #4da8da;
+            text-align: center;
+        }
+        p.subtitle {
+            margin: 0 0 20px 0;
+            color: #8892b0;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1250px;
+            width: 100%;
+            justify-content: center;
+        }
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            min-width: 550px;
+        }
+        .canvas-box {
+            background-color: #0b0c10;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            border: 1px solid #232733;
+            position: relative;
+        }
+        .canvas-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: rgba(0,0,0,0.65);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #4da8da;
+            border: 1px solid rgba(77, 168, 218, 0.3);
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .controls {
+            width: 380px;
+            background-color: #1c1e2d;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 1px solid #2d3142;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: fit-content;
+        }
+        .section-title {
+            font-size: 0.95rem;
+            color: #ffd166;
+            border-bottom: 1px solid #2d3142;
+            padding-bottom: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: #c0c7d6;
+        }
+        label span {
+            color: #4da8da;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #4da8da;
+            cursor: pointer;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            background: #0b0c10;
+            color: #fff;
+            border: 1px solid #4da8da;
+            cursor: pointer;
+        }
+        .data-panel {
+            background-color: #12131c;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 4px solid #4da8da;
+            color: #a0aab8;
+        }
+        .data-panel span {
+            color: #00f5d4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Virtual Lab: จำลองการเกิดรุ้งกินน้ำตามหลักทัศนศาสตร์</h1>
+    <p class="subtitle">ศึกษาการหักเห-การสะท้อนแสงในหยดน้ำ และผลลัพธ์การมองเห็นรุ้งบนท้องฟ้าจริง</p>
+
+    <div class="main-layout">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <!-- Canvas 1: Single Droplet Micro View -->
+            <div class="canvas-box">
+                <span class="canvas-title">1. เส้นทางแสงในหยดน้ำ (Micro View)</span>
+                <canvas id="dropletCanvas" width="650" height="320"></canvas>
+            </div>
+            
+            <!-- Canvas 2: Macro Atmosphere Observer View -->
+            <div class="canvas-box">
+                <span class="canvas-title">2. ภาพจำลองปรากฏการณ์บนท้องฟ้า (Macroscopic View)</span>
+                <canvas id="skyCanvas" width="650" height="320"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="section-title">🔬 ตัวแปรในหยดน้ำ (Droplet Variables)</div>
+            
+            <div class="control-group">
+                <label for="impactParam">ระยะตกกระทบ b (Impact Parameter): <span id="valImpact">0.60</span></label>
+                <input type="range" id="impactParam" min="0.05" max="0.95" step="0.01" value="0.60">
+            </div>
+
+            <div class="control-group">
+                <label for="refractiveIndex">ดรรชนีหักเหของน้ำ n (เฉลี่ย): <span id="valN">1.333</span></label>
+                <input type="range" id="refractiveIndex" min="1.200" max="1.500" step="0.001" value="1.333">
+            </div>
+
+            <div class="control-group">
+                <label for="dispersion">การกระจายแสง (Dispersion Δn): <span id="valDispersion">0.012</span></label>
+                <input type="range" id="dispersion" min="0.000" max="0.030" step="0.001" value="0.012">
+            </div>
+
+            <div class="control-group">
+                <label for="reflectionMode">โหมดการสะท้อนบนท้องฟ้า:</label>
+                <select id="reflectionMode">
+                    <option value="1">สะท้อน 1 ครั้ง (รุ้งปฐมภูมิเท่านั้น)</option>
+                    <option value="2">สะท้อน 2 ครั้ง (รุ้งทุติยภูมิเท่านั้น)</option>
+                    <option value="both">สะท้อนทั้ง 1 และ 2 ครั้ง (รุ้งคู่ Double Rainbow)</option>
+                </select>
+            </div>
+
+            <div class="section-title">🌅 ตัวแปรสิ่งแวดล้อม (Environment Controls)</div>
+
+            <div class="control-group">
+                <label for="sunElevation">มุมสูงดวงอาทิตย์ (Sun Elevation): <span id="valSunElev">15</span>°</label>
+                <input type="range" id="sunElevation" min="0" max="60" step="1" value="15">
+            </div>
+
+            <div class="control-group">
+                <label for="obsDistance">ระยะห่างจากม่านฝน: <span id="valObsDist">50</span> m</label>
+                <input type="range" id="obsDistance" min="20" max="100" step="1" value="50">
+            </div>
+
+            <div class="data-panel">
+                <strong>ข้อมูลการคำนวณ (Physics Outputs):</strong><br>
+                • มุมรุ้งปฐมภูมิ (Primary): <span id="outAngle1">42.0</span>°<br>
+                • มุมรุ้งทุติยภูมิ (Secondary): <span id="outAngle2">51.0</span>°<br>
+                • สถานะรุ้งปฐมภูมิ: <span id="outVis1" style="color:#00f5d4;">มองเห็นได้</span><br>
+                • สถานะรุ้งทุติยภูมิ: <span id="outVis2" style="color:#00f5d4;">มองเห็นได้</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropCanvas = document.getElementById('dropletCanvas');
+        const dropCtx = dropCanvas.getContext('2d');
+        const skyCanvas = document.getElementById('skyCanvas');
+        const skyCtx = skyCanvas.getContext('2d');
+
+        // Inputs
+        const impactInput = document.getElementById('impactParam');
+        const nInput = document.getElementById('refractiveIndex');
+        const dispInput = document.getElementById('dispersion');
+        const modeInput = document.getElementById('reflectionMode');
+        const sunElevInput = document.getElementById('sunElevation');
+        const obsDistInput = document.getElementById('obsDistance');
+
+        // Outputs
+        const valImpact = document.getElementById('valImpact');
+        const valN = document.getElementById('valN');
+        const valDispersion = document.getElementById('valDispersion');
+        const valSunElev = document.getElementById('valSunElev');
+        const valObsDist = document.getElementById('valObsDist');
+        const outAngle1 = document.getElementById('outAngle1');
+        const outAngle2 = document.getElementById('outAngle2');
+        const outVis1 = document.getElementById('outVis1');
+        const outVis2 = document.getElementById('outVis2');
+
+        const spectrum = [
+            { name: 'Red', color: '#ff3333', dnOffset: -1.0 },
+            { name: 'Orange', color: '#ff9933', dnOffset: -0.6 },
+            { name: 'Yellow', color: '#ffff33', dnOffset: -0.2 },
+            { name: 'Green', color: '#33ff33', dnOffset: 0.1 },
+            { name: 'Cyan', color: '#00ffff', dnOffset: 0.4 },
+            { name: 'Blue', color: '#3366ff', dnOffset: 0.7 },
+            { name: 'Violet', color: '#9933ff', dnOffset: 1.0 }
+        ];
+
+        function calculateRainbowAngle(b, nBase, dn, reflections) {
+            const i = Math.asin(b);
+            const sinR = Math.sin(i) / nBase;
+            if (Math.abs(sinR) > 1) return 0;
+            const r = Math.asin(sinR);
+            let devRad = (reflections === 1) ? (4 * r - 2 * i) : (2 * i - 6 * r + Math.PI);
+            return Math.abs((devRad * 180) / Math.PI);
+        }
+
+        function renderMicroView(b, nBase, dn, mode) {
+            const w = dropCanvas.width;
+            const h = dropCanvas.height;
+            dropCtx.clearRect(0, 0, w, h);
+
+            const cx = w * 0.45;
+            const cy = h * 0.5;
+            const R = 100;
+            const reflections = (mode === '2') ? 2 : 1;
+
+            // Water Droplet
+            const grad = dropCtx.createRadialGradient(cx-20, cy-20, 10, cx, cy, R);
+            grad.addColorStop(0, "rgba(180, 230, 255, 0.35)");
+            grad.addColorStop(1, "rgba(50, 130, 200, 0.15)");
+            dropCtx.beginPath();
+            dropCtx.arc(cx, cy, R, 0, Math.PI * 2);
+            dropCtx.fillStyle = grad;
+            dropCtx.fill();
+            dropCtx.strokeStyle = "#4da8da";
+            dropCtx.lineWidth = 2;
+            dropCtx.stroke();
+
+            // Incident Light
+            const rayY = cy - b * R;
+            dropCtx.beginPath();
+            dropCtx.moveTo(20, rayY);
+            dropCtx.lineTo(cx - Math.sqrt(R*R - (b*R)*(b*R)), rayY);
+            dropCtx.strokeStyle = "#ffffff";
+            dropCtx.lineWidth = 4;
+            dropCtx.shadowColor = "#ffffff";
+            dropCtx.shadowBlur = 8;
+            dropCtx.stroke();
+            dropCtx.shadowBlur = 0;
+
+            spectrum.forEach((spec) => {
+                const nColor = nBase + (spec.dnOffset * dn);
+                const i = Math.asin(b);
+                const sinR = Math.sin(i) / nColor;
+                if (Math.abs(sinR) > 1) return;
+
+                const r = Math.asin(sinR);
+                const x1 = cx - Math.sqrt(R * R - (b * R) * (b * R));
+                const y1 = rayY;
+
+                let currentAngle = Math.PI + i - r;
+                let points = [{x: x1, y: y1}];
+
+                for (let k = 0; k < reflections; k++) {
+                    let nextAngle = currentAngle + Math.PI - 2 * r;
+                    let nx = cx + R * Math.cos(nextAngle);
+                    let ny = cy + R * Math.sin(nextAngle);
+                    points.push({x: nx, y: ny});
+                    currentAngle = nextAngle;
+                }
+
+                let exitAngle = currentAngle + Math.PI - r + i;
+                let lastPt = points[points.length - 1];
+                let endX = lastPt.x + Math.cos(exitAngle) * 280;
+                let endY = lastPt.y + Math.sin(exitAngle) * 280;
+
+                // Internal Ray
+                dropCtx.beginPath();
+                dropCtx.moveTo(points[0].x, points[0].y);
+                for (let p = 1; p < points.length; p++) dropCtx.lineTo(points[p].x, points[p].y);
+                dropCtx.strokeStyle = spec.color;
+                dropCtx.lineWidth = 1.2;
+                dropCtx.stroke();
+
+                // Exit Ray
+                dropCtx.beginPath();
+                dropCtx.moveTo(lastPt.x, lastPt.y);
+                dropCtx.lineTo(endX, endY);
+                dropCtx.strokeStyle = spec.color;
+                dropCtx.lineWidth = 2;
+                dropCtx.stroke();
+            });
+        }
+
+        function renderMacroView(sunElev, obsDist, angle1, angle2, mode) {
+            const w = skyCanvas.width;
+            const h = skyCanvas.height;
+            skyCtx.clearRect(0, 0, w, h);
+
+            // Sky Background
+            const skyGrad = skyCtx.createLinearGradient(0, 0, 0, h);
+            skyGrad.addColorStop(0, "#0a1118");
+            skyGrad.addColorStop(0.7, "#16222f");
+            skyGrad.addColorStop(1, "#2c3e50");
+            skyCtx.fillStyle = skyGrad;
+            skyCtx.fillRect(0, 0, w, h);
+
+            // Ground
+            skyCtx.fillStyle = "#112211";
+            skyCtx.fillRect(0, h - 30, w, 30);
+
+            // Observer
+            const obsX = 100;
+            const obsY = h - 30;
+            skyCtx.strokeStyle = "#ffffff";
+            skyCtx.lineWidth = 2;
+            skyCtx.beginPath();
+            skyCtx.arc(obsX, obsY - 25, 5, 0, Math.PI * 2);
+            skyCtx.moveTo(obsX, obsY - 20); skyCtx.lineTo(obsX, obsY - 8);
+            skyCtx.moveTo(obsX, obsY - 8); skyCtx.lineTo(obsX - 5, obsY);
+            skyCtx.moveTo(obsX, obsY - 8); skyCtx.lineTo(obsX + 5, obsY);
+            skyCtx.stroke();
+
+            // Sun
+            const sunAngleRad = (sunElev * Math.PI) / 180;
+            const sunX = 20;
+            const sunY = obsY - Math.tan(sunAngleRad) * (obsX - sunX);
+
+            if (sunY > 0 && sunY < h) {
+                skyCtx.beginPath();
+                skyCtx.arc(sunX, sunY, 10, 0, Math.PI * 2);
+                skyCtx.fillStyle = "#ffcc00";
+                skyCtx.shadowColor = "#ffcc00";
+                skyCtx.shadowBlur = 12;
+                skyCtx.fill();
+                skyCtx.shadowBlur = 0;
+            }
+
+            // Rain Curtain
+            const rainX = obsX + (obsDist * 4.5);
+            skyCtx.fillStyle = "rgba(120, 140, 160, 0.2)";
+            skyCtx.fillRect(rainX - 30, 20, 90, h - 50);
+
+            const visAngle1 = angle1 - sunElev;
+            const visAngle2 = angle2 - sunElev;
+
+            const showPrimary = (mode === '1' || mode === 'both');
+            const showSecondary = (mode === '2' || mode === 'both');
+
+            // Render Primary Rainbow
+            if (showPrimary) {
+                if (visAngle1 > 0) {
+                    outVis1.textContent = `มองเห็นได้ (สูง ${visAngle1.toFixed(1)}°)`;
+                    outVis1.style.color = "#00f5d4";
+
+                    const apex1 = obsY - Math.tan((visAngle1 * Math.PI) / 180) * (rainX - obsX);
+                    const colors1 = ['#ff3333', '#ff9933', '#ffff33', '#33ff33', '#00ffff', '#3366ff', '#9933ff'];
+
+                    colors1.forEach((col, idx) => {
+                        skyCtx.beginPath();
+                        skyCtx.strokeStyle = col;
+                        skyCtx.lineWidth = 3;
+                        skyCtx.globalAlpha = 0.85;
+                        skyCtx.arc(rainX, obsY, Math.max(5, (obsY - apex1) + (idx * 2.5 - 7.5)), Math.PI * 1.1, Math.PI * 1.9, false);
+                        skyCtx.stroke();
+                    });
+                } else {
+                    outVis1.textContent = "ลับขอบฟ้า (ดวงอาทิตย์สูงเกินไป)";
+                    outVis1.style.color = "#ff595e";
+                }
+            } else {
+                outVis1.textContent = "ปิดใช้งาน (ไม่ถูกเลือก)";
+                outVis1.style.color = "#8892b0";
+            }
+
+            // Render Secondary Rainbow
+            if (showSecondary) {
+                if (visAngle2 > 0) {
+                    outVis2.textContent = `มองเห็นได้ (สูง ${visAngle2.toFixed(1)}°)`;
+                    outVis2.style.color = "#00f5d4";
+
+                    const apex2 = obsY - Math.tan((visAngle2 * Math.PI) / 180) * (rainX - obsX);
+                    const colors2 = ['#9933ff', '#3366ff', '#00ffff', '#33ff33', '#ffff33', '#ff9933', '#ff3333']; // สลับสี!
+
+                    colors2.forEach((col, idx) => {
+                        skyCtx.beginPath();
+                        skyCtx.strokeStyle = col;
+                        skyCtx.lineWidth = 2.5;
+                        skyCtx.globalAlpha = 0.45;
+                        skyCtx.arc(rainX, obsY, Math.max(5, (obsY - apex2) + (idx * 2.5 - 7.5)), Math.PI * 1.1, Math.PI * 1.9, false);
+                        skyCtx.stroke();
+                    });
+                } else {
+                    outVis2.textContent = "ลับขอบฟ้า (ดวงอาทิตย์สูงเกินไป)";
+                    outVis2.style.color = "#ff595e";
+                }
+            } else {
+                outVis2.textContent = "ปิดใช้งาน (ไม่ถูกเลือก)";
+                outVis2.style.color = "#8892b0";
+            }
+            skyCtx.globalAlpha = 1.0;
+        }
+
+        function updateSimulation() {
+            const b = parseFloat(impactInput.value);
+            const nBase = parseFloat(nInput.value);
+            const dn = parseFloat(dispInput.value);
+            const mode = modeInput.value;
+            const sunElev = parseFloat(sunElevInput.value);
+            const obsDist = parseFloat(obsDistInput.value);
+
+            valImpact.textContent = b.toFixed(2);
+            valN.textContent = nBase.toFixed(3);
+            valDispersion.textContent = dn.toFixed(3);
+            valSunElev.textContent = sunElev;
+            valObsDist.textContent = obsDist;
+
+            const angle1 = calculateRainbowAngle(0.60, nBase, dn, 1);
+            const angle2 = calculateRainbowAngle(0.90, nBase, dn, 2);
+
+            outAngle1.textContent = angle1.toFixed(1);
+            outAngle2.textContent = angle2.toFixed(1);
+
+            renderMicroView(b, nBase, dn, mode);
+            renderMacroView(sunElev, obsDist, angle1, angle2, mode);
+        }
+
+        [impactInput, nInput, dispInput, modeInput, sunElevInput, obsDistInput].forEach(elem => {
+            elem.addEventListener('input', updateSimulation);
+        });
+
+        updateSimulation();
+    </script>
+</body>
+</html>

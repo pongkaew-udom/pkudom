@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปรากฏการณ์ เมฆสีรุ้ง และคู่มือ Virtual Lab</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>ปรากฏการณ์ เมฆสีรุ้ง</h1>
+        <div class="article-box">
+            <p>ปรากฏการณ์ เมฆสีรุ้ง หรือ Cloud Iridescence คือ ปรากฏการณ์ทางทัศนศาสตร์ชั้นบรรยากาศ ที่ทำให้เกิดสีสันที่สวยงามคล้ายสีของรุ้งกินน้ำปรากฏบนก้อนเมฆ โดยเกิดขึ้นจากการแทรกสอดและการเลี้ยวเบนของแสงอาทิตย์ (หรือแสงจันทร์) เมื่อเดินทางผ่านหยดน้ำขนาดเล็กมากหรือผลึกน้ำแข็งที่มีขนาดสม่ำเสมอกันในเมฆชั้นกลางและชั้นสูง เช่น เมฆอัลโตคิวมูลัส (Altocumulus) เมฆซีร์โรคิวมูลัส (Cirrocumulus) หรือเมฆหมวก (Pileus) ซึ่งเมื่อแสงเดินทางผ่านหยดน้ำหรือผลึกน้ำแข็งขนาดจิ๋วเหล่านี้ แสงจะเลี้ยวเบนและเกิดการแทรกสอดแยกออกเป็นสเปกตรัมของสีต่างๆ โดยส่วนมากจะปรากฏเป็นแถบสีพาสเทล เช่น ชมพู เขียว ฟ้า และส้ม เรียงตัวสลับกันอย่างไม่เป็นระเบียบตามขอบของเมฆ ปรากฏการณ์นี้จะมองเห็นได้ชัดเจนที่สุดเมื่อเมฆเคลื่อนตัวอยู่ใกล้กับตำแหน่งของดวงอาทิตย์ และมีเงาเมฆหนาช่วยบดบังแสงจ้าจากดวงอาทิตย์ไว้</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>ขั้นตอนการทดลองจำลองปรากฏการณ์เมฆสีรุ้ง (Cloud Iridescence) ผ่านระบบ Virtual Lab</h2>
+        <ol>
+            <li>
+                <strong>การสังเกตและศึกษากลไกการเลี้ยวเบนระดับจุลภาค (Micro View)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตหน้าจอจำลองส่วนบน "1. มุมมองจุลภาค: การเลี้ยวเบนและหักเหที่หยดน้ำ" เพื่อศึกษาวิถีการเดินทางของรังสีแสงขาวขนานจากดวงอาทิตย์เมื่อตกกระทบและเดินทางผ่านหยดน้ำทรงกลม</li>
+                    <li>สังเกตพฤติกรรมของแสงเมื่อเกิดการเลี้ยวเบนและการหักเหแยกออกที่บริเวณขอบของหยดน้ำ ซึ่งทำให้แสงขาวแยกออกเป็นแถบสเปกตรัมสีต่างๆ (เช่น สีแดงและสีฟ้า) ทำมุมเลี้ยวเบนแตกต่างกันตามความยาวคลื่น</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การปรับเปลี่ยนพารามิเตอร์และตัวแปรการทดลอง</strong>
+                <ul class="nested-list">
+                    <li><strong>ปรับความสด/สว่างของสีรุ้ง (Color Vibrance):</strong> เลื่อนแถบปรับช่วง 20% - 200% (ค่าเริ่มต้น 140 %) เพื่อเพิ่มหรือลดความเข้มและความสว่างของแถบสีรุ้ง</li>
+                    <li><strong>ปรับขนาดหยดน้ำ (Droplet Radius <i>a</i>):</strong> เลื่อนแถบปรับรัศมีหยดน้ำช่วง 1.5 - 15.0 ไมโครเมตร (ค่าเริ่มต้น 4.5 ไมโครเมตร) เพื่อสังเกตการเปลี่ยนแปลงของมุมเลี้ยวเบนแสง</li>
+                    <li><strong>ปรับความสม่ำเสมอของขนาดหยดน้ำ (Size Uniformity):</strong> เลื่อนแถบปรับระดับตั้งแต่ 1 - 10 (ต่ำมาก ถึง สูงมาก) เพื่อศึกษาผลกระทบของการคมชัดและการซ้อนทับกันของแถบสีรุ้ง</li>
+                    <li><strong>ปรับขนาดก้อนเมฆสีรุ้ง (Cloud Scale):</strong> เลื่อนแถบปรับช่วง 50 % - 200 % (ค่าเริ่มต้น 110%) เพื่อขยายหรือลดขนาดพื้นที่ของเมฆหมวก (Pileus Cloud)</li>
+                    <li><strong>ปรับความหนาแน่นเมฆ (Optical Density):</strong> เลื่อนแถบช่วง 10 % - 100 % (ค่าเริ่มต้น 25 %) เพื่อสังเกตการโปร่งแสงและการกระจัดกระจายของแสงในเนื้อเมฆ</li>
+                    <li><strong>ปรับระยะห่างเชิงมุมจากดวงอาทิตย์ (Sun Angle):</strong> เลื่อนแถบช่วง 3° - 35° (ค่าเริ่มต้น 12 °) เพื่อปรับตำแหน่งความห่างระหว่างก้อนเมฆกับดวงอาทิตย์</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การสังเกตผลและการบันทึกข้อมูลทางทัศนศาสตร์ (Macro View & Data Analysis)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตการเปลี่ยนแปลงบนหน้าจอส่วนล่าง "2. มุมมองมหภาค: ภาพจำลองเมฆสีรุ้งเรืองรองและดวงอาทิตย์สดใส" ซึ่งจะแสดงผลกลุ่มเมฆสีรุ้งพาสเทล (โทนสีชมพู, พีช/ส้ม, เขียวมะนาว, ฟ้า, ลาเวนเดอร์) ปรากฏอยู่ใกล้ดวงอาทิตย์ตามค่าพารามิเตอร์ที่ตั้งไว้</li>
+                    <li>บันทึกผลการคำนวณจากกล่อง "ข้อมูลการคำนวณทางทัศนศาสตร์" ได้แก่:
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>ค่าดรรชนีหักเหน้ำ (n = 1.333$)</li>
+                            <li>ค่ามุมเลี้ยวเบนพีกแรกของแสงสีแดง (ความยาวคลื่น เท่ากับ 650 นาโนเมตร)</li>
+                            <li>ประเมินสภาพการเกิดสีรุ้งจากช่องแสดงสถานะ (เช่น เกิดสีรุ้งพาสเทลเรืองรองคมชัด, สีรุ้งซ้อนทับจนจาง, หรือไม่เกิดสีรุ้งเนื่องจากเมฆหนาเกินไป)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

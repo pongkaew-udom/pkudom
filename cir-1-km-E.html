@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Halo Phenomenon & Virtual Lab User Guide</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>Solar Halo Phenomenon</h1>
+        <div class="article-box">
+            <p>The Solar Halo phenomenon (or Sun Halo) is an atmospheric optical phenomenon that creates a glowing ring of light around the sun. It occurs due to the refraction and reflection of sunlight as it passes through countless microscopic hexagonal ice crystals suspended in high-altitude clouds, specifically Cirrostratus clouds. These ice crystals act as natural prisms, refracting light at an angle of approximately 22 degrees to form a large halo ring with a rainbow-like spectrum of colors. Typically, a reddish hue appears on the inner edge closest to the sun, transitioning outward through orange, yellow, and up to a bluish-violet tone on the outer edge. This phenomenon is most clearly visible when the sky is covered with a thin layer of clouds and sunlight shines through them at the appropriate angle. Besides the standard 22-degree halo, it can occasionally occur alongside other optical phenomena such as Sun Dogs or Sun Pillars.</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>Experimental Steps for Solar Halo Optics Virtual Lab Simulation</h2>
+        <ol>
+            <li>
+                <strong>Observation and Study of Microscopic Light Path (Micro View)</strong>
+                <ul class="nested-list">
+                    <li>Observe the top simulation screen "1. Micro Edge Refraction" to study the trajectory of white light rays from the sun as they strike and refract through the edge of a hexagonal ice crystal.</li>
+                    <li>Observe the dispersion of the light spectrum (red, orange, yellow, green, blue bands) and the actual output refraction angle as it changes according to parameter adjustments.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Adjustment of Experimental Parameters and Variables</strong>
+                <ul class="nested-list">
+                    <li><strong>Adjust Refractive Index of Ice (<i>n</i>):</strong> Slide the control bar within the range of 1.250 - 1.400 (default value: 1.310).</li>
+                    <li><strong>Select Crystal Type / Refraction Angle (Prism Angle):</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>Select 60° for a 22° halo formation (light passing through side faces of the crystal).</li>
+                            <li>Select 90° for a 46° halo formation (light passing through basal faces of the crystal).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Adjust Crystal Orientation (Crystal Rotation):</strong> Slide the angle control within the range of -25° to 25° (default value: 0°) to study the effect of crystal tilt on the sharpness and blurriness/expansion of the halo ring.</li>
+                    <li><strong>Adjust Sun Position (Sun Elevation):</strong> Slide the elevation bar within the range of 15° - 85° (default value: 65°) to adjust the sun's height in the sky.</li>
+                    <li><strong>Adjust Field of View / Zoom (Field of View):</strong> Slide between levels 1 - 3 (Near Zoom, Medium, Wide Angle).</li>
+                    <li><strong>Adjust Halo Intensity (Intensity Glow):</strong> Slide the intensity range between 50% - 200% (default value: 120%) to modify the brightness and radiance of the halo ring.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Observation of Results and Optical Data Recording (Macro View & Data Analysis)</strong>
+                <ul class="nested-list">
+                    <li>Observe the bottom screen "2. Observer Sky View & Head Rotation" to view the simulated sky, the colorful halo radius (red inner edge, blue outer edge), and the observer's line-of-sight perspective tilted toward the sun.</li>
+                    <li>Record calculated results from the "Physics Outputs" panel, including:
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>Minimum Deviation Angle (Min Deviation)</li>
+                            <li>Actual Deviation Angle from Tilt (Actual Dev)</li>
+                            <li>Apparent Halo Radius (Halo Radius)</li>
+                            <li>Crystal Alignment State (e.g., Minimum Deviation Alignment for optimal sharpness, or Tilted State resulting in expanded and faded halos)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

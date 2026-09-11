@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การเกิดปรากฏการณ์รุ้งกินน้ำ และคู่มือ Virtual Lab</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            color: #334155;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol, ul {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>การเกิดปรากฏการณ์รุ้งกินน้ำ (Rainbow)</h1>
+        <div class="article-box">
+            <p>ปรากฏการณ์รุ้งกินน้ำ (Rainbow) เป็นปรากฏการณ์ทางทัศนศาสตร์ชั้นบรรยากาศ (Atmospheric Optics) ที่เกิดขึ้นจากการปฏิสัมพันธ์ระหว่างแสงอาทิตย์และหยดน้ำฝนทรงกลมในอากาศ โดยเมื่อแสงขาวจากดวงอาทิตย์ตกกระทบเข้าสู่หยดน้ำ รังสีของแสงจะเกิดการหักเห (Refraction) ณ บริเวณรอยต่อระหว่างอากาศกับหยดน้ำ ส่งผลให้แสงแต่ละความยาวคลื่นแยกออกจากกันเป็นสเปกตรัมสีต่างๆ จากนั้นแสงจะเคลื่อนที่ไปตกกระทบกับผนังด้านหลังภายในหยดน้ำและเกิดการสะท้อนกลับหมด (Internal Reflection) ก่อนจะหักเหออกจากหยดน้ำกลับสู่ชั้นบรรยากาศอีกครั้งเข้าสู่นัยน์ตาของผู้สังเกต ซึ่งขบวนการดังกล่าวทำให้เกิดแถบสีเรียงลำดับจากความยาวคลื่นมากไปน้อย ได้แก่ แดง แสด เหลือง เขียว น้ำเงิน คราม และม่วง โดยปรากฏการณ์นี้จะมองเห็นได้สมบูรณ์ก็ต่อเมื่อผู้สังเกตยืนหันหลังให้ดวงอาทิตย์ และมีมุมกวาดสายตาทำมุมประมาณ 40 ถึง 42 องศา กับแกนกึ่งกลางระหว่างดวงอาทิตย์และจุดศูนย์กลางของวงโค้งรุ้งกินน้ำ</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>คู่มือการใช้งาน Virtual Lab: สื่อจำลองการเกิดรุ้งกินน้ำตามหลักทัศนศาสตร์</h2>
+        <p>เรื่องนี้เป็นสื่อการเรียนรู้ปฏิสัมพันธ์ (Interactive Simulation) ที่ออกแบบมาเพื่อจำลองพฤติกรรมของแสงและการเกิดรุ้งกินน้ำทั้งระดับจุลภาค (ภายในหยดน้ำ) และระดับมหภาค (ภาพรวมบนท้องฟ้า) โดยผู้เรียนและผู้สอนสามารถปรับเปลี่ยนตัวแปรต่างๆ ทางฟิสิกส์เพื่อสังเกตผลลัพธ์ได้แบบเรียลไทม์</p>
+    </section>
+
+    <section class="section-block">
+        <h3>ส่วนประกอบและการแสดงผล</h3>
+        <ol>
+            <li><strong>เส้นทางแสงในหยดน้ำ (Micro View):</strong> หน้าจอฝั่งซ้ายบน แสดงภาพการหักเหและการสะท้อนภายในหยดน้ำฝนทรงกลม ทำให้เห็นการแยกของสเปกตรัมแสงขาวออกเป็น 7 สี</li>
+            <li><strong>ภาพจำลองปรากฏการณ์บนท้องฟ้า (Macroscopic View):</strong> หน้าจอฝั่งซ้ายล่าง แสดงภาพตำแหน่งผู้สังเกต ดวงอาทิตย์ ม่านฝน และการปรากฏของรุ้งกินน้ำบนท้องฟ้าจริงตามมุมสูงของดวงอาทิตย์</li>
+            <li><strong>แผงควบคุมและแสดงผลข้อมูล (Control Panel & Physics Outputs):</strong> หน้าจอฝั่งขวา ใช้สำหรับปรับค่าตัวแปรและอ่านค่ามุมการมองเห็นรุ้ง</li>
+        </ol>
+    </section>
+
+    <section class="section-block">
+        <h3>วิธีการใช้งานแถบควบคุมตัวแปร</h3>
+        
+        <p><strong>ตัวแปรในหยดน้ำ (Droplet Variables):</strong></p>
+        <ul class="nested-list">
+            <li><strong>ระยะตกกระทบ b (Impact Parameter):</strong> ปรับตำแหน่งที่รังสีแสงตกกระทบผิวหยดน้ำ เพื่อสังเกตทิศทางรังสีแสงที่ออกจากหยดน้ำ</li>
+            <li><strong>ดรรชนีหักเหของน้ำ n:</strong> ปรับค่าตัวกลางหักเห (ค่าเริ่มต้น 1.333) เพื่อทดลองดูว่าหากตัวกลางเปลี่ยนไป ทิศทางการหักเหของแสงจะเปลี่ยนแปลงอย่างไร</li>
+            <li><strong>การกระจายแสง (Dispersion ):</strong> ปรับช่วงความต่างของดรรชนีหักเหในแต่ละสี เพื่อสังเกตการแยกแถบสีของสเปกตรัม (ยิ่งค่ามาก แถบสียิ่งคลี่กว้าง)</li>
+            <li><strong>โหมดการสะท้อนบนท้องฟ้า:</strong> เลือกแสดงเฉพาะรุ้งปฐมภูมิ (สะท้อน 1 ครั้ง), รุ้งทุติยภูมิ (สะท้อน 2 ครั้ง) หรือแสดงพร้อมกันทั้งคู่ (Double Rainbow)</li>
+        </ul>
+
+        <p><strong>ตัวแปรสิ่งแวดล้อม (Environment Controls):</strong></p>
+        <ul class="nested-list">
+            <li><strong>มุมสูงดวงอาทิตย์ (Sun Elevation):</strong> ปรับระดับความสูงของดวงอาทิตย์เหนือขอบฟ้า (0° - 60°) เพื่อสังเกตว่าถ้าดวงอาทิตย์อยู่สูงเกินไป (มากกว่าประมาณ 42°) รุ้งจะตกลงไปอยู่ใต้ขอบฟ้าและมองไม่เห็น</li>
+            <li><strong>ระยะห่างจากม่านฝน:</strong> ปรับระยะทางระหว่างผู้สังเกตกับกลุ่มฝน</li>
+        </ul>
+    </section>
+
+    <section class="section-block">
+        <h3>จุดเด่นสำหรับการเรียนการสอน</h3>
+        <ul class="nested-list">
+            <li>ช่วยให้ผู้เรียนเข้าใจว่าทำไม รุ้งทุติยภูมิ (Secondary Rainbow) จึงมีความเข้มแสงน้อยกว่า และมี ลำดับสีที่สลับกัน (แดงอยู่ด้านล่าง ม่วงอยู่ด้านบน) เมื่อเทียบกับรุ้งปฐมภูมิ</li>
+            <li>แสดงความสัมพันธ์ของมุมเบี่ยงเบนทางทัศนศาสตร์ เช่น มุมการมองเห็นรุ้งปฐมภูมิที่ประมาณ 42.0 ° และรุ้งทุติยภูมิที่ประมาณ 51.0 ° อย่างชัดเจน</li>
+        </ul>
+    </section>
+
+</div>
+
+</body>
+</html>

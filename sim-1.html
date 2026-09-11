@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Physics Lab: ห้องทดลองสร้างปรากฏการณ์แสงในบรรยากาศ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #0b0e14;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.8rem;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        p.subtitle {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1280px;
+            width: 100%;
+            justify-content: center;
+        }
+        .canvas-section {
+            flex: 1;
+            min-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .canvas-card {
+            background-color: #111827;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+        .canvas-header {
+            padding: 10px 16px;
+            background: #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #374151;
+        }
+        .canvas-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-target {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            background-color: #030712;
+        }
+        .controls-sidebar {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .panel-card {
+            background-color: #111827;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            padding: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .panel-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .phenomenon-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn-p {
+            padding: 10px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-p:hover {
+            border-color: #38bdf8;
+            color: #fff;
+        }
+        .btn-p.active {
+            background: #0284c7;
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        label span {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+        select, input[type="range"] {
+            width: 100%;
+        }
+        select {
+            padding: 8px 10px;
+            background-color: #030712;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+        select:focus {
+            border-color: #38bdf8;
+        }
+        input[type="range"] {
+            accent-color: #38bdf8;
+            cursor: pointer;
+        }
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+        .btn-action:active {
+            transform: translateY(1px);
+        }
+        .status-box {
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .status-fail {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+        .status-neutral {
+            background-color: rgba(107, 114, 128, 0.15);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            color: #9ca3af;
+        }
+        .guide-box {
+            background: #111827;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            line-height: 1.5;
+        }
+        .guide-box h4 {
+            margin: 0 0 6px 0;
+            color: #f3f4f6;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Virtual Physics Lab: จำลองการสร้างปรากฏการณ์แสงบนท้องฟ้า</h1>
+        <p class="subtitle">เลือกเป้าหมายปรากฏการณ์ ปรับตั้งค่าเงื่อนไขบรรยากาศและดวงอาทิตย์ เพื่อสังเกตผลลัพธ์ของฉาก</p>
+    </header>
+
+    <div class="main-layout">
+        <div class="canvas-section">
+            <div class="canvas-card">
+                <div class="canvas-header">
+                    <div class="canvas-title">
+                        <span>🏞️ ฉากจำลองบรรยากาศกลางแจ้ง (Outdoor Unified Scene)</span>
+                    </div>
+                    <span id="targetBadge" class="badge badge-target">เป้าหมาย: รุ้งกินน้ำ</span>
+                </div>
+                <canvas id="skyCanvas" width="750" height="480"></canvas>
+            </div>
+
+            <div class="guide-box">
+                <h4>💡 คำแนะนำการใช้งาน:</h4>
+                <p>1. เลือก <strong>เป้าหมายปรากฏการณ์</strong> ที่ต้องการสร้าง (รุ้งกินน้ำ, ซันด็อก, เมฆสีรุ้ง, หรือ ทรงกลด)</p>
+                <p>2. กำหนดสถานการณ์: ปรับตั้งค่า <strong>อนุภาคในอากาศ</strong>, <strong>มุมสูงดวงอาทิตย์</strong>, <strong>ทิศทางการมอง/ตำแหน่ง</strong> และ <strong>ความสม่ำเสมอ</strong></p>
+                <p>3. กดปุ่ม <strong>"ทดสอบสถานการณ์"</strong> หากกำหนดเงื่อนไขถูกต้องตามหลักฟิสิกส์ ปรากฏการณ์จะเกิดบนท้องฟ้า หากไม่ถูกต้องจะไม่เกิดขึ้น!</p>
+            </div>
+        </div>
+
+        <div class="controls-sidebar">
+            <div class="panel-card">
+                <div class="panel-title">🎯 1. เลือกเป้าหมายปรากฏการณ์</div>
+                <div class="phenomenon-selector">
+                    <button class="btn-p active" onclick="selectPhenomenon('rainbow')">🌈 1. รุ้งกินน้ำ</button>
+                    <button class="btn-p" onclick="selectPhenomenon('sundog')">☀️ 2. ซันด็อก</button>
+                    <button class="btn-p" onclick="selectPhenomenon('iridescence')">☁️ 3. เมฆสีรุ้ง</button>
+                    <button class="btn-p" onclick="selectPhenomenon('halo')">⭕ 4. ทรงกลด</button>
+                </div>
+
+                <div class="panel-title">⚙️ 2. กำหนดเงื่อนไขสถานการณ์</div>
+
+                <div class="form-group">
+                    <label for="particleType">ชนิดของอนุภาคในอากาศ: <span id="valParticle">หยดน้ำทรงกลม ใหญ่ (>0.5mm)</span></label>
+                    <select id="particleType" onchange="updateUIValues()">
+                        <option value="droplet_large">หยดน้ำทรงกลมขนาดใหญ่ ( Raindrops > 0.5 mm )</option>
+                        <option value="droplet_micro">หยดน้ำขนาดจิ๋วสม่ำเสมอ ( Cloud Droplets 2-5 µm )</option>
+                        <option value="ice_plate">ผลึกน้ำแข็งหกเหลี่ยมทรงแผ่นเรียงแนวราบ ( Flat Plates )</option>
+                        <option value="ice_column">ผลึกน้ำแข็งหกเหลี่ยมทรงแท่งสุ่มทิศทาง ( Column Crystals )</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sunElevation">มุมสูงดวงอาทิตย์ (Sun Elevation): <span id="valSunElev">20</span>°</label>
+                    <input type="range" id="sunElevation" min="0" max="80" step="1" value="20" oninput="updateUIValues()">
+                </div>
+
+                <div class="form-group">
+                    <label for="observerLook">ทิศทางการมองของผู้เรียน/คน: <span id="valLook">หันหลังให้ดวงอาทิตย์ (ดวงอาทิตย์ -> คน -> รุ้ง)</span></label>
+                    <select id="observerLook" onchange="updateUIValues()">
+                        <option value="away">หันหลังให้ดวงอาทิตย์ (Look away from Sun)</option>
+                        <option value="towards">หันหน้าเข้าหา/มองใกล้ดวงอาทิตย์ (Look towards Sun)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="uniformity">ความหนาแน่น / ความสม่ำเสมออนุภาค: <span id="valUniform">สูง</span></label>
+                    <input type="range" id="uniformity" min="1" max="10" step="1" value="8" oninput="updateUIValues()">
+                </div>
+
+                <button class="btn-action" onclick="testScenario()">🧪 ทดสอบสถานการณ์</button>
+
+                <div id="statusBox" class="status-box status-neutral">
+                    พร้อมทดสอบ: กรุณาปรับเงื่อนไขแล้วกด "ทดสอบสถานการณ์"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('skyCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let targetPhenomenon = 'rainbow';
+        let simulationActive = false;
+        let isCorrectScenario = false;
+        let feedbackMessage = "";
+
+        function selectPhenomenon(p) {
+            targetPhenomenon = p;
+            const btns = document.querySelectorAll('.btn-p');
+            btns.forEach(btn => btn.classList.remove('active'));
+
+            const badge = document.getElementById('targetBadge');
+            
+            if (p === 'rainbow') {
+                btns[0].classList.add('active');
+                badge.textContent = "เป้าหมาย: รุ้งกินน้ำ (Rainbow)";
+            } else if (p === 'sundog') {
+                btns[1].classList.add('active');
+                badge.textContent = "เป้าหมาย: ซันด็อก (Sun Dog)";
+            } else if (p === 'iridescence') {
+                btns[2].classList.add('active');
+                badge.textContent = "เป้าหมาย: เมฆสีรุ้ง (Cloud Iridescence)";
+            } else if (p === 'halo') {
+                btns[3].classList.add('active');
+                badge.textContent = "เป้าหมาย: พระอาทิตย์ทรงกลด (Solar Halo)";
+            }
+
+            simulationActive = false;
+            const statusBox = document.getElementById('statusBox');
+            statusBox.className = "status-box status-neutral";
+            statusBox.innerHTML = "เปลี่ยนเป้าหมายแล้ว! กรุณาปรับตั้งค่าเงื่อนไขให้ถูกต้อง แล้วกด 'ทดสอบสถานการณ์'";
+            
+            drawScene();
+        }
+
+        function updateUIValues() {
+            const particle = document.getElementById('particleType').value;
+            const sunElev = document.getElementById('sunElevation').value;
+            const look = document.getElementById('observerLook').value;
+            const uniform = document.getElementById('uniformity').value;
+
+            document.getElementById('valSunElev').textContent = sunElev;
+            document.getElementById('valLook').textContent = look === 'away' ? 'หันหลังให้ดวงอาทิตย์ (ดวงอาทิตย์ ➔ คน ➔ รุ้ง)' : 'หันหน้าเข้าหา/มองใกล้ดวงอาทิตย์';
+
+            const particleTexts = {
+                'droplet_large': 'หยดน้ำทรงกลมใหญ่ (>0.5mm)',
+                'droplet_micro': 'หยดน้ำขนาดจิ๋วสม่ำเสมอ (2-5 µm)',
+                'ice_plate': 'ผลึกน้ำแข็งหกเหลี่ยมทรงแผ่นเรียงแนวราบ',
+                'ice_column': 'ผลึกน้ำแข็งหกเหลี่ยมทรงแท่งสุ่มทิศทาง'
+            };
+            document.getElementById('valParticle').textContent = particleTexts[particle];
+            document.getElementById('valUniform').textContent = uniform > 7 ? 'สูงมาก' : (uniform > 4 ? 'ปานกลาง' : 'ต่ำ');
+
+            drawScene();
+        }
+
+        function testScenario() {
+            const particle = document.getElementById('particleType').value;
+            const sunElev = parseInt(document.getElementById('sunElevation').value);
+            const look = document.getElementById('observerLook').value;
+            const uniform = parseInt(document.getElementById('uniformity').value);
+
+            isCorrectScenario = false;
+            feedbackMessage = "";
+
+            if (targetPhenomenon === 'rainbow') {
+                if (particle === 'droplet_large' && sunElev <= 42 && look === 'away') {
+                    isCorrectScenario = true;
+                    feedbackMessage = "🎉 <strong>ถูกต้อง! เกิดรุ้งกินน้ำสำเร็จ</strong><br>• เรียงลำดับถูกต้อง: <strong>ดวงอาทิตย์ (หลัง) ➔ ผู้เรียน (กลาง) ➔ ม่านฝน/รุ้ง (หน้า)</strong><br>• แสงอาทิตย์หักเหและสะท้อนภายในหยดน้ำฝนทรงกลม<br>• มุมสูงดวงอาทิตย์ต่ำกว่า 42° ทำให้เกิดรุ้งเห็นได้ชัดเจนบนขอบฟ้า";
+                } else {
+                    feedbackMessage = "❌ <strong>ไม่เกิดรุ้งกินน้ำ!</strong> สาเหตุเพราะ:<br>";
+                    if (particle !== 'droplet_large') feedbackMessage += "• อนุภาคต้องเป็น 'หยดน้ำทรงกลมขนาดใหญ่' (น้ำฝน)<br>";
+                    if (sunElev > 42) feedbackMessage += "• ดวงอาทิตย์อยู่สูงเกินไป (>42°) ทำให้วงรุ้งตกลงใต้ขอบฟ้า<br>";
+                    if (look !== 'away') feedbackMessage += "• การมองรุ้งกินน้ำต้อง 'หันหลังให้ดวงอาทิตย์' เท่านั้น (ลำดับ: ดวงอาทิตย์ ➔ คน ➔ รุ้ง)<br>";
+                }
+            } 
+            else if (targetPhenomenon === 'sundog') {
+                if (particle === 'ice_plate' && sunElev <= 30 && look === 'towards' && uniform >= 5) {
+                    isCorrectScenario = true;
+                    feedbackMessage = "🎉 <strong>ถูกต้อง! เกิดปรากฏการณ์ซันด็อก (Sun Dogs) สำเร็จ</strong><br>• ลำดับการมอง: <strong>ผู้เรียนมองตรงไปทางดวงอาทิตย์</strong><br>• แสงอาทิตย์หักเหผ่านหน้าข้าง 60° ของผลึกน้ำแข็งแผ่นหกเหลี่ยมที่เรียงตัวแนวราบ<br>• ดวงอาทิตย์อยู่ใกล้ขอบฟ้า (≤30°) เกิดดวงอาทิตย์ย่อยข้างซ้าย-ขวา";
+                } else {
+                    feedbackMessage = "❌ <strong>ไม่เกิดซันด็อก!</strong> สาเหตุเพราะ:<br>";
+                    if (particle !== 'ice_plate') feedbackMessage += "• ต้องใช้ 'ผลึกน้ำแข็งหกเหลี่ยมทรงแผ่นเรียงแนวราบ'<br>";
+                    if (sunElev > 30) feedbackMessage += "• มุมสูงดวงอาทิตย์สูงเกินไป (>30°) ซันด็อกจะจางลงและแยกออกจากขอบฮาโล<br>";
+                    if (look !== 'towards') feedbackMessage += "• ต้องหันหน้าเข้าหา/มองบริเวณรอบดวงอาทิตย์<br>";
+                    if (uniform < 5) feedbackMessage += "• ความหนาแน่น/การเรียงตัวของผลึกน้ำแข็งน้อยเกินไป<br>";
+                }
+            } 
+            else if (targetPhenomenon === 'iridescence') {
+                if (particle === 'droplet_micro' && look === 'towards' && uniform >= 6) {
+                    isCorrectScenario = true;
+                    feedbackMessage = "🎉 <strong>ถูกต้อง! เกิดเมฆสีรุ้ง (Cloud Iridescence) สำเร็จ</strong><br>• ลำดับการมอง: <strong>ผู้เรียนมองไปทางเมฆใกล้ดวงอาทิตย์</strong><br>• เกิดจากการเลี้ยวเบนของแสงผ่านหยดน้ำจิ๋วในเมฆที่มีขนาดสม่ำเสมอ<br>• แสงสีพาสเทลเรืองรองเปล่งประกายสวยงามตามขอบและเนื้อเมฆ";
+                } else {
+                    feedbackMessage = "❌ <strong>ไม่เกิดเมฆสีรุ้ง!</strong> สาเหตุเพราะ:<br>";
+                    if (particle !== 'droplet_micro') feedbackMessage += "• ต้องใช้อนุภาค 'หยดน้ำขนาดจิ๋วสม่ำเสมอ (Cloud Droplets)'<br>";
+                    if (look !== 'towards') feedbackMessage += "• เมฆสีรุ้งเกิดขึ้นบริเวณใกล้ดวงอาทิตย์ (หันหน้าเข้าหาดวงอาทิตย์)<br>";
+                    if (uniform < 6) feedbackMessage += "• ขนาดหยดน้ำไม่สม่ำเสมอพอ ทำให้สีรุ้งซ้อนทับกลายเป็นสีขาวจาง<br>";
+                }
+            } 
+            else if (targetPhenomenon === 'halo') {
+                if ((particle === 'ice_column' || particle === 'ice_plate') && look === 'towards') {
+                    isCorrectScenario = true;
+                    feedbackMessage = "🎉 <strong>ถูกต้อง! เกิดพระอาทิตย์ทรงกลด 22° (Solar Halo) สำเร็จ</strong><br>• ลำดับการมอง: <strong>ผู้เรียนมองตรงไปทางดวงอาทิตย์</strong><br>• แสงหักเหผ่านผลึกน้ำแข็งหกเหลี่ยมสุ่มทิศทางด้วยมุมหักเหขั้นต่ำ ~22°<br>• เกิดเป็นวงกลมสีรุ้งล้อมรอบดวงอาทิตย์";
+                } else {
+                    feedbackMessage = "❌ <strong>ไม่เกิดพระอาทิตย์ทรงกลด!</strong> สาเหตุเพราะ:<br>";
+                    if (particle !== 'ice_column' && particle !== 'ice_plate') feedbackMessage += "• ต้องใช้อนุภาค 'ผลึกน้ำแข็งหกเหลี่ยม' ในเมฆซีร์โรสเตรตัส<br>";
+                    if (look !== 'towards') feedbackMessage += "• วงทรงกลดเกิดล้อมรอบดวงอาทิตย์ ต้องมองไปทางดวงอาทิตย์<br>";
+                }
+            }
+
+            simulationActive = true;
+            const statusBox = document.getElementById('statusBox');
+            statusBox.className = isCorrectScenario ? "status-box status-success" : "status-box status-fail";
+            statusBox.innerHTML = feedbackMessage;
+
+            drawScene();
+        }
+
+        function drawScene() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const sunElev = parseInt(document.getElementById('sunElevation').value);
+            const look = document.getElementById('observerLook').value;
+
+            // Sky Background
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+            if (sunElev > 50) {
+                skyGrad.addColorStop(0, "#0284c7");
+                skyGrad.addColorStop(0.7, "#38bdf8");
+                skyGrad.addColorStop(1, "#bae6fd");
+            } else if (sunElev > 20) {
+                skyGrad.addColorStop(0, "#0369a1");
+                skyGrad.addColorStop(0.6, "#38bdf8");
+                skyGrad.addColorStop(1, "#fde68a");
+            } else {
+                skyGrad.addColorStop(0, "#1e1b4b");
+                skyGrad.addColorStop(0.4, "#431407");
+                skyGrad.addColorStop(0.8, "#c2410c");
+                skyGrad.addColorStop(1, "#fef08a");
+            }
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, w, h);
+
+            // Sun Position
+            const sunY = (h * 0.72) - (sunElev / 90.0) * (h * 0.65);
+            const sunX = 180;
+
+            // Draw Sun
+            ctx.save();
+            ctx.shadowColor = "#fef08a";
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, 22, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.restore();
+
+            ctx.fillStyle = "#fef08a";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("☀️ ดวงอาทิตย์", sunX, sunY + 38);
+
+            // Cloud Layer
+            const isIridescenceActive = (simulationActive && isCorrectScenario && targetPhenomenon === 'iridescence');
+            const cloudX = sunX + 260;
+            const cloudY = sunY - 50;
+
+            drawRealisticCloud(cloudX, cloudY, isIridescenceActive);
+
+            // Mountains
+            ctx.fillStyle = "#1e293b";
+            ctx.beginPath();
+            ctx.moveTo(0, h - 80);
+            ctx.lineTo(120, h - 180);
+            ctx.lineTo(250, h - 110);
+            ctx.lineTo(400, h - 210);
+            ctx.lineTo(580, h - 90);
+            ctx.lineTo(750, h - 160);
+            ctx.lineTo(750, h);
+            ctx.lineTo(0, h);
+            ctx.fill();
+
+            ctx.fillStyle = "#0f172a";
+            ctx.beginPath();
+            ctx.moveTo(0, h - 60);
+            ctx.lineTo(180, h - 130);
+            ctx.lineTo(320, h - 80);
+            ctx.lineTo(500, h - 140);
+            ctx.lineTo(680, h - 70);
+            ctx.lineTo(750, h - 100);
+            ctx.lineTo(750, h);
+            ctx.lineTo(0, h);
+            ctx.fill();
+
+            // Ground
+            const groundGrad = ctx.createLinearGradient(0, h - 70, 0, h);
+            groundGrad.addColorStop(0, "#15803d");
+            groundGrad.addColorStop(1, "#052e16");
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, h - 70, w, 70);
+
+            drawTree(50, h - 65, 0.7);
+            drawTree(680, h - 70, 1.1);
+
+            const observerX = 400;
+            drawObserver(observerX, h - 70, look);
+
+            // Render Phenomenon Effects on Top Layer
+            if (simulationActive && isCorrectScenario) {
+                if (targetPhenomenon === 'rainbow') {
+                    drawRainbowEffect(w, h, sunElev, 620);
+                } else if (targetPhenomenon === 'sundog') {
+                    drawSundogEffect(sunX, sunY);
+                } else if (targetPhenomenon === 'halo') {
+                    drawHaloEffect(sunX, sunY);
+                }
+            }
+        }
+
+        function drawCloudPath(ctx, cx, cy, puffs) {
+            ctx.beginPath();
+            puffs.forEach(p => {
+                ctx.arc(cx + p.x, cy + p.y, p.r, 0, Math.PI * 2);
+            });
+            ctx.closePath();
+        }
+
+        function drawRealisticCloud(cx, cy, hasIridescence) {
+            ctx.save();
+
+            const puffs = [
+                {x: -60, y: 10, r: 28},
+                {x: -35, y: -12, r: 35},
+                {x: 0, y: -22, r: 42},
+                {x: 40, y: -10, r: 36},
+                {x: 75, y: 8, r: 28},
+                {x: 20, y: 15, r: 32},
+                {x: -25, y: 18, r: 30}
+            ];
+
+            // Base Shadow
+            ctx.fillStyle = "rgba(100, 116, 139, 0.35)";
+            puffs.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(cx + p.x, cy + p.y + 6, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Cloud Base Body
+            drawCloudPath(ctx, cx, cy, puffs);
+            const cloudGrad = ctx.createRadialGradient(cx, cy - 10, 10, cx, cy, 90);
+            cloudGrad.addColorStop(0, "#ffffff");
+            cloudGrad.addColorStop(0.85, "#e2e8f0");
+            cloudGrad.addColorStop(1, "rgba(203, 213, 225, 0.8)");
+            ctx.fillStyle = cloudGrad;
+            ctx.fill();
+
+            // Cloud Iridescence Effect (จำกัดขอบเขตให้อยู่เฉพาะบนตัวเมฆ)
+            if (hasIridescence) {
+                ctx.save();
+
+                // สร้าง Clip Mask ตามรูปทรงก้อนเมฆ
+                drawCloudPath(ctx, cx, cy, puffs);
+                ctx.clip();
+
+                // 1. วาดสีรุ้งไล่ระดับพาสเทลให้กลมกลืนบนเนื้อเมฆ
+                const bandGrad1 = ctx.createLinearGradient(cx - 90, cy - 50, cx + 90, cy + 50);
+                bandGrad1.addColorStop(0.0, "rgba(255, 255, 255, 0)");
+                bandGrad1.addColorStop(0.15, "rgba(244, 114, 182, 0.75)"); // ชมพู
+                bandGrad1.addColorStop(0.35, "rgba(250, 204, 21, 0.70)");  // เหลือง
+                bandGrad1.addColorStop(0.55, "rgba(52, 211, 153, 0.70)");  // เขียว
+                bandGrad1.addColorStop(0.75, "rgba(56, 189, 248, 0.75)");  // ฟ้า
+                bandGrad1.addColorStop(0.90, "rgba(192, 132, 252, 0.70)"); // ม่วง
+                bandGrad1.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+
+                ctx.fillStyle = bandGrad1;
+                drawCloudPath(ctx, cx, cy, puffs);
+                ctx.fill();
+
+                // 2. เติมไฮไลต์ความนุ่มนวลและมิติสีขาวกลางเนื้อเมฆ
+                ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+                puffs.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(cx + p.x, cy + p.y, p.r * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.restore();
+
+                ctx.fillStyle = "#38bdf8";
+                ctx.font = "bold 13px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("☁️ ปรากฏการณ์เมฆสีรุ้ง (Cloud Iridescence)", cx, cy - 65);
+            } else {
+                ctx.fillStyle = "#cbd5e1";
+                ctx.font = "11px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("☁️ เมฆอัลโตคิวมูลัส (Altocumulus)", cx, cy - 55);
+            }
+
+            ctx.restore();
+        }
+
+        function drawTree(x, y, scale) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            ctx.fillStyle = "#451a03";
+            ctx.fillRect(-8, -40, 16, 40);
+
+            ctx.fillStyle = "#166534";
+            ctx.beginPath();
+            ctx.arc(0, -55, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(-20, -45, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(20, -45, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawObserver(x, y, look) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.strokeStyle = "#e2e8f0";
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.moveTo(0, -20); ctx.lineTo(-8, 0);
+            ctx.moveTo(0, -20); ctx.lineTo(8, 0);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, -42); ctx.lineTo(0, -20);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(0, -50, 8, 0, Math.PI * 2);
+            ctx.fillStyle = "#f8fafc";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            if (look === 'towards') {
+                ctx.moveTo(0, -35); ctx.lineTo(-12, -42);
+                ctx.moveTo(0, -35); ctx.lineTo(-15, -30);
+            } else {
+                ctx.moveTo(0, -35); ctx.lineTo(12, -42);
+                ctx.moveTo(0, -35); ctx.lineTo(15, -30);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = "#fbbf24";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(look === 'towards' ? "👤 ผู้เรียน (หันหน้ามองดวงอาทิตย์ ➔)" : "👤 ผู้เรียน (หันหลังให้ดวงอาทิตย์ ➔ มองม่านฝน)", 0, 18);
+
+            ctx.restore();
+        }
+
+        function drawRainbowEffect(w, h, sunElev, rainbowX) {
+            ctx.save();
+            const rainY = h - 70;
+            const radius = 210 - (sunElev * 2.2);
+
+            const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            ctx.globalAlpha = 0.85;
+
+            colors.forEach((col, idx) => {
+                ctx.beginPath();
+                ctx.arc(rainbowX, rainY, radius + (idx * 4), Math.PI * 1.1, Math.PI * 1.9, false);
+                ctx.strokeStyle = col;
+                ctx.lineWidth = 4.5;
+                ctx.stroke();
+            });
+
+            ctx.fillStyle = "rgba(186, 230, 253, 0.15)";
+            ctx.fillRect(rainbowX - radius - 20, 20, (radius * 2) + 40, h - 90);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "13px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("🌈 ม่านฝนและรุ้งกินน้ำ", rainbowX, rainY - radius - 15);
+
+            ctx.restore();
+        }
+
+        function drawSundogEffect(sunX, sunY) {
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+
+            const haloRadius = 110;
+
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, haloRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(255, 200, 120, 0.4)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            drawSingleSundog(sunX - haloRadius, sunY, -1);
+            drawSingleSundog(sunX + haloRadius, sunY, 1);
+
+            ctx.beginPath();
+            ctx.moveTo(sunX - 150, sunY);
+            ctx.lineTo(sunX + 150, sunY);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawSingleSundog(x, y, dir) {
+            const grad = ctx.createRadialGradient(x, y, 2, x + (dir * 15), y, 35);
+            grad.addColorStop(0, "rgba(255, 255, 255, 1)");
+            grad.addColorStop(0.2, "rgba(255, 100, 50, 0.9)");
+            grad.addColorStop(0.5, "rgba(255, 220, 100, 0.7)");
+            grad.addColorStop(0.8, "rgba(56, 189, 248, 0.4)");
+            grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+            ctx.beginPath();
+            ctx.arc(x + (dir * 10), y, 28, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
+
+        function drawHaloEffect(sunX, sunY) {
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+
+            const radius = 125;
+
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.8)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, radius + 4, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(251, 191, 36, 0.7)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, radius + 9, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        updateUIValues();
+        drawScene();
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปรากฏการณ์ พระอาทิตย์ทรงกลด และคู่มือ Virtual Lab</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>ปรากฏการณ์ พระอาทิตย์ทรงกลด</h1>
+        <div class="article-box">
+            <p>ปรากฏการณ์ พระอาทิตย์ทรงกลด หรือ ซันฮาโล (Sun Halo) คือ ปรากฏการณ์ทางทัศนศาสตร์ชั้นบรรยากาศ ที่ทำให้เกิดวงแหวนแสงสว่างล้อมรอบดวงอาทิตย์ ซึ่งเกิดขึ้นจากการหักเหและการสะท้อนของแสงอาทิตย์เมื่อเดินทางผ่านผลึกน้ำแข็งทรงหกเหลี่ยมขนาดเล็กจำนวนมากที่ลอยอยู่ในเมฆชั้นสูงประเภทเซอโรสเตรตัส (Cirrostratus) โดยผลึกน้ำแข็งเหล่านี้ทำหน้าที่เสมือนปริซึมตามธรรมชาติ คอยหักเหแสงเป็นมุมประมาณ 22 องศา เกิดเป็นวงแหวนแสงขนาดใหญ่ที่มีสเปกตรัมสีคล้ายรุ้งกินน้ำ โดยมากจะปรากฏสีแดงที่ขอบด้านในใกล้ดวงอาทิตย์ และไล่เรียงเป็นสีส้ม เหลือง ไปจนถึงสีฟ้าปนม่วงทางด้านนอก ปรากฏการณ์นี้จะมองเห็นได้ชัดเจนที่สุดเมื่อท้องฟ้ามีเมฆบางเบาปกคลุมทั่วบริเวณ และดวงอาทิตย์ส่องแสงผ่านชั้นเมฆดังกล่าวในมุมที่เหมาะสม ซึ่งนอกจากวงแหวน 22 องศาแล้ว ในบางครั้งยังอาจเกิดร่วมกับปรากฏการณ์ทางทัศนศาสตร์อื่นๆ เช่น ซันด็อก (Sun Dog) หรือเสาแสง (Sun Pillar) ได้อีกด้วย</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>ขั้นตอนการทดลองจำลองการเกิดพระอาทิตย์ทรงกลด (Solar Halo Optics) ผ่านระบบ Virtual Lab</h2>
+        <ol>
+            <li>
+                <strong>การสังเกตและศึกษาวิถีแสงระดับจุลภาค (Micro View)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตหน้าจอจำลองส่วนบน "1. เส้นทางแสงตกกระทบขอบผลึกน้ำแข็ง (Micro Edge Refraction)" เพื่อศึกษาวิถีการเดินทางของลำแสงสีขาวจากดวงอาทิตย์เมื่อตกกระทบและเกิดการหักเหผ่านขอบผลึกน้ำแข็งหกเหลี่ยม</li>
+                    <li>สังเกตการแยกออกของสเปกตรัมแสง (แถบสีแดง, ส้ม, เหลือง, เขียว, ฟ้า) และมุมการหักเหออกจริงที่เปลี่ยนแปลงไปตามการปรับตั้งค่า</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การปรับเปลี่ยนพารามิเตอร์และตัวแปรการทดลอง</strong>
+                <ul class="nested-list">
+                    <li><strong>ปรับดรรชนีหักเหของน้ำแข็ง (<i>n</i>):</strong> เลื่อนแถบปรับค่าช่วง 1.250 - 1.400 (ค่าเริ่มต้น 1.310)</li>
+                    <li><strong>เลือกประเภทผลึก / มุมการหักเห (Prism Angle):</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>เลือก 60° สำหรับการเกิดทรงกลด 22° (แสงผ่านหน้าข้างผลึก)</li>
+                            <li>เลือก 90° สำหรับการเกิดทรงกลด 46° (แสงผ่านหน้าตัดผลึก)</li>
+                        </ul>
+                    </li>
+                    <li><strong>ปรับมุมเอียงของผลึก (Crystal Rotation):</strong> เลื่อนแถบปรับมุมช่วง -25° ถึง 25° (ค่าเริ่มต้น 0°) เพื่อศึกษาผลกระทบของการเอียงผลึกต่อความคมชัดและการเบลอขยายของวงทรงกลด</li>
+                    <li><strong>ปรับมุมสูงดวงอาทิตย์ (Sun Elevation):</strong> เลื่อนแถบปรับระดับช่วง 15° - 85° (ค่าเริ่มต้น 65°) เพื่อปรับตำแหน่งความสูงของดวงอาทิตย์บนท้องฟ้า</li>
+                    <li><strong>ปรับมุมมองภาพ / Zoom (Field of View):</strong> เลื่อนระดับ 1 - 3 (ซูมใกล้, ปานกลาง, มุมกว้าง)</li>
+                    <li><strong>ปรับความเข้มสีทรงกลด (Intensity Glow):</strong> เลื่อนแถบช่วง 50% - 200% (ค่าเริ่มต้น 120%) เพื่อปรับความสว่างและเรืองรองของวงแหวนทรงกลด</li>
+                </ul>
+            </li>
+            <li>
+                <strong>การสังเกตผลและการบันทึกข้อมูลทางทัศนศาสตร์ (Macro View & Data Analysis)</strong>
+                <ul class="nested-list">
+                    <li>สังเกตหน้าจอส่วนล่าง "2. มุมมองการมองท้องฟ้าและการเอียงศีรษะตามดวงอาทิตย์" เพื่อดูภาพจำลองท้องฟ้า รัศมีวงแหวนทรงกลดหลากสี (ขอบในสีแดง ขอบนอกสีฟ้า) และมุมมองของผู้สังเกตที่หันหน้าตามดวงอาทิตย์</li>
+                    <li>บันทึกผลการคำนวณจากกล่อง "ข้อมูลการคำนวณ (Physics Outputs)" ได้แก่:
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>ค่ามุมเบี่ยงเบนขั้นต่ำ (Min Deviation)</li>
+                            <li>ค่ามุมเบี่ยงเบนจริงจากการเอียง (Actual Dev)</li>
+                            <li>ค่ารัศมีทรงกลดปรากฏ (Halo Radius)</li>
+                            <li>สถานะของผลึก (เช่น Minimum Deviation Alignment เมื่อวงทรงกลดคมชัดที่สุด หรือสถานะเอียงซึ่งทำให้วงขยายและแสงเบลอจางลง)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

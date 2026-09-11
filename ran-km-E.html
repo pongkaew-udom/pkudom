@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Formation & Virtual Lab User Guide</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        h2 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            color: #334155;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .article-box {
+            background-color: var(--accent-bg);
+            padding: 20px 24px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 28px;
+        }
+
+        ol, ul {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>Rainbow </h1>
+        <div class="article-box">
+            <p>The rainbow phenomenon is an atmospheric optical phenomenon resulting from the interaction between sunlight and spherical raindrops in the air. When white sunlight enters a water droplet, light rays undergo refraction at the boundary between air and water, separating different wavelengths into distinct color spectrums. The light then strikes the inner back wall of the droplet, undergoing total internal reflection, before refracting out of the droplet back into the atmosphere toward the observer's eyes. This process creates a sequential color band ordered from longest to shortest wavelength: red, orange, yellow, green, blue, indigo, and violet. The phenomenon is fully visible only when the observer stands with their back to the sun, viewing at an angle of approximately 40 to 42 degrees relative to the central axis between the sun and the center of the rainbow arc.</p>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h2>Virtual Lab User Guide: Optical Rainbow Simulation</h2>
+        <p>This interactive simulation learning tool is designed to model light behavior and rainbow formation at both the microscopic level (inside a water droplet) and the macroscopic level (sky view). Students and instructors can adjust various physical variables to observe real-time results.</p>
+    </section>
+
+    <section class="section-block">
+        <h3>Components and Display</h3>
+        <ol>
+            <li><strong>Light Path in Droplet (Micro View):</strong> Located at the top-left screen, displaying refraction and reflection inside a spherical raindrop, showing white light dispersion into 7 colors.</li>
+            <li><strong>Atmospheric Sky Simulation (Macroscopic View):</strong> Located at the bottom-left screen, displaying the observer's position, sun position, rain curtain, and real-sky rainbow appearance relative to sun elevation.</li>
+            <li><strong>Control Panel & Physics Outputs:</strong> Located on the right screen, used to adjust parameters and read rainbow viewing angles.</li>
+        </ol>
+    </section>
+
+    <section class="section-block">
+        <h3>How to Use Control Sliders</h3>
+        
+        <p><strong>Droplet Variables:</strong></p>
+        <ul class="nested-list">
+            <li><strong>Impact Parameter (b):</strong> Adjusts the point where light rays strike the droplet surface to observe exiting ray directions.</li>
+            <li><strong>Refractive Index of Water (n):</strong> Adjusts the medium's refractive value (default 1.333) to observe how refraction changes across different media.</li>
+            <li><strong>Dispersion (&Delta;n):</strong> Adjusts the refractive index variation across colors to observe spectral band separation (higher values create wider bands).</li>
+            <li><strong>Reflection Mode:</strong> Selects primary rainbow (1 reflection), secondary rainbow (2 reflections), or both simultaneously (Double Rainbow).</li>
+        </ul>
+
+        <p><strong>Environment Controls:</strong></p>
+        <ul class="nested-list">
+            <li><strong>Sun Elevation:</strong> Adjusts the sun height above the horizon (0° - 60°) to observe how high sun angles (above ~42°) sink the rainbow below the horizon.</li>
+            <li><strong>Distance to Rain Curtain:</strong> Adjusts the distance between the observer and the rainfall.</li>
+        </ul>
+    </section>
+
+    <section class="section-block">
+        <h3>Educational Highlights</h3>
+        <ul class="nested-list">
+            <li>Helps learners understand why a Secondary Rainbow has lower light intensity and inverted color order (red on bottom, violet on top) compared to a Primary Rainbow.</li>
+            <li>Clearly illustrates optical deviation angles, such as the primary rainbow viewing angle at approximately 42.0° and secondary rainbow at 51.0°.</li>
+        </ul>
+    </section>
+
+</div>
+
+</body>
+</html>

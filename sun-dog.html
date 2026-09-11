@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Sun Dogs (Parhelia) Optics Simulation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
+            color: #79c0ff;
+            text-align: center;
+        }
+        p.subtitle {
+            margin: 0 0 20px 0;
+            color: #8b949e;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1250px;
+            width: 100%;
+            justify-content: center;
+        }
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            min-width: 550px;
+        }
+        .canvas-box {
+            background-color: #010409;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            border: 1px solid #30363d;
+            position: relative;
+        }
+        .canvas-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: rgba(13, 17, 23, 0.85);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #58a6ff;
+            border: 1px solid rgba(88, 166, 255, 0.4);
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .controls {
+            width: 380px;
+            background-color: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: fit-content;
+        }
+        .section-title {
+            font-size: 0.95rem;
+            color: #d2a8ff;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: #c9d1d9;
+        }
+        label span {
+            color: #79c0ff;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #79c0ff;
+            cursor: pointer;
+        }
+        .data-panel {
+            background-color: #0d1117;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 4px solid #79c0ff;
+            color: #8b949e;
+        }
+        .data-panel span {
+            color: #ffa657;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Virtual Lab: จำลองปรากฏการณ์ซันด็อก (Sun Dogs / Parhelia)</h1>
+    <p class="subtitle">การหักเหแสงผ่านผลึกน้ำแข็งหกเหลี่ยมทรงแผ่นเรียงตัวแนวราบในท้องฟ้า</p>
+
+    <div class="main-layout">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <!-- Canvas 1: Micro View Hexagonal Crystal Refraction -->
+            <div class="canvas-box">
+                <span class="canvas-title">1. มุมมองจุลภาค: การหักเหของแสงผ่านผลึกน้ำแข็งหกเหลี่ยม (60° Prism Refraction)</span>
+                <canvas id="microCanvas" width="650" height="280"></canvas>
+            </div>
+            
+            <!-- Canvas 2: Macro View Sky Sun Dogs & 22° Halo -->
+            <div class="canvas-box">
+                <span class="canvas-title">2. มุมมองมหภาค: ปรากฏการณ์ซันด็อกและวงฮาโล 22° ตามภาพจริง</span>
+                <canvas id="skyCanvas" width="650" height="420"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="section-title">☀️ พารามิเตอร์ดวงอาทิตย์และบรรยากาศ</div>
+            
+            <div class="control-group">
+                <label for="sunElevation">มุมความสูงดวงอาทิตย์ (Sun Elevation): <span id="valElevation">5</span>°</label>
+                <input type="range" id="sunElevation" min="0" max="45" step="1" value="5">
+            </div>
+
+            <div class="control-group">
+                <label for="crystalAlignment">การเรียงตัวราบของผลึก (Horizontal Alignment): <span id="valAlignment">สมบูรณ์แบบ</span></label>
+                <input type="range" id="crystalAlignment" min="1" max="10" step="1" value="9">
+            </div>
+
+            <div class="control-group">
+                <label for="iceDensity">ความหนาแน่นเมฆซีร์รัส (Ice Crystal Density): <span id="valDensity">70</span>%</label>
+                <input type="range" id="iceDensity" min="10" max="100" step="5" value="70">
+            </div>
+
+            <div class="control-group">
+                <label for="sundogBrightness">ความสว่างและสเปกตรัมสี (Brightness): <span id="valBrightness">160</span>%</label>
+                <input type="range" id="sundogBrightness" min="50" max="250" step="10" value="160">
+            </div>
+
+            <div class="data-panel">
+                <strong>ข้อมูลการคำนวณทางทัศนศาสตร์:</strong><br>
+                • ดรรชนีหักเหน้ำแข็ง (n_ice): <span>1.310 (Red) - 1.317 (Violet)</span><br>
+                • มุมเบี่ยงเบนขั้นต่ำ (Minimum Deviation): <span id="outMinDev">21.84</span>°<br>
+                • ระยะห่างซันด็อกจริงจากดวงอาทิตย์: <span id="outSundogDistance">21.9</span>°<br>
+                • คุณลักษณะ: <span style="color:#79c0ff; font-weight:bold;">แสงแนวนอนเข้มสว่างกว่าแนวตั้ง / ซันด็อกตั้งตรงขอบพอดี</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mCanvas = document.getElementById('microCanvas');
+        const mCtx = mCanvas.getContext('2d');
+        const sCanvas = document.getElementById('skyCanvas');
+        const sCtx = sCanvas.getContext('2d');
+
+        // Inputs
+        const elevationInput = document.getElementById('sunElevation');
+        const alignmentInput = document.getElementById('crystalAlignment');
+        const densityInput = document.getElementById('iceDensity');
+        const brightnessInput = document.getElementById('sundogBrightness');
+
+        // Outputs
+        const valElevation = document.getElementById('valElevation');
+        const valAlignment = document.getElementById('valAlignment');
+        const valDensity = document.getElementById('valDensity');
+        const valBrightness = document.getElementById('valBrightness');
+        const outMinDev = document.getElementById('outMinDev');
+        const outSundogDistance = document.getElementById('outSundogDistance');
+
+        function getDeviationAngle(n, apexAngleDeg = 60) {
+            const A = (apexAngleDeg * Math.PI) / 180;
+            const sinHalfDev = n * Math.sin(A / 2);
+            return (2 * Math.asin(sinHalfDev) - A) * (180 / Math.PI);
+        }
+
+        // 1. Draw Micro View: Hexagonal Crystal & Refraction Path
+        function renderMicroView() {
+            const w = mCanvas.width;
+            const h = mCanvas.height;
+            mCtx.clearRect(0, 0, w, h);
+
+            mCtx.fillStyle = "#050811";
+            mCtx.fillRect(0, 0, w, h);
+
+            const cx = w * 0.45;
+            const cy = h * 0.52;
+            const size = 65;
+
+            // Draw Hexagonal Plate Crystal
+            mCtx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const x = cx + size * Math.cos(angle);
+                const y = cy + size * Math.sin(angle);
+                if (i === 0) mCtx.moveTo(x, y);
+                else mCtx.lineTo(x, y);
+            }
+            mCtx.closePath();
+
+            const hexGrad = mCtx.createRadialGradient(cx, cy, 10, cx, cy, size);
+            hexGrad.addColorStop(0, "rgba(200, 235, 255, 0.4)");
+            hexGrad.addColorStop(1, "rgba(100, 180, 240, 0.15)");
+            mCtx.fillStyle = hexGrad;
+            mCtx.fill();
+            mCtx.strokeStyle = "#58a6ff";
+            mCtx.lineWidth = 2;
+            mCtx.stroke();
+
+            // Refraction Light Path
+            const inX = cx - size * 1.2;
+            const inY = cy - size * 0.5;
+            const entryX = cx - size * Math.cos(Math.PI / 3);
+            const entryY = cy - size * Math.sin(Math.PI / 3);
+            const exitX = cx + size;
+            const exitY = cy;
+
+            mCtx.beginPath();
+            mCtx.moveTo(inX - 120, inY);
+            mCtx.lineTo(entryX, entryY);
+            mCtx.strokeStyle = "#ffffff";
+            mCtx.lineWidth = 3;
+            mCtx.stroke();
+
+            mCtx.beginPath();
+            mCtx.moveTo(entryX, entryY);
+            mCtx.lineTo(exitX, exitY);
+            mCtx.strokeStyle = "rgba(220, 240, 255, 0.8)";
+            mCtx.lineWidth = 2.5;
+            mCtx.stroke();
+
+            const colors = [
+                { hex: "#ff4d4d", angle: 21.8 },
+                { hex: "#ffcc00", angle: 22.1 },
+                { hex: "#33cc66", angle: 22.4 },
+                { hex: "#3399ff", angle: 22.8 }
+            ];
+
+            colors.forEach(c => {
+                const rad = (c.angle * Math.PI) / 180;
+                const outLen = 160;
+                const targetX = exitX + Math.cos(rad * 0.8) * outLen;
+                const targetY = exitY + Math.sin(rad * 0.8) * outLen;
+
+                mCtx.beginPath();
+                mCtx.moveTo(exitX, exitY);
+                mCtx.lineTo(targetX, targetY);
+                mCtx.strokeStyle = c.hex;
+                mCtx.lineWidth = 2;
+                mCtx.stroke();
+            });
+
+            mCtx.fillStyle = "#79c0ff";
+            mCtx.font = "12px sans-serif";
+            mCtx.fillText("แสงอาทิตย์ขนานเข้า", inX - 110, inY - 10);
+            mCtx.fillText("มุมหักเหขั้นต่ำ ~22°", exitX + 30, exitY - 25);
+            mCtx.fillText("ผลึกน้ำแข็งหกเหลี่ยมทรงแผ่น (Plate Ice Crystal)", cx - 110, cy + size + 25);
+        }
+
+        // 2. Realistic Sky View Matching Reference Photo
+        function renderSkyView(elevation, alignment, density, brightness) {
+            const w = sCanvas.width;
+            const h = sCanvas.height;
+            sCtx.clearRect(0, 0, w, h);
+
+            const sunX = w * 0.5;
+            const sunY = h * 0.48 - (elevation * 1.2);
+
+            // Sky Background: Deep Sky Blue fading to Warm Atmosphere near Horizon
+            const skyGrad = sCtx.createLinearGradient(0, 0, 0, h);
+            skyGrad.addColorStop(0.0, "#1c4e80"); 
+            skyGrad.addColorStop(0.35, "#43729b"); 
+            skyGrad.addColorStop(0.65, "#a8997a"); 
+            skyGrad.addColorStop(0.85, "#c2a36b"); 
+            skyGrad.addColorStop(1.0, "#3e4c59"); 
+            sCtx.fillStyle = skyGrad;
+            sCtx.fillRect(0, 0, w, h);
+
+            // Fog / Haze Overlay
+            const hazeAlpha = (density / 100) * 0.22;
+            sCtx.fillStyle = `rgba(255, 230, 190, ${hazeAlpha})`;
+            sCtx.fillRect(0, 0, w, h);
+
+            const r22 = 135; // R_22 halo inner boundary
+            const elevRad = (elevation * Math.PI) / 180;
+            const sundogDistDeg = 21.84 / Math.cos(elevRad);
+            
+            // Sundog inner edge connects strictly at boundary (r22)
+            const sundogRadius = (sundogDistDeg / 21.84) * r22;
+            outSundogDistance.textContent = sundogDistDeg.toFixed(1);
+
+            const bFactor = (brightness / 100.0) * (alignment / 8.0) * (density / 50.0);
+
+            // --- 1. 22° Halo Ring (Sharp Inner Edge, Outer Fading) ---
+            sCtx.save();
+            sCtx.globalCompositeOperation = "screen";
+
+            const ringGrad = sCtx.createRadialGradient(sunX, sunY, r22 - 3, sunX, sunY, r22 + 22);
+            const ringAlpha = 0.35 * bFactor;
+
+            ringGrad.addColorStop(0.0, "rgba(255, 255, 255, 0)");
+            ringGrad.addColorStop(0.12, `rgba(255, 80, 20, ${ringAlpha * 0.9})`);  // Crisp Red Inner Edge
+            ringGrad.addColorStop(0.35, `rgba(255, 210, 100, ${ringAlpha})`);      // Golden Yellow Body
+            ringGrad.addColorStop(0.60, `rgba(180, 220, 240, ${ringAlpha * 0.45})`);// Outer Cool Blue/White
+            ringGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+
+            sCtx.beginPath();
+            sCtx.arc(sunX, sunY, r22 + 22, 0, Math.PI * 2);
+            sCtx.arc(sunX, sunY, Math.max(0, r22 - 3), 0, Math.PI * 2, true);
+            sCtx.fillStyle = ringGrad;
+            sCtx.filter = "blur(2.5px)";
+            sCtx.fill();
+            sCtx.restore();
+
+            // --- 2. Soft Vertical Sun Pillar (Duller/Fainter than Horizontal) ---
+            sCtx.save();
+            sCtx.globalCompositeOperation = "screen";
+            const pillarGrad = sCtx.createLinearGradient(sunX, sunY - 170, sunX, sunY + 170);
+            pillarGrad.addColorStop(0.0, "rgba(255, 240, 200, 0)");
+            pillarGrad.addColorStop(0.25, `rgba(255, 225, 170, ${0.25 * bFactor})`);
+            pillarGrad.addColorStop(0.5, `rgba(255, 245, 210, ${0.45 * bFactor})`);
+            pillarGrad.addColorStop(0.75, `rgba(255, 225, 170, ${0.25 * bFactor})`);
+            pillarGrad.addColorStop(1.0, "rgba(255, 240, 200, 0)");
+
+            sCtx.fillStyle = pillarGrad;
+            sCtx.filter = "blur(10px)";
+            sCtx.fillRect(sunX - 12, sunY - 170, 24, 340);
+            sCtx.restore();
+
+            // --- 3. Parhelic Circle (Horizontal Band: Intense & Bright across the Sky) ---
+            sCtx.save();
+            sCtx.globalCompositeOperation = "screen";
+            const parCircleGrad = sCtx.createLinearGradient(0, sunY, w, sunY);
+            parCircleGrad.addColorStop(0.0, "rgba(255, 235, 190, 0)");
+            parCircleGrad.addColorStop(0.1, `rgba(255, 235, 190, ${0.4 * bFactor})`);
+            parCircleGrad.addColorStop(0.5, `rgba(255, 255, 240, ${0.9 * bFactor})`); // Highly luminous center
+            parCircleGrad.addColorStop(0.9, `rgba(255, 235, 190, ${0.4 * bFactor})`);
+            parCircleGrad.addColorStop(1.0, "rgba(255, 235, 190, 0)");
+
+            sCtx.fillStyle = parCircleGrad;
+            sCtx.filter = "blur(4px)";
+            sCtx.fillRect(0, sunY - 8, w, 16);
+            sCtx.restore();
+
+            // --- 4. Photorealistic Sun Dogs (Situated ON the Ring Boundary, Not Invading Inside) ---
+            function drawPhotorealisticSunDog(isRight) {
+                const dir = isRight ? 1 : -1;
+                // Inner edge aligns exactly with r22 (does not enter interior of halo)
+                const dogInnerX = sunX + (dir * r22);
+                const dogCenterY = sunY;
+
+                sCtx.save();
+                sCtx.globalCompositeOperation = "screen";
+
+                // A. Main Luminous Sundog Core Body (Spreads outward from r22)
+                const dogWidth = 42;
+                const dogHeight = 36;
+                const dogCenterX = dogInnerX + (dir * (dogWidth * 0.4));
+
+                const flareGrad = sCtx.createRadialGradient(
+                    dogInnerX, dogCenterY, 1,
+                    dogCenterX, dogCenterY, dogWidth
+                );
+                flareGrad.addColorStop(0.0, `rgba(255, 90, 20, ${1.0 * bFactor})`);   // Deep Red Inner Edge at r22
+                flareGrad.addColorStop(0.18, `rgba(255, 225, 110, ${1.0 * bFactor})`); // Bright Gold Core
+                flareGrad.addColorStop(0.40, `rgba(255, 255, 255, ${1.0 * bFactor})`); // White Luminous Center
+                flareGrad.addColorStop(0.75, `rgba(170, 215, 255, ${0.5 * bFactor})`); // Outer Blue-White Tail
+                flareGrad.addColorStop(1.0, "rgba(255, 255, 255, 0)");
+
+                sCtx.beginPath();
+                sCtx.ellipse(dogCenterX, dogCenterY, dogWidth, dogHeight, 0, 0, Math.PI * 2);
+                sCtx.fillStyle = flareGrad;
+                sCtx.filter = "blur(3.5px)";
+                sCtx.fill();
+
+                // B. Horizontal Parhelic Tail Extension (Bright Horizontal Flare)
+                const tailLen = 130 * (brightness / 100);
+                const tailGrad = sCtx.createLinearGradient(dogInnerX, dogCenterY, dogInnerX + (dir * tailLen), dogCenterY);
+                tailGrad.addColorStop(0.0, `rgba(255, 250, 230, ${0.95 * bFactor})`);
+                tailGrad.addColorStop(0.3, `rgba(255, 230, 170, ${0.65 * bFactor})`);
+                tailGrad.addColorStop(1.0, "rgba(255, 220, 160, 0)");
+
+                sCtx.beginPath();
+                sCtx.ellipse(dogInnerX + (dir * tailLen * 0.45), dogCenterY, tailLen * 0.5, 9, 0, 0, Math.PI * 2);
+                sCtx.fillStyle = tailGrad;
+                sCtx.filter = "blur(4px)";
+                sCtx.fill();
+
+                sCtx.restore();
+            }
+
+            if (density > 10) {
+                drawPhotorealisticSunDog(false); // Left Sun Dog
+                drawPhotorealisticSunDog(true);  // Right Sun Dog
+            }
+
+            // --- 5. Main Sun Center & Radiant Glare ---
+            sCtx.save();
+            sCtx.globalCompositeOperation = "screen";
+
+            // Large Atmospheric Glare
+            const sunGlow = sCtx.createRadialGradient(sunX, sunY, 4, sunX, sunY, 140);
+            sunGlow.addColorStop(0.0, "rgba(255, 255, 255, 1.0)");
+            sunGlow.addColorStop(0.12, "rgba(255, 245, 210, 0.95)");
+            sunGlow.addColorStop(0.35, "rgba(255, 195, 90, 0.55)");
+            sunGlow.addColorStop(0.75, "rgba(215, 130, 40, 0.15)");
+            sunGlow.addColorStop(1.0, "rgba(200, 100, 30, 0)");
+
+            sCtx.beginPath();
+            sCtx.arc(sunX, sunY, 140, 0, Math.PI * 2);
+            sCtx.fillStyle = sunGlow;
+            sCtx.filter = "blur(3px)";
+            sCtx.fill();
+
+            // Bright Center Sun Disc
+            sCtx.beginPath();
+            sCtx.arc(sunX, sunY, 16, 0, Math.PI * 2);
+            sCtx.fillStyle = "#ffffff";
+            sCtx.fill();
+            sCtx.restore();
+
+            // Info Label
+            sCtx.fillStyle = "#e2e8f0";
+            sCtx.font = "12px sans-serif";
+            sCtx.fillText("ดวงอาทิตย์ย่อยอยู่ที่ขอบเส้นฮาโลพอดี (ไม่เกินเข้ามา) / แนวแสงขนานสว่างเข้มกว่าแนวตั้ง", 15, h - 15);
+        }
+
+        function updateSimulation() {
+            const elevation = parseInt(elevationInput.value);
+            const alignment = parseInt(alignmentInput.value);
+            const density = parseInt(densityInput.value);
+            const brightness = parseInt(brightnessInput.value);
+
+            valElevation.textContent = elevation;
+            valDensity.textContent = density;
+            valBrightness.textContent = brightness;
+
+            const alignLabels = ["สุ่มทิศทาง", "เอียงเล็กน้อย", "ปานกลาง", "สูง", "สมบูรณ์แบบ"];
+            valAlignment.textContent = alignLabels[Math.floor((alignment - 1) / 2.0)];
+
+            const minDev = getDeviationAngle(1.310);
+            outMinDev.textContent = minDev.toFixed(2);
+
+            renderMicroView();
+            renderSkyView(elevation, alignment, density, brightness);
+        }
+
+        [elevationInput, alignmentInput, densityInput, brightnessInput].forEach(elem => {
+            elem.addEventListener('input', updateSimulation);
+        });
+
+        updateSimulation();
+    </script>
+</body>
+</html>

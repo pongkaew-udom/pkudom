@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atmospheric Physics Lab - การเรียนรู้ปรากฏการณ์แสงในบรรยากาศ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030712;
+            color: #e0e6ed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* 🌄 ฉากวิวทิวทัศน์หลัก */
+        .landscape-stage {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            min-height: 900px;
+            background: linear-gradient(to bottom, #0284c7 0%, #38bdf8 45%, #fef08a 80%, #f97316 100%);
+            overflow: hidden;
+            border-bottom: 5px solid #1e293b;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        /* ☀️ ดวงอาทิตย์ */
+        .sun-container {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+        .sun {
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle, #ffffff 40%, #fef08a 70%, rgba(254,240,138,0) 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 60px #fef08a, 0 0 120px rgba(254,240,138,0.6);
+            animation: pulseSun 4s infinite alternate ease-in-out;
+        }
+        @keyframes pulseSun {
+            0% { transform: scale(0.98); box-shadow: 0 0 50px #fef08a; }
+            100% { transform: scale(1.05); box-shadow: 0 0 80px #fef08a, 0 0 140px rgba(254,240,138,0.8); }
+        }
+
+        /* ☁️ ก้อนเมฆ */
+        .cloud-bg {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px;
+            pointer-events: none;
+        }
+        .cloud-1 { top: 40px; left: 5%; width: 220px; height: 70px; }
+        .cloud-2 { top: 120px; right: 6%; width: 260px; height: 80px; }
+
+        /* 🏔️ ชั้นภูเขา */
+        .mountains-back {
+            position: absolute;
+            bottom: 120px;
+            width: 100%;
+            height: 260px;
+            background: #1e293b;
+            clip-path: polygon(0% 100%, 0% 40%, 15% 15%, 32% 55%, 50% 10%, 68% 48%, 85% 20%, 100% 50%, 100% 100%);
+            opacity: 0.85;
+            z-index: 3;
+        }
+        .mountains-front {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            height: 200px;
+            background: #0f172a;
+            clip-path: polygon(0% 100%, 0% 60%, 22% 20%, 42% 65%, 60% 25%, 78% 70%, 100% 30%, 100% 100%);
+            z-index: 4;
+        }
+
+        /* 🌲 พื้นดิน */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
+            background: linear-gradient(to bottom, #15803d, #052e16);
+            z-index: 5;
+            border-top: 4px solid #22c55e;
+        }
+
+        /* 📌 HEADER */
+        header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px 20px 10px 20px;
+            background: rgba(11, 14, 20, 0.45);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        h1 {
+            margin: 0 0 4px 0;
+            font-size: 2.2rem;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+        }
+        p.subtitle {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+        }
+
+        /* 🎯 การจัดวางการ์ด */
+        .cards-overlay {
+            position: absolute;
+            top: 140px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 140px);
+            z-index: 6;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 20px;
+            padding: 20px 40px;
+            max-width: 1240px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(17, 24, 39, 0.92);
+            border-color: #38bdf8;
+            box-shadow: 0 15px 30px rgba(56, 189, 248, 0.3);
+        }
+
+        .card-header-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .card-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            line-height: 1.3;
+        }
+        .card-title span.en {
+            display: block;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            font-weight: normal;
+        }
+        .card-desc {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            line-height: 1.45;
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+        .card-desc span.en {
+            display: block;
+            margin-top: 4px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* กลุ่มปุ่มกดเลือกภาษา */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-play {
+            flex: 1;
+            display: inline-block;
+            padding: 10px 6px;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        .btn-play:hover {
+            background: linear-gradient(135deg, #0369a1, #1d4ed8);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
+        }
+        .btn-play.en {
+            background: linear-gradient(135deg, #0284c7, #0d9488);
+        }
+        .btn-play.en:hover {
+            background: linear-gradient(135deg, #0369a1, #0f766e);
+        }
+
+        /* ตกแต่งการ์ดพิเศษ */
+        .card-special-1 {
+            border-color: rgba(251, 191, 36, 0.5);
+            background: rgba(30, 27, 75, 0.85);
+        }
+        .card-special-1:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 15px 30px rgba(245, 158, 11, 0.35);
+        }
+        .card-special-1 .btn-play {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+
+        .card-special-2 {
+            border-color: rgba(52, 211, 153, 0.5);
+            background: rgba(6, 78, 59, 0.8);
+        }
+        .card-special-2:hover {
+            border-color: #34d399;
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.35);
+        }
+        .card-special-2 .btn-play {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        /* Modal ใบความรู้ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 16px;
+            max-width: 750px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #9ca3af;
+            cursor: pointer;
+        }
+        .close-btn:hover {
+            color: #fff;
+        }
+        .info-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #1f2937;
+        }
+        .info-section h3 {
+            color: #38bdf8;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+        .info-section h3 span.en {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        /* Responsive สำหรับหน้าจอขนาดเล็ก */
+        @media (max-width: 900px) {
+            .cards-overlay {
+                grid-template-columns: 1fr;
+                position: relative;
+                top: 0;
+                left: 0;
+                transform: none;
+                height: auto;
+            }
+            .landscape-stage {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="landscape-stage">
+        <!-- Header สองภาษา -->
+        <header>
+            <h1>🌤️ Virtual Physics Lab: Atmospheric Optics</h1>
+            <p class="subtitle">การเรียนรู้ปรากฏการณ์แสงในบรรยากาศด้วยการเรียนรู้จากสถานะการณ์จำลอง โดย พงษ์แก้ว อุดมสมุทรหิรัญ (pkudom)   </p>
+ <p class="subtitle">  Explore Atmospheric Optical Phenomena & Interactive Simulations by Pongkaew Udomsamuthirun (pkudom) </p>
+        </header>
+
+        <!-- ☀️ องค์ประกอบฉากวิวธรรมชาติ Background -->
+        <div class="sun-container">
+            <div class="sun"></div>
+        </div>
+        <div class="cloud-bg cloud-1"></div>
+        <div class="cloud-bg cloud-2"></div>
+        <div class="mountains-back"></div>
+        <div class="mountains-front"></div>
+        <div class="ground"></div>
+
+        <!-- 🎯 กล่องเมนูทั้ง 6 ซ้อนในฉากวิว -->
+        <div class="cards-overlay">
+            <!-- ช่องที่ 1: รุ้งกินน้ำ -->
+            <div class="card">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">🌈</span>
+                        <div class="card-title">
+                            1. รุ้งกินน้ำ
+                            <span class="en">Rainbow</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        เรียนรู้การหักเหและการสะท้อนกลับหมดของแสงในหยดน้ำฝน
+                        <span class="en">Explore light refraction and total internal reflection in raindrops.</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="ran-ok.html" class="btn-play">▶ เล่น (TH)</a>
+                    <a href="ran-ok-E.html" class="btn-play en">▶ Play (EN)</a>
+                </div>
+            </div>
+
+            <!-- ช่องที่ 2: ซันด็อก-ดวงอาทิตย์หลายดวง -->
+            <div class="card">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">☀️</span>
+                        <div class="card-title">
+                            2. ซันด็อก
+                            <span class="en">Sun Dog (Parhelion)</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        การหักเหของแสงผ่านผลึกน้ำแข็งแผ่นหกเหลี่ยมแนวราบทำให้เห็นดวงอาทิตย์หลายดวง
+                        <span class="en">The refraction of light through horizontally oriented hexagonal ice plates creates the appearance of multiple suns.</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="sun-dog.html" class="btn-play">▶ เล่น (TH)</a>
+                    <a href="sun-dog-E.html" class="btn-play en">▶ Play (EN)</a>
+                </div>
+            </div>
+
+            <!-- ช่องที่ 3: เมฆสีรุ้ง -->
+            <div class="card">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">☁️</span>
+                        <div class="card-title">
+                            3. เมฆสีรุ้ง
+                            <span class="en">Cloud Iridescence</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        สังเกตการเลี้ยวเบนของแสงผ่านหยดน้ำขนาดจิ๋วในเมฆ
+                        <span class="en">Observe light diffraction through tiny uniform water droplets in clouds.</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="clou-1.html" class="btn-play">▶ เล่น (TH)</a>
+                    <a href="clou-1-E.html" class="btn-play en">▶ Play (EN)</a>
+                </div>
+            </div>
+
+            <!-- ช่องที่ 4: พระอาทิตย์ทรงกลด -->
+            <div class="card">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">⭕</span>
+                        <div class="card-title">
+                            4. พระอาทิตย์ทรงกลด
+                            <span class="en">22° Solar Halo</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        การหักเหของแสงผ่านผลึกน้ำแข็งแท่งหกเหลี่ยมเเบบสุ่ม
+                        <span class="en">Discover 22° circular ring halos formed by randomly oriented column ice crystals.</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="cir-1.html" class="btn-play">▶ เล่น (TH)</a>
+                    <a href="cir-1-E.html" class="btn-play en">▶ Play (EN)</a>
+                </div>
+            </div>
+
+            <!-- ช่องที่ 5: จำลองสถานการณ์ -->
+            <div class="card card-special-1">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">🧪</span>
+                        <div class="card-title">
+                            5. ห้องจำลองสถานการณ์
+                            <span class="en">Lab Simulator</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        ห้องทดลองรวม! ปรับมุมดวงอาทิตย์ และชนิดอนุภาคเพื่อสร้างปรากฏการณ์
+                        <span class="en">All-in-one simulator! Adjust sun angle and particles to test phenomena.</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="sim-1.html" class="btn-play">🧪 เล่น (TH)</a>
+                    <a href="sim-1-E.html" class="btn-play en">🧪 Play (EN)</a>
+                </div>
+            </div>
+
+            <!-- ช่องที่ 6: ใบความรู้ -->
+            <div class="card card-special-2">
+                <div>
+                    <div class="card-header-icon">
+                        <span class="card-icon">📚</span>
+                        <div class="card-title">
+                            6. ใบความรู้
+                            <span class="en">Knowledge Base</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        รวบรวมทฤษฎีทางฟิสิกส์ และสรุปหลักการเกิดปรากฏการณ์
+                        <span class="en">Comprehensive physics theory and principles behind each phenomenon.</span>
+                    </div>
+                </div>
+                <button class="btn-play" style="width: 100%;" onclick="openModal()">📖 อ่านใบความรู้ / Read Knowledge Base</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal หน้าต่างใบความรู้สองภาษา -->
+    <div id="knowledgeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 style="color: #34d399; margin-top: 0;">📚 ใบความรู้ / Knowledge Base</h2>
+            
+            <div class="info-section">
+                <h3>1. รุ้งกินน้ำ <span class="en">| Rainbow</span></h3>
+                <p><strong>หลักการ (TH):</strong> <a href="ran-km.html" class="btn-play">▶ เล่น (TH)</a>
+                <p><strong>Principle (EN):</strong>  <a href="ran-km-E.html" class="btn-play en">▶ Play (EN)</a>
+
+            </div>
+
+            <div class="info-section">
+                <h3>2. ปรากฏการณ์ซันด็อก <span class="en">| Sun Dog (Parhelion)</span></h3>
+                 <p><strong>หลักการ (TH):</strong> <a href="sun-dog-km.html" class="btn-play">▶ เล่น (TH)</a>
+                <p><strong>Principle (EN):</strong>  <a href="sun-dog-km-E.html" class="btn-play en">▶ Play (EN)</a>
+            </div>
+
+            <div class="info-section">
+                <h3>3. เมฆสีรุ้ง <span class="en">| Cloud Iridescence</span></h3>
+                <p><strong>หลักการ (TH):</strong> <a href="clou-km.html" class="btn-play">▶ เล่น (TH)</a>
+                <p><strong>Principle (EN):</strong>  <a href="clou-km-E.html" class="btn-play en">▶ Play (EN)</a>
+            </div>
+
+            <div class="info-section">
+                <h3>4. พระอาทิตย์ทรงกลด <span class="en">| 22° Solar Halo</span></h3>
+                 <p><strong>หลักการ (TH):</strong> <a href="cir-1-km.html" class="btn-play">▶ เล่น (TH)</a>
+                <p><strong>Principle (EN):</strong>  <a href="cir-1-km-E.html" class="btn-play en">▶ Play (EN)</a>
+            </div>
+ <div class="info-section">
+                <h3>5. ห้องจำลอง <span class="en">| Lab Simulator</span></h3>
+                <p><strong>หลักการ (TH):</strong> <a href="sim-km.html" class="btn-play">▶ เล่น (TH)</a>
+                <p><strong>Principle (EN):</strong>  <a href="sim-km-E.html" class="btn-play en">▶ Play (EN)</a>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('knowledgeModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('knowledgeModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('knowledgeModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

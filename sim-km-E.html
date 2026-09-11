@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Physics Lab Experimental Procedures</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --text-main: #1e293b;
+            --border-color: #e2e8f0;
+            --accent-bg: #f0f9ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0f2fe;
+        }
+
+        ol {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 16px;
+        }
+
+        .nested-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .nested-list > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <section class="section-block">
+        <h1>Experimental Procedure for Simulating Atmospheric Optical Phenomena in Virtual Physics Lab</h1>
+        
+        <ol>
+            <li>
+                <strong>Phenomenon Selection</strong>
+                <p style="margin: 8px 0;">In the "🎯 1. Phenomenon Selection" section, select the optical phenomenon you wish to generate, including:</p>
+                <ul class="nested-list">
+                    <li>🌈 1. Rainbow</li>
+                    <li>☀️ 2. Sun Dog</li>
+                    <li>☁️ 3. Cloud Iridescence</li>
+                    <li>⭕ 4. Solar Halo</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Scenario Settings</strong>
+                <ul class="nested-list">
+                    <li><strong>Particle Type Selection:</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>Large Spherical Raindrops (Raindrops > 0.5 mm)</li>
+                            <li>Uniform Micro Droplets (Cloud Droplets 2-5 µm)</li>
+                            <li>Horizontally Aligned Hexagonal Ice Plates (Flat Plates)</li>
+                            <li>Randomly Oriented Hexagonal Ice Columns (Column Crystals)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Adjust Sun Elevation:</strong> Slide the angle adjustment bar within the range of 0 degrees to 80 degrees.</li>
+                    <li><strong>Select Observer Direction:</strong>
+                        <ul class="nested-list" style="padding-left: 15px;">
+                            <li>Look away from Sun</li>
+                            <li>Look towards Sun</li>
+                        </ul>
+                    </li>
+                    <li><strong>Adjust Particle Uniformity / Density:</strong> Slide the level bar from 1 to 10.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Testing & Observation</strong>
+                <ul class="nested-list">
+                    <li>Click the "🧪 Test Scenario" button to run the simulation.</li>
+                    <li><strong>If settings are physically correct:</strong> The system will display the phenomenon on the "🏞️ Outdoor Unified Scene" along with a green notification box explaining the cause of the phenomenon.</li>
+                    <li><strong>If settings are incorrect:</strong> The system will display a red notification message in the status box indicating the reasons why the phenomenon failed to occur.</li>
+                </ul>
+            </li>
+        </ol>
+    </section>
+
+</div>
+
+</body>
+</html>

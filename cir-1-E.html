@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Solar Halo Optics Simulation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #12131C;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
+            color: #ffd166;
+            text-align: center;
+        }
+        p.subtitle {
+            margin: 0 0 20px 0;
+            color: #8892b0;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1250px;
+            width: 100%;
+            justify-content: center;
+        }
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            min-width: 550px;
+        }
+        .canvas-box {
+            background-color: #0b0c10;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            border: 1px solid #232733;
+            position: relative;
+        }
+        .canvas-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: rgba(0,0,0,0.75);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #ffd166;
+            border: 1px solid rgba(255, 209, 102, 0.4);
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .controls {
+            width: 380px;
+            background-color: #1c1e2d;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 1px solid #2d3142;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: fit-content;
+        }
+        .section-title {
+            font-size: 0.95rem;
+            color: #4da8da;
+            border-bottom: 1px solid #2d3142;
+            padding-bottom: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: #c0c7d6;
+        }
+        label span {
+            color: #ffd166;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ffd166;
+            cursor: pointer;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            background: #0b0c10;
+            color: #fff;
+            border: 1px solid #ffd166;
+            cursor: pointer;
+        }
+        .data-panel {
+            background-color: #12131c;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 4px solid #ffd166;
+            color: #a0aab8;
+        }
+        .data-panel span {
+            color: #00f5d4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Virtual Lab: Solar Halo Optics Simulation</h1>
+    <p class="subtitle">Study light refraction through hexagonal ice crystal faces and sky halo phenomena</p>
+
+    <div class="main-layout">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <!-- Canvas 1: Micro View Refraction at Edge -->
+            <div class="canvas-box">
+                <span class="canvas-title">1. Light Path at Ice Crystal Edge (Micro Edge Refraction)</span>
+                <canvas id="crystalCanvas" width="650" height="300"></canvas>
+            </div>
+            
+            <!-- Canvas 2: Macro Observer & Sun Sky View -->
+            <div class="canvas-box">
+                <span class="canvas-title">2. Sky View & Observer Head Orientation Tracking the Sun</span>
+                <canvas id="haloSkyCanvas" width="650" height="360"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="section-title">❄️ Ice Crystal Controls</div>
+            
+            <div class="control-group">
+                <label for="iceIndex">Ice Refractive Index n: <span id="valIceN">1.310</span></label>
+                <input type="range" id="iceIndex" min="1.250" max="1.400" step="0.001" value="1.310">
+            </div>
+
+            <div class="control-group">
+                <label for="prismAngle">Crystal Type / Refraction Angle:</label>
+                <select id="prismAngle">
+                    <option value="60">60° (22° Halo - Through Side Faces)</option>
+                    <option value="90">90° (46° Halo - Through End Faces)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="crystalRotation">Crystal Rotation Angle: <span id="valRot">0</span>°</label>
+                <input type="range" id="crystalRotation" min="-25" max="25" step="1" value="0">
+            </div>
+
+            <div class="section-title">☀️ Sun & Observer Controls</div>
+
+            <div class="control-group">
+                <label for="sunElevation">Sun Elevation Angle: <span id="valSunElev">65</span>°</label>
+                <input type="range" id="sunElevation" min="15" max="85" step="1" value="65">
+            </div>
+
+            <div class="control-group">
+                <label for="obsFOV">Field of View / Zoom: <span id="valFOV">Medium</span></label>
+                <input type="range" id="obsFOV" min="1" max="3" step="1" value="2">
+            </div>
+
+            <div class="control-group">
+                <label for="haloIntensity">Halo Intensity Glow: <span id="valIntensity">120</span>%</label>
+                <input type="range" id="haloIntensity" min="50" max="200" step="10" value="120">
+            </div>
+
+            <div class="data-panel">
+                <strong>Physics Outputs:</strong><br>
+                • Minimum Deviation: <span id="outMinDev">21.8</span>°<br>
+                • Actual Deviation (w/ Tilt): <span id="outActualDev">21.8</span>°<br>
+                • Apparent Halo Radius: <span id="outHaloRadius">21.8</span>°<br>
+                • Crystal Status: <span id="outCrystalState" style="color:#ffd166; font-weight:bold;">Minimum Deviation Alignment</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cCanvas = document.getElementById('crystalCanvas');
+        const cCtx = cCanvas.getContext('2d');
+        const sCanvas = document.getElementById('haloSkyCanvas');
+        const sCtx = sCanvas.getContext('2d');
+
+        // Inputs
+        const nInput = document.getElementById('iceIndex');
+        const prismInput = document.getElementById('prismAngle');
+        const rotInput = document.getElementById('crystalRotation');
+        const sunElevInput = document.getElementById('sunElevation');
+        const fovInput = document.getElementById('obsFOV');
+        const intensityInput = document.getElementById('haloIntensity');
+
+        // Outputs
+        const valIceN = document.getElementById('valIceN');
+        const valRot = document.getElementById('valRot');
+        const valSunElev = document.getElementById('valSunElev');
+        const valFOV = document.getElementById('valFOV');
+        const valIntensity = document.getElementById('valIntensity');
+        const outMinDev = document.getElementById('outMinDev');
+        const outActualDev = document.getElementById('outActualDev');
+        const outHaloRadius = document.getElementById('outHaloRadius');
+        const outCrystalState = document.getElementById('outCrystalState');
+
+        const spectrum = [
+            { name: 'Red', color: '#ff2222', dn: -0.005, width: 3 },
+            { name: 'Orange', color: '#ff8c00', dn: -0.002, width: 2.5 },
+            { name: 'Yellow', color: '#ffff00', dn: 0.000, width: 2 },
+            { name: 'Green', color: '#00ff66', dn: 0.003, width: 2 },
+            { name: 'Blue', color: '#00ccff', dn: 0.007, width: 2.5 }
+        ];
+
+        // Theoretical Minimum Deviation: D_min = 2 * asin(n * sin(A/2)) - A
+        function calcMinDeviation(n, apexDeg) {
+            const A = (apexDeg * Math.PI) / 180;
+            const sinVal = n * Math.sin(A / 2);
+            if (sinVal > 1) return 0;
+            const dMinRad = 2 * Math.asin(sinVal) - A;
+            return (dMinRad * 180) / Math.PI;
+        }
+
+        // Exact Refraction Angle with Rotation Impact (Non-minimum deviation shift)
+        function calcActualDeviation(n, apexDeg, rotDeg) {
+            const minDev = calcMinDeviation(n, apexDeg);
+            // Non-symmetric orientation increases total deviation angle
+            const extraDev = Math.pow(Math.abs(rotDeg) * 0.08, 1.8);
+            return minDev + extraDev;
+        }
+
+        // 1. Precise Micro View (Ice Crystal + Dynamic Refraction Ray Shift)
+        function renderCrystalMicro(nBase, apexAngle, rotDeg) {
+            const w = cCanvas.width;
+            const h = cCanvas.height;
+            cCtx.clearRect(0, 0, w, h);
+
+            cCtx.fillStyle = "#090a0f";
+            cCtx.fillRect(0, 0, w, h);
+
+            const cx = w * 0.42;
+            const cy = h * 0.5;
+            const size = 88;
+
+            // Hexagon Geometry with Rotation
+            const rotRad = (rotDeg * Math.PI) / 180;
+            let vertices = [];
+            for (let i = 0; i < 6; i++) {
+                const a = rotRad + (i * Math.PI) / 3;
+                vertices.push({
+                    x: cx + size * Math.cos(a),
+                    y: cy + size * Math.sin(a)
+                });
+            }
+
+            // Draw Hexagonal Crystal
+            cCtx.beginPath();
+            cCtx.moveTo(vertices[0].x, vertices[0].y);
+            for (let i = 1; i < 6; i++) cCtx.lineTo(vertices[i].x, vertices[i].y);
+            cCtx.closePath();
+            cCtx.fillStyle = "rgba(77, 168, 218, 0.16)";
+            cCtx.fill();
+            cCtx.strokeStyle = "#4da8da";
+            cCtx.lineWidth = 2.5;
+            cCtx.stroke();
+
+            // Incident Light Entry on Face
+            const p1 = vertices[4];
+            const p2 = vertices[5];
+            const entryPoint = {
+                x: p1.x + (p2.x - p1.x) * 0.35,
+                y: p1.y + (p2.y - p1.y) * 0.35
+            };
+
+            // Exit Point on Face
+            const p3 = vertices[0];
+            const p4 = vertices[1];
+            const exitPoint = {
+                x: p4.x + (p3.x - p4.x) * 0.4,
+                y: p4.y + (p3.y - p4.y) * 0.4
+            };
+
+            // Incident Light Ray
+            cCtx.beginPath();
+            cCtx.moveTo(20, cy);
+            cCtx.lineTo(entryPoint.x, entryPoint.y);
+            cCtx.strokeStyle = "#ffffff";
+            cCtx.lineWidth = 3.5;
+            cCtx.shadowColor = "#ffffff";
+            cCtx.shadowBlur = 8;
+            cCtx.stroke();
+            cCtx.shadowBlur = 0;
+
+            // Actual Deviation Angle Affected by Rotation
+            const actualDev = calcActualDeviation(nBase, apexAngle, rotDeg);
+            const devRad = (actualDev * Math.PI) / 180;
+
+            // Refracted Rays
+            spectrum.forEach((spec) => {
+                const specAngle = devRad + (spec.dn * 2.5);
+                
+                // Ray inside Crystal
+                cCtx.beginPath();
+                cCtx.moveTo(entryPoint.x, entryPoint.y);
+                cCtx.lineTo(exitPoint.x, exitPoint.y);
+                cCtx.strokeStyle = spec.color;
+                cCtx.lineWidth = 1.8;
+                cCtx.stroke();
+
+                // Exit Ray Direction Shifting with Rotation
+                const rayLen = 250;
+                const exitX = exitPoint.x + Math.cos(specAngle) * rayLen;
+                const exitY = exitPoint.y + Math.sin(specAngle) * rayLen;
+
+                cCtx.beginPath();
+                cCtx.moveTo(exitPoint.x, exitPoint.y);
+                cCtx.lineTo(exitX, exitY);
+                cCtx.strokeStyle = spec.color;
+                cCtx.lineWidth = spec.width;
+                cCtx.stroke();
+            });
+
+            // Labels
+            cCtx.fillStyle = "#ffd166";
+            cCtx.font = "12px sans-serif";
+            cCtx.fillText("Incident Light Ray", 25, cy - 10);
+            cCtx.fillText(`Exit Refraction Angle: ${actualDev.toFixed(1)}°`, exitPoint.x + 15, exitPoint.y - 10);
+        }
+
+        // 2. Observer Sky View: Sun Elevation Dynamic Shift & Head Rotation
+        function renderHaloSky(nBase, apexAngle, rotDeg, sunElev, fov, intensity) {
+            const w = sCanvas.width;
+            const h = sCanvas.height;
+            sCtx.clearRect(0, 0, w, h);
+
+            // Sun Position Coordinates Changing with Elevation Angle
+            // Elevation 90 = High Top Center, Elevation 15 = Low Bottom Right/Left
+            const sunY = h - 35 - ((sunElev - 10) / 78) * (h - 100);
+            const sunX = w * 0.5;
+
+            // Sky Color Gradation
+            const skyGrad = sCtx.createRadialGradient(sunX, sunY, 5, sunX, sunY, w * 0.8);
+            if (sunElev >= 60) {
+                skyGrad.addColorStop(0, "#e0f2fe");
+                skyGrad.addColorStop(0.3, "#38bdf8");
+                skyGrad.addColorStop(1, "#0284c7");
+            } else if (sunElev >= 35) {
+                skyGrad.addColorStop(0, "#bae6fd");
+                skyGrad.addColorStop(0.4, "#0284c7");
+                skyGrad.addColorStop(1, "#0c4a6e");
+            } else {
+                skyGrad.addColorStop(0, "#fde68a");
+                skyGrad.addColorStop(0.25, "#f97316");
+                skyGrad.addColorStop(0.7, "#1e3a8a");
+                skyGrad.addColorStop(1, "#0f172a");
+            }
+            sCtx.fillStyle = skyGrad;
+            sCtx.fillRect(0, 0, w, h);
+
+            // Ground Level
+            sCtx.fillStyle = "#090d16";
+            sCtx.fillRect(0, h - 30, w, 30);
+
+            // Observer Position Fixed at Bottom Center
+            const obsX = w * 0.5;
+            const obsY = h - 30;
+
+            // Calculate Angle from Observer to Sun for Dynamic Head Tilt
+            const dx = sunX - obsX;
+            const dy = sunY - (obsY - 22);
+            const gazeAngle = Math.atan2(dy, dx); // Angle pointing directly to Sun
+
+            // Draw Dynamic Observer Figure
+            sCtx.strokeStyle = "#ffffff";
+            sCtx.lineWidth = 2.2;
+            sCtx.fillStyle = "#ffffff";
+
+            // Body
+            sCtx.beginPath();
+            sCtx.moveTo(obsX, obsY - 14); sCtx.lineTo(obsX, obsY - 3); // Torso
+            sCtx.moveTo(obsX, obsY - 3); sCtx.lineTo(obsX - 5, obsY);  // Left Leg
+            sCtx.moveTo(obsX, obsY - 3); sCtx.lineTo(obsX + 5, obsY);  // Right Leg
+            sCtx.stroke();
+
+            // Head Rotated Towards Sun Direct Line of Sight
+            const headRadius = 5;
+            const headCenterX = obsX + Math.cos(gazeAngle) * 3;
+            const headCenterY = (obsY - 20) + Math.sin(gazeAngle) * 3;
+
+            sCtx.beginPath();
+            sCtx.arc(headCenterX, headCenterY, headRadius, 0, Math.PI * 2);
+            sCtx.stroke();
+
+            // Arms Reaching/Pointing toward Sun Position
+            const armLen = 10;
+            sCtx.beginPath();
+            sCtx.moveTo(obsX, obsY - 12);
+            sCtx.lineTo(obsX + Math.cos(gazeAngle - 0.3) * armLen, (obsY - 12) + Math.sin(gazeAngle - 0.3) * armLen);
+            sCtx.moveTo(obsX, obsY - 12);
+            sCtx.lineTo(obsX + Math.cos(gazeAngle + 0.3) * armLen, (obsY - 12) + Math.sin(gazeAngle + 0.3) * armLen);
+            sCtx.stroke();
+
+            // Dashed Line of Sight
+            sCtx.beginPath();
+            sCtx.setLineDash([3, 4]);
+            sCtx.moveTo(headCenterX, headCenterY);
+            sCtx.lineTo(sunX, sunY);
+            sCtx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+            sCtx.stroke();
+            sCtx.setLineDash([]);
+
+            // Halo Ring Physics Shifted by Crystal Rotation
+            const actualDev = calcActualDeviation(nBase, apexAngle, rotDeg);
+            const scaleFactor = (4 - fov) * 2.5;
+            const radiusPx = actualDev * scaleFactor;
+
+            // Rotation disperses sharp focus -> reduces intensity & widens blur
+            const rotBlur = Math.abs(rotDeg) * 0.4;
+            const alphaMult = (intensity / 100) * Math.max(0.3, 1 - (Math.abs(rotDeg) * 0.025));
+
+            if (radiusPx > 0) {
+                sCtx.save();
+                sCtx.globalCompositeOperation = "source-over";
+
+                // Inner Red
+                sCtx.beginPath();
+                sCtx.arc(sunX, sunY, radiusPx, 0, Math.PI * 2);
+                sCtx.strokeStyle = `rgba(255, 40, 40, ${0.85 * alphaMult})`;
+                sCtx.lineWidth = 4 + rotBlur;
+                sCtx.stroke();
+
+                // Middle Yellow
+                sCtx.beginPath();
+                sCtx.arc(sunX, sunY, radiusPx + 4 + (rotBlur * 0.5), 0, Math.PI * 2);
+                sCtx.strokeStyle = `rgba(255, 215, 0, ${0.75 * alphaMult})`;
+                sCtx.lineWidth = 4.5 + rotBlur;
+                sCtx.stroke();
+
+                // Outer Blue
+                sCtx.beginPath();
+                sCtx.arc(sunX, sunY, radiusPx + 9 + rotBlur, 0, Math.PI * 2);
+                sCtx.strokeStyle = `rgba(140, 220, 255, ${0.45 * alphaMult})`;
+                sCtx.lineWidth = 6 + rotBlur;
+                sCtx.stroke();
+
+                sCtx.restore();
+            }
+
+            // Sun Core
+            sCtx.beginPath();
+            sCtx.arc(sunX, sunY, 16, 0, Math.PI * 2);
+            sCtx.fillStyle = "#ffffff";
+            sCtx.shadowColor = "#ffffff";
+            sCtx.shadowBlur = 30;
+            sCtx.fill();
+            sCtx.shadowBlur = 0;
+
+            // Annotations
+            sCtx.fillStyle = "#ffffff";
+            sCtx.font = "bold 12px sans-serif";
+            sCtx.fillText(`Sun (Elevation ${sunElev}°)`, sunX - 60, sunY - 26);
+            sCtx.fillText(`Halo Radius: ${actualDev.toFixed(1)}°`, sunX + radiusPx + 10, sunY + 4);
+            sCtx.font = "11px sans-serif";
+            sCtx.fillText("Observer head tracks sun angle", obsX - 75, obsY - 35);
+        }
+
+        function updateSimulation() {
+            const nBase = parseFloat(nInput.value);
+            const apexAngle = parseFloat(prismInput.value);
+            const rotDeg = parseFloat(rotInput.value);
+            const sunElev = parseFloat(sunElevInput.value);
+            const fov = parseInt(fovInput.value);
+            const intensity = parseInt(intensityInput.value);
+
+            valIceN.textContent = nBase.toFixed(3);
+            valRot.textContent = rotDeg;
+            valSunElev.textContent = sunElev;
+            valIntensity.textContent = intensity;
+
+            const fovLabels = ["Near Zoom", "Medium", "Wide View"];
+            valFOV.textContent = fovLabels[fov - 1];
+
+            const minDev = calcMinDeviation(nBase, apexAngle);
+            const actualDev = calcActualDeviation(nBase, apexAngle, rotDeg);
+
+            outMinDev.textContent = minDev.toFixed(1);
+            outActualDev.textContent = actualDev.toFixed(1);
+            outHaloRadius.textContent = actualDev.toFixed(1);
+
+            if (Math.abs(rotDeg) === 0) {
+                outCrystalState.textContent = "Minimum Deviation Alignment (Sharp Halo)";
+                outCrystalState.style.color = "#00f5d4";
+            } else {
+                outCrystalState.textContent = `Tilted ${rotDeg}° (Expanded & Blurred Halo)`;
+                outCrystalState.style.color = "#ffd166";
+            }
+
+            renderCrystalMicro(nBase, apexAngle, rotDeg);
+            renderHaloSky(nBase, apexAngle, rotDeg, sunElev, fov, intensity);
+        }
+
+        [nInput, prismInput, rotInput, sunElevInput, fovInput, intensityInput].forEach(elem => {
+            elem.addEventListener('input', updateSimulation);
+        });
+
+        updateSimulation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Cloud Iridescence Optics</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #0d1117;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
+            color: #ff9ebb;
+            text-align: center;
+        }
+        p.subtitle {
+            margin: 0 0 20px 0;
+            color: #8892b0;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1250px;
+            width: 100%;
+            justify-content: center;
+        }
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            min-width: 550px;
+        }
+        .canvas-box {
+            background-color: #06070a;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            border: 1px solid #232733;
+            position: relative;
+        }
+        .canvas-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: rgba(0,0,0,0.75);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #ff9ebb;
+            border: 1px solid rgba(255, 158, 187, 0.4);
+            z-index: 10;
+        }
+        canvas {
+            display: block;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .controls {
+            width: 380px;
+            background-color: #161a26;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 1px solid #25293c;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: fit-content;
+        }
+        .section-title {
+            font-size: 0.95rem;
+            color: #a78bfa;
+            border-bottom: 1px solid #2d3142;
+            padding-bottom: 4px;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: #c0c7d6;
+        }
+        label span {
+            color: #ff9ebb;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #ff9ebb;
+            cursor: pointer;
+        }
+        .data-panel {
+            background-color: #0b0c12;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 4px solid #ff9ebb;
+            color: #a0aab8;
+        }
+        .data-panel span {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Virtual Lab: จำลองปรากฏการณ์เมฆสีรุ้ง (Cloud Iridescence)</h1>
+    <p class="subtitle">แสดงตำแหน่งดวงอาทิตย์เจิดจ้าพร้อมเมฆสีรุ้งพริ้วสวยงามบนท้องฟ้าเปิด</p>
+
+    <div class="main-layout">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <!-- Canvas 1: Micro View -->
+            <div class="canvas-box">
+                <span class="canvas-title">1. มุมมองจุลภาค: การเลี้ยวเบนและหักเหที่หยดน้ำ</span>
+                <canvas id="microCanvas" width="650" height="270"></canvas>
+            </div>
+            
+            <!-- Canvas 2: Macro View -->
+            <div class="canvas-box">
+                <span class="canvas-title">2. มุมมองมหภาค: ภาพจำลองเมฆสีรุ้งเรืองรองและดวงอาทิตย์สดใส</span>
+                <canvas id="skyCanvas" width="650" height="380"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="section-title">🌈 ตัวแปรความคมชัดของสีรุ้ง (Rainbow Enhancement)</div>
+            
+            <div class="control-group">
+                <label for="colorVibrance">ความสด/สว่างของสีรุ้ง (Color Vibrance): <span id="valVibrance">140</span>%</label>
+                <input type="range" id="colorVibrance" min="20" max="200" step="5" value="140">
+            </div>
+
+            <div class="section-title">💧 พารามิเตอร์หยดน้ำ (Droplet Properties)</div>
+            
+            <div class="control-group">
+                <label for="dropletSize">ขนาดหยดน้ำ (Droplet Radius $a$): <span id="valSize">4.5</span> µm</label>
+                <input type="range" id="dropletSize" min="1.5" max="15.0" step="0.1" value="4.5">
+            </div>
+
+            <div class="control-group">
+                <label for="sizeUniformity">ความสม่ำเสมอของขนาดหยดน้ำ: <span id="valUniformity">สูงมาก</span></label>
+                <input type="range" id="sizeUniformity" min="1" max="10" step="1" value="10">
+            </div>
+
+            <div class="section-title">☁️ เมฆ & ดวงอาทิตย์ (Cloud & Sun)</div>
+
+            <div class="control-group">
+                <label for="cloudScale">ขนาดก้อนเมฆสีรุ้ง: <span id="valScale">110</span>%</label>
+                <input type="range" id="cloudScale" min="50" max="200" step="10" value="110">
+            </div>
+
+            <div class="control-group">
+                <label for="cloudDensity">ความหนาแน่นเมฆ (Optical Density): <span id="valDensity">25</span>%</label>
+                <input type="range" id="cloudDensity" min="10" max="100" step="5" value="25">
+            </div>
+
+            <div class="control-group">
+                <label for="sunAngle">ระยะห่างเชิงมุมจากดวงอาทิตย์: <span id="valAngle">12</span>°</label>
+                <input type="range" id="sunAngle" min="3" max="35" step="1" value="12">
+            </div>
+
+            <div class="data-panel">
+                <strong>ข้อมูลการคำนวณทางทัศนศาสตร์:</strong><br>
+                • ดรรชนีหักเหน้ำ ($n$): <span>1.333</span><br>
+                • มุมเลี้ยวเบนพีกแรก ($\lambda=650\text{nm}$): <span id="outRedAngle">9.1</span>°<br>
+                • สภาพการเกิดสีรุ้ง: <span id="outStatus" style="color:#ff9ebb; font-weight:bold;">เกิดสีรุ้งพาสเทลเรืองรองคมชัด</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mCanvas = document.getElementById('microCanvas');
+        const mCtx = mCanvas.getContext('2d');
+        const sCanvas = document.getElementById('skyCanvas');
+        const sCtx = sCanvas.getContext('2d');
+
+        // Inputs
+        const vibranceInput = document.getElementById('colorVibrance');
+        const sizeInput = document.getElementById('dropletSize');
+        const uniformityInput = document.getElementById('sizeUniformity');
+        const scaleInput = document.getElementById('cloudScale');
+        const densityInput = document.getElementById('cloudDensity');
+        const angleInput = document.getElementById('sunAngle');
+
+        // Outputs
+        const valVibrance = document.getElementById('valVibrance');
+        const valSize = document.getElementById('valSize');
+        const valUniformity = document.getElementById('valUniformity');
+        const valScale = document.getElementById('valScale');
+        const valDensity = document.getElementById('valDensity');
+        const valAngle = document.getElementById('valAngle');
+        const outRedAngle = document.getElementById('outRedAngle');
+        const outStatus = document.getElementById('outStatus');
+
+        const nWater = 1.333;
+
+        function calcDiffractionAngle(wavelengthNm, radiusMicron) {
+            const lambda = wavelengthNm * 1e-9;
+            const d = (radiusMicron * 2) * 1e-6;
+            const sinTheta = (1.22 * lambda) / d;
+            if (sinTheta > 1) return 90;
+            return (Math.asin(sinTheta) * 180) / Math.PI;
+        }
+
+        // 1. Render Micro View
+        function renderMicroView(radiusMicron) {
+            const w = mCanvas.width;
+            const h = mCanvas.height;
+            mCtx.clearRect(0, 0, w, h);
+
+            mCtx.fillStyle = "#07080e";
+            mCtx.fillRect(0, 0, w, h);
+
+            const dropX = w * 0.35;
+            const dropY = h * 0.5;
+            const R = 22 + (radiusMicron * 4);
+
+            const rayOffsets = [-R * 0.8, -R * 0.4, 0, R * 0.4, R * 0.8];
+
+            const dropGrad = mCtx.createRadialGradient(dropX - R*0.3, dropY - R*0.3, 2, dropX, dropY, R);
+            dropGrad.addColorStop(0, "rgba(225, 245, 255, 0.9)");
+            dropGrad.addColorStop(0.8, "rgba(56, 189, 248, 0.4)");
+            dropGrad.addColorStop(1, "rgba(14, 165, 233, 0.8)");
+            
+            mCtx.beginPath();
+            mCtx.arc(dropX, dropY, R, 0, Math.PI * 2);
+            mCtx.fillStyle = dropGrad;
+            mCtx.fill();
+            mCtx.strokeStyle = "#38bdf8";
+            mCtx.lineWidth = 1.5;
+            mCtx.stroke();
+
+            rayOffsets.forEach(offsetY => {
+                const startY = dropY + offsetY;
+                const startX = 20;
+
+                const hitX = dropX - Math.sqrt(Math.max(0, R*R - offsetY*offsetY));
+                const hitY = startY;
+
+                mCtx.beginPath();
+                mCtx.moveTo(startX, startY);
+                mCtx.lineTo(hitX, hitY);
+                mCtx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+                mCtx.lineWidth = 2;
+                mCtx.stroke();
+
+                if (Math.abs(offsetY) < 2) {
+                    const exitX = dropX + R;
+                    mCtx.beginPath();
+                    mCtx.moveTo(hitX, hitY);
+                    mCtx.lineTo(exitX, hitY);
+                    mCtx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+                    mCtx.lineWidth = 2.5;
+                    mCtx.stroke();
+
+                    mCtx.beginPath();
+                    mCtx.moveTo(exitX, hitY);
+                    mCtx.lineTo(w - 20, hitY);
+                    mCtx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+                    mCtx.stroke();
+                } else {
+                    const normalAngle = Math.atan2(hitY - dropY, hitX - dropX);
+                    const incidentAngle = Math.abs(Math.PI - normalAngle);
+                    const refractAngle = Math.asin(Math.sin(incidentAngle) / nWater);
+
+                    const insideAngle = normalAngle + Math.PI - refractAngle;
+                    const rayLenInside = 2 * R * Math.cos(refractAngle);
+                    const exitX = hitX + Math.cos(insideAngle) * rayLenInside;
+                    const exitY = hitY + Math.sin(insideAngle) * rayLenInside;
+
+                    mCtx.beginPath();
+                    mCtx.moveTo(hitX, hitY);
+                    mCtx.lineTo(exitX, exitY);
+                    mCtx.strokeStyle = "rgba(56, 189, 248, 0.8)";
+                    mCtx.lineWidth = 1.5;
+                    mCtx.stroke();
+
+                    const exitNormal = Math.atan2(exitY - dropY, exitX - dropX);
+                    const exitRefractAngle = exitNormal + (incidentAngle - refractAngle);
+
+                    mCtx.beginPath();
+                    mCtx.moveTo(exitX, exitY);
+                    mCtx.lineTo(exitX + Math.cos(exitRefractAngle) * 120, exitY + Math.sin(exitRefractAngle) * 120);
+                    mCtx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                    mCtx.stroke();
+                }
+            });
+
+            const diffRed = calcDiffractionAngle(650, radiusMicron);
+            const diffBlue = calcDiffractionAngle(450, radiusMicron);
+
+            [{ color: '#ff6688', angle: diffRed }, { color: '#38bdf8', angle: diffBlue }].forEach(spec => {
+                const rad = (spec.angle * Math.PI) / 180;
+                mCtx.strokeStyle = spec.color;
+                mCtx.lineWidth = 2;
+
+                mCtx.beginPath();
+                mCtx.moveTo(dropX, dropY - R);
+                mCtx.lineTo(dropX + Math.cos(rad * 1.5) * 200, (dropY - R) - Math.sin(rad * 1.5) * 200);
+                mCtx.stroke();
+
+                mCtx.beginPath();
+                mCtx.moveTo(dropX, dropY + R);
+                mCtx.lineTo(dropX + Math.cos(rad * 1.5) * 200, (dropY + R) + Math.sin(rad * 1.5) * 200);
+                mCtx.stroke();
+            });
+
+            mCtx.fillStyle = "#ff9ebb";
+            mCtx.font = "12px sans-serif";
+            mCtx.fillText("มุมเลี้ยวเบนแสงสีแดง/ฟ้า แยกออกจากกันที่ขอบหยดน้ำ", dropX - 100, dropY + R + 30);
+        }
+
+        // Upper Wispy Pileus Cloud Curve Path
+        function drawPileusCloud(ctx, cx, cy, scale) {
+            ctx.beginPath();
+            ctx.moveTo(cx - 190 * scale, cy + 40 * scale);
+            ctx.quadraticCurveTo(cx - 95 * scale, cy - 85 * scale, cx + 55 * scale, cy - 75 * scale);
+            ctx.quadraticCurveTo(cx + 180 * scale, cy - 65 * scale, cx + 230 * scale, cy + 20 * scale);
+            ctx.quadraticCurveTo(cx + 110 * scale, cy + 65 * scale, cx - 50 * scale, cy + 55 * scale);
+            ctx.quadraticCurveTo(cx - 135 * scale, cy + 75 * scale, cx - 190 * scale, cy + 40 * scale);
+            ctx.closePath();
+        }
+
+        // Draw Sun and Realistic Bright Lens Flare
+        function drawSun(ctx, sunX, sunY) {
+            ctx.save();
+
+            // 1. Outer Bright Halo
+            const haloGrad = ctx.createRadialGradient(sunX, sunY, 15, sunX, sunY, 120);
+            haloGrad.addColorStop(0, "rgba(255, 255, 240, 0.9)");
+            haloGrad.addColorStop(0.2, "rgba(255, 230, 160, 0.5)");
+            haloGrad.addColorStop(0.5, "rgba(255, 180, 120, 0.2)");
+            haloGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+            ctx.fillStyle = haloGrad;
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, 120, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Sun Core Rays (Glow Spikes)
+            ctx.strokeStyle = "rgba(255, 250, 220, 0.35)";
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * Math.PI) / 6;
+                const len = 60 + (i % 2 === 0 ? 30 : 0);
+                ctx.beginPath();
+                ctx.moveTo(sunX, sunY);
+                ctx.lineTo(sunX + Math.cos(angle) * len, sunY + Math.sin(angle) * len);
+                ctx.stroke();
+            }
+
+            // 3. Sun Core Disk
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, 22, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.shadowColor = "#fff8e0";
+            ctx.shadowBlur = 30;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 2. Render Macro View: Bright Open Sky with Iridescent Cloud
+        function renderSkyView(vibranceFactor, radiusMicron, uniformity, cloudScalePercent, density, sunAngle) {
+            const w = sCanvas.width;
+            const h = sCanvas.height;
+            sCtx.clearRect(0, 0, w, h);
+
+            const sunX = 100;
+            const sunY = h - 100;
+            const cloudScale = cloudScalePercent / 100.0;
+
+            // Deep Blue Sky Background with Sun Glow
+            const bgGrad = sCtx.createRadialGradient(sunX, sunY, 20, sunX, sunY, w * 1.1);
+            bgGrad.addColorStop(0, "#fff5d0");
+            bgGrad.addColorStop(0.25, "#4282c2");
+            bgGrad.addColorStop(0.6, "#1d4473");
+            bgGrad.addColorStop(1, "#0a182d");
+            sCtx.fillStyle = bgGrad;
+            sCtx.fillRect(0, 0, w, h);
+
+            // Draw Visible Sun First
+            drawSun(sCtx, sunX, sunY);
+
+            const cloudX = sunX + (sunAngle * 11) + 50;
+            const cloudY = sunY - 90;
+
+            const cloudOpacity = Math.min(0.95, 0.25 + (density / 100) * 0.75);
+
+            // 1. Draw Cloud Base
+            sCtx.save();
+            drawPileusCloud(sCtx, cloudX, cloudY, cloudScale);
+            
+            const cloudGrad = sCtx.createRadialGradient(cloudX - 30, cloudY, 10, cloudX, cloudY, 160 * cloudScale);
+            cloudGrad.addColorStop(0, `rgba(255, 255, 255, ${cloudOpacity})`);
+            cloudGrad.addColorStop(0.7, `rgba(215, 230, 250, ${cloudOpacity * 0.6})`);
+            cloudGrad.addColorStop(1, `rgba(160, 190, 220, 0)`);
+
+            sCtx.fillStyle = cloudGrad;
+            sCtx.filter = "blur(8px)";
+            sCtx.fill();
+
+            // 2. Vivid Iridescent Spectrum Overlay
+            if (density <= 75 && uniformity > 2) {
+                const distToSun = Math.sqrt(Math.pow(cloudX - sunX, 2) + Math.pow(cloudY - sunY, 2));
+
+                const spectrumGrad = sCtx.createRadialGradient(
+                    sunX, sunY, Math.max(10, distToSun - 110 * cloudScale),
+                    sunX, sunY, distToSun + 130 * cloudScale
+                );
+
+                const uFactor = (uniformity / 10.0) * vibranceFactor;
+
+                // High Vibrancy Glowing Pastel Palette
+                spectrumGrad.addColorStop(0.0,  `rgba(255, 255, 255, 0)`);
+                spectrumGrad.addColorStop(0.15, `rgba(255, 100, 150, ${Math.min(1.0, 0.95 * uFactor)})`); // Pink
+                spectrumGrad.addColorStop(0.35, `rgba(255, 180, 80, ${Math.min(1.0, 0.98 * uFactor)})`);  // Peach/Orange
+                spectrumGrad.addColorStop(0.55, `rgba(150, 255, 130, ${Math.min(1.0, 0.95 * uFactor)})`); // Lime Green
+                spectrumGrad.addColorStop(0.75, `rgba(80, 220, 255, ${Math.min(1.0, 0.92 * uFactor)})`);  // Cyan
+                spectrumGrad.addColorStop(0.90, `rgba(200, 150, 255, ${Math.min(1.0, 0.85 * uFactor)})`); // Lavender
+                spectrumGrad.addColorStop(1.0,  `rgba(255, 255, 255, 0)`);
+
+                // Layer 1: Core Rainbow Spectrum
+                sCtx.globalCompositeOperation = "source-atop";
+                sCtx.fillStyle = spectrumGrad;
+                sCtx.filter = "blur(6px)";
+                drawPileusCloud(sCtx, cloudX, cloudY, cloudScale);
+                sCtx.fill();
+
+                // Layer 2: Glowing Vibrance Boost
+                sCtx.globalCompositeOperation = "lighter";
+                sCtx.fillStyle = spectrumGrad;
+                sCtx.filter = "blur(14px)";
+                drawPileusCloud(sCtx, cloudX, cloudY, cloudScale);
+                sCtx.fill();
+            }
+            sCtx.restore();
+
+            // Sun Distance Line Indicator
+            sCtx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+            sCtx.setLineDash([4, 4]);
+            sCtx.beginPath();
+            sCtx.moveTo(sunX, sunY);
+            sCtx.lineTo(cloudX, cloudY);
+            sCtx.stroke();
+            sCtx.setLineDash([]);
+
+            // Label for Sun & Distance
+            sCtx.fillStyle = "#ffffff";
+            sCtx.font = "12px sans-serif";
+            sCtx.fillText("☀️ ดวงอาทิตย์", sunX - 30, sunY + 40);
+            sCtx.fillText(`ระยะเชิงมุม ${sunAngle}°`, (sunX + cloudX) / 2 - 20, (sunY + cloudY) / 2 + 20);
+        }
+
+        function updateSimulation() {
+            const vibrance = parseInt(vibranceInput.value);
+            const radiusMicron = parseFloat(sizeInput.value);
+            const uniformity = parseInt(uniformityInput.value);
+            const cloudScalePercent = parseInt(scaleInput.value);
+            const density = parseInt(densityInput.value);
+            const sunAngle = parseInt(angleInput.value);
+
+            valVibrance.textContent = vibrance;
+            valSize.textContent = radiusMicron.toFixed(1);
+            valScale.textContent = cloudScalePercent;
+            valDensity.textContent = density;
+            valAngle.textContent = sunAngle;
+
+            const uLabels = ["ต่ำมาก", "ต่ำ", "ปานกลาง", "สูง", "สูงมาก (หยดน้ำเท่ากันหมด)"];
+            valUniformity.textContent = uLabels[Math.floor((uniformity - 1) / 2.0)];
+
+            const redAngle = calcDiffractionAngle(650, radiusMicron);
+            outRedAngle.textContent = redAngle.toFixed(1);
+
+            if (density > 75) {
+                outStatus.textContent = "ไม่เกิดสีรุ้ง (เมฆหนาเกินไป แสงถูกกระจัดกระจายซ้ำซ้อน)";
+                outStatus.style.color = "#cbd5e1";
+            } else if (uniformity >= 3) {
+                outStatus.textContent = "เกิดสีรุ้งพาสเทลเรืองรอง คมชัดสูง (ตรงตามภาพอ้างอิง)";
+                outStatus.style.color = "#ff9ebb";
+            } else {
+                outStatus.textContent = "สีรุ้งซ้อนทับกันจนกลายเป็นสีขาวจางๆ";
+                outStatus.style.color = "#38bdf8";
+            }
+
+            renderMicroView(radiusMicron);
+            renderSkyView(vibrance / 100.0, radiusMicron, uniformity, cloudScalePercent, density, sunAngle);
+        }
+
+        [vibranceInput, sizeInput, uniformityInput, scaleInput, densityInput, angleInput].forEach(elem => {
+            elem.addEventListener('input', updateSimulation);
+        });
+
+        updateSimulation();
+    </script>
+</body>
+</html>
