@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: การวัดความต้านทานด้วยโอห์มมิเตอร์ (Ohmmeter)</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-color: #2b6cb0;
+            --accent-color: #d97706;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1250px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .title {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .title h1 {
+            font-size: 1.8rem;
+        }
+
+        .title p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        /* Lab Viewport */
+        .lab-viewport {
+            position: relative;
+            height: 520px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: linear-gradient(to bottom, #f8fafc, #edf2f7);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controls Panel */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.92rem;
+        }
+
+        .control-group label span {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent-color);
+            background-color: #fffbebfb;
+            color: var(--accent-color);
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e0;
+            outline: none;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-record {
+            background-color: #319795;
+            color: white;
+        }
+
+        .btn-record:hover {
+            background-color: #2c7a7b;
+        }
+
+        .btn-clear-table {
+            background-color: #718096;
+            color: white;
+        }
+
+        .btn-clear-table:hover {
+            background-color: #4a5568;
+        }
+
+        .btn-reset-all {
+            background-color: #dd6b20;
+            color: white;
+        }
+
+        .btn-reset-all:hover {
+            background-color: #c05621;
+        }
+
+        /* Table Area */
+        .table-container {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .formula-box {
+            background-color: #fffaf0;
+            border-left: 4px solid var(--accent-color);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card title">
+        <h1>📟 Virtual Lab: การวัดความต้านทานด้วยโอห์มมิเตอร์ (Ohmmeter)</h1>
+        <p>ทดลองวัดค่าความต้านทานรวมของตัวต้านทานขนาด 100 Ω เมื่อนำมาต่ออนุกรมและขนานทีละตัว (1 - 10 ตัว)</p>
+    </div>
+
+    <!-- Left side: Simulation View -->
+    <div class="card">
+        <h3>ผังการวัดความต้านทานไฟฟ้า</h3>
+        <div class="lab-viewport">
+            <svg id="circuit-svg" viewBox="0 0 520 500">
+                <!-- Board Background -->
+                <rect x="15" y="15" width="490" height="470" fill="#f8fafc" rx="12" stroke="#cbd5e0" stroke-width="2"/>
+
+                <!-- Ohmmeter Wires -->
+                <g id="ohmmeter-wires-group"></g>
+
+                <!-- Resistor Bank Container -->
+                <g id="resistor-bank-group"></g>
+
+                <!-- Digital Ohmmeter Main Unit -->
+                <g transform="translate(170, 30)">
+                    <!-- Outer Body -->
+                    <rect x="0" y="0" width="180" height="110" fill="#1e293b" rx="10" stroke="#0f172a" stroke-width="2"/>
+                    <!-- Screen Area -->
+                    <rect x="15" y="15" width="150" height="45" fill="#0284c7" rx="5"/>
+                    <text id="svg-ohmmeter-display" x="90" y="46" fill="#ffffff" font-size="22" font-family="monospace" font-weight="bold" text-anchor="middle">100.0 Ω</text>
+                    <text x="90" y="80" fill="#cbd5e0" font-size="11" font-weight="bold" text-anchor="middle">DIGITAL OHMMETER (Ω)</text>
+                    
+                    <!-- Probe Terminals -->
+                    <circle cx="35" cy="95" r="6" fill="#ef4444"/>
+                    <text x="35" y="98" fill="white" font-size="8" font-weight="bold" text-anchor="middle">+</text>
+                    <circle cx="145" cy="95" r="6" fill="#1e293b" stroke="#ffffff" stroke-width="1.5"/>
+                    <text x="145" y="98" fill="white" font-size="8" font-weight="bold" text-anchor="middle">-</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right side: Controls & Live Data -->
+    <div class="card controls">
+        <h3>แผงควบคุมการทดลอง</h3>
+
+        <!-- Circuit Connection Mode -->
+        <div class="control-group">
+            <label>รูปแบบการต่อตัวต้านทาน:</label>
+            <div class="mode-toggle">
+                <div class="mode-btn active" id="mode-series" onclick="setCircuitMode('series')">ต่ออนุกรม (Series)</div>
+                <div class="mode-btn" id="mode-parallel" onclick="setCircuitMode('parallel')">ต่อขนาน (Parallel)</div>
+            </div>
+        </div>
+
+        <!-- Resistor Count Slider -->
+        <div class="control-group">
+            <label for="count-slider">
+                จำนวนตัวต้านทาน (N): <span id="count-val">1 ตัว</span>
+            </label>
+            <input type="range" id="count-slider" min="1" max="10" value="1" step="1">
+        </div>
+
+        <!-- Live Measurement Box -->
+        <div class="formula-box">
+            <b>สรุปผลการวัดด้วยโอห์มมิเตอร์:</b><br>
+            • ชนิดการต่อ: <span id="calc-mode-text" style="font-weight:bold; color:#d97706;">ต่ออนุกรม</span><br>
+            • จำนวนตัวต้านทาน: <span id="calc-count-text" style="font-weight:bold;">1</span> ตัว (ตัวละ 100 Ω)<br>
+            • ความต้านทานตามทฤษฎี (R_{calc}): <span id="r-theory-display" style="font-weight:bold;">100.0</span> Ω<br>
+            • ค่าที่วัดได้จากโอห์มมิเตอร์ (R_{measured}): <span id="r-measured-display" style="font-weight:bold; color:#d97706; font-size:1.1rem;">100.0</span> Ω
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group">
+            <button class="btn-record" id="btn-add">บันทึกผลลงตาราง</button>
+            <button class="btn-clear-table" id="btn-clear">ล้างตาราง</button>
+            <button class="btn-reset-all" id="btn-reset-all">🔄 คืนค่าเริ่มต้น</button>
+        </div>
+    </div>
+
+    <!-- Bottom: Data Table -->
+    <div class="card table-container">
+        <h3>ตารางบันทึกผลการวัดความต้านทานไฟฟ้า</h3>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>ครั้งที่</th>
+                    <th>รูปแบบการต่อ</th>
+                    <th>จำนวนตัวต้านทาน N (ตัว)</th>
+                    <th>ความต้านทานแต่ละตัว R (Ω)</th>
+                    <th>ความต้านทานคำนวณทางทฤษฎี (Ω)</th>
+                    <th>ค่าที่อ่านได้จากโอห์มมิเตอร์ (Ω)</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Global State
+    let circuitMode = 'series'; // 'series' or 'parallel'
+    let measuredCount = 1;      // 1 to 10
+    let recordCount = 0;
+    const R_SINGLE = 100.0;     // 100 Ohms
+
+    // DOM Elements
+    const modeSeriesBtn = document.getElementById('mode-series');
+    const modeParallelBtn = document.getElementById('mode-parallel');
+    const countSlider = document.getElementById('count-slider');
+    const countVal = document.getElementById('count-val');
+
+    const calcModeText = document.getElementById('calc-mode-text');
+    const calcCountText = document.getElementById('calc-count-text');
+    const rTheoryDisplay = document.getElementById('r-theory-display');
+    const rMeasuredDisplay = document.getElementById('r-measured-display');
+
+    const ohmmeterWiresGroup = document.getElementById('ohmmeter-wires-group');
+    const resistorBankGroup = document.getElementById('resistor-bank-group');
+    const svgOhmmeterDisplay = document.getElementById('svg-ohmmeter-display');
+
+    const btnAdd = document.getElementById('btn-add');
+    const btnClear = document.getElementById('btn-clear');
+    const btnResetAll = document.getElementById('btn-reset-all');
+    const tableBody = document.querySelector('#data-table tbody');
+
+    function setCircuitMode(mode) {
+        circuitMode = mode;
+        if (mode === 'series') {
+            modeSeriesBtn.classList.add('active');
+            modeParallelBtn.classList.remove('active');
+        } else {
+            modeParallelBtn.classList.add('active');
+            modeSeriesBtn.classList.remove('active');
+        }
+        updateVisuals();
+    }
+
+    function calculatePhysics() {
+        let rTotal = 0;
+        if (circuitMode === 'series') {
+            // Series: R_total = N * 100
+            rTotal = measuredCount * R_SINGLE;
+        } else {
+            // Parallel: R_total = 100 / N
+            rTotal = R_SINGLE / measuredCount;
+        }
+        return {
+            circuitMode,
+            measuredCount,
+            rTotal
+        };
+    }
+
+    function drawOhmmeterAndResistors(state) {
+        ohmmeterWiresGroup.innerHTML = '';
+        resistorBankGroup.innerHTML = '';
+
+        const N = state.measuredCount;
+
+        if (state.circuitMode === 'series') {
+            // --- SERIES DRAWING ---
+            const startX = 45;
+            const endX = 475;
+            const y = 280;
+            const availableWidth = endX - startX;
+            const segmentWidth = availableWidth / N;
+
+            let resistorSVG = '';
+            for (let i = 0; i < N; i++) {
+                let rx = startX + i * segmentWidth;
+                let resWidth = Math.min(26, segmentWidth * 0.45);
+                let leadWidth = (segmentWidth - resWidth) / 2;
+                let labelText = N > 7 ? `R${i+1}` : `R${i+1} (100Ω)`;
+
+                resistorSVG += `
+                    <g>
+                        <line x1="${rx}" y1="${y}" x2="${rx + leadWidth}" y2="${y}" stroke="#0284c7" stroke-width="3.5"/>
+                        <path d="M ${rx + leadWidth} ${y} l ${resWidth*0.08} -8 l ${resWidth*0.16} 16 l ${resWidth*0.16} -16 l ${resWidth*0.16} 16 l ${resWidth*0.16} -16 l ${resWidth*0.16} 16 l ${resWidth*0.12} -8" fill="none" stroke="#d97706" stroke-width="3.5" stroke-linejoin="round"/>
+                        <line x1="${rx + leadWidth + resWidth}" y1="${y}" x2="${rx + segmentWidth}" y2="${y}" stroke="#0284c7" stroke-width="3.5"/>
+                        <circle cx="${rx}" cy="${y}" r="3.5" fill="#1e293b"/>
+                        <text x="${rx + segmentWidth / 2}" y="${y + 24}" font-size="${N > 8 ? 9 : 11}" font-weight="bold" fill="#334155" text-anchor="middle">${labelText}</text>
+                    </g>
+                `;
+            }
+            resistorSVG += `<circle cx="${endX}" cy="${y}" r="3.5" fill="#1e293b"/>`;
+            resistorBankGroup.innerHTML = resistorSVG;
+
+            // Ohmmeter Lead Wires (Positive Red to startX, Negative Black to endX)
+            const probeRedX = 205;
+            const probeBlackX = 315;
+            const probeY = 125;
+
+            let wires = `
+                <!-- Red Probe (+) -->
+                <path d="M ${probeRedX} ${probeY} L ${startX} ${probeY} L ${startX} ${y}" stroke="#ef4444" stroke-width="3" fill="none"/>
+                <!-- Black Probe (-) -->
+                <path d="M ${probeBlackX} ${probeY} L ${endX} ${probeY} L ${endX} ${y}" stroke="#1e293b" stroke-width="3" fill="none"/>
+                
+                <!-- Probe Contact Dots -->
+                <circle cx="${startX}" cy="${y}" r="5" fill="#ef4444"/>
+                <circle cx="${endX}" cy="${y}" r="5" fill="#1e293b"/>
+            `;
+            ohmmeterWiresGroup.innerHTML = wires;
+
+        } else {
+            // --- PARALLEL DRAWING ---
+            const topRailY = 210;
+            const bottomRailY = 380;
+            const startX = 100;
+            const endX = 420;
+            
+            const stepX = N > 1 ? (endX - startX) / (N - 1) : 0;
+            const activeEndX = N === 1 ? startX : endX;
+
+            // Bus Rails
+            let resistorSVG = `
+                <line x1="${startX}" y1="${topRailY}" x2="${activeEndX}" y2="${topRailY}" stroke="#ef4444" stroke-width="4"/>
+                <line x1="${startX}" y1="${bottomRailY}" x2="${activeEndX}" y2="${bottomRailY}" stroke="#1e293b" stroke-width="4"/>
+            `;
+
+            for (let i = 0; i < N; i++) {
+                let rx = N === 1 ? startX : startX + i * stepX;
+
+                resistorSVG += `
+                    <g>
+                        <line x1="${rx}" y1="${topRailY}" x2="${rx}" y2="275" stroke="#0284c7" stroke-width="2.5"/>
+                        <path d="M ${rx} 275 l -8 3 l 16 6 l -16 6 l 16 6 l -16 6 l 16 6 l -8 3" fill="none" stroke="#d97706" stroke-width="3.5" stroke-linejoin="round"/>
+                        <line x1="${rx}" y1="311" x2="${rx}" y2="${bottomRailY}" stroke="#0284c7" stroke-width="2.5"/>
+                        
+                        <circle cx="${rx}" cy="${topRailY}" r="4.5" fill="#ef4444"/>
+                        <circle cx="${rx}" cy="${bottomRailY}" r="4.5" fill="#1e293b"/>
+                        <text x="${rx + 12}" y="297" font-size="11" font-weight="bold" fill="#1e293b">R${i+1}</text>
+                    </g>
+                `;
+            }
+            resistorBankGroup.innerHTML = resistorSVG;
+
+            // Ohmmeter Probes to Rails
+            const probeRedX = 205;
+            const probeBlackX = 315;
+            const probeY = 125;
+
+            let wires = `
+                <!-- Red Probe (+) to Top Rail -->
+                <path d="M ${probeRedX} ${probeY} L ${startX} ${probeY} L ${startX} ${topRailY}" stroke="#ef4444" stroke-width="3" fill="none"/>
+                <!-- Black Probe (-) to Bottom Rail -->
+                <path d="M ${probeBlackX} ${probeY} L 460 ${probeY} L 460 ${bottomRailY} L ${activeEndX} ${bottomRailY}" stroke="#1e293b" stroke-width="3" fill="none"/>
+                
+                <circle cx="${startX}" cy="${topRailY}" r="5" fill="#ef4444"/>
+                <circle cx="${activeEndX}" cy="${bottomRailY}" r="5" fill="#1e293b"/>
+            `;
+            ohmmeterWiresGroup.innerHTML = wires;
+        }
+    }
+
+    function updateVisuals() {
+        const state = calculatePhysics();
+
+        countVal.innerText = `${state.measuredCount} ตัว`;
+        calcModeText.innerText = state.circuitMode === 'series' ? "ต่ออนุกรม (Series)" : "ต่อขนาน (Parallel)";
+        calcCountText.innerText = state.measuredCount;
+
+        rTheoryDisplay.innerText = state.rTotal.toFixed(1);
+        rMeasuredDisplay.innerText = state.rTotal.toFixed(1);
+
+        // Display format for Ohmmeter Screen
+        if (state.rTotal >= 1000) {
+            svgOhmmeterDisplay.textContent = `${(state.rTotal / 1000).toFixed(2)} kΩ`;
+        } else {
+            svgOhmmeterDisplay.textContent = `${state.rTotal.toFixed(1)} Ω`;
+        }
+
+        drawOhmmeterAndResistors(state);
+    }
+
+    function addRecord() {
+        const state = calculatePhysics();
+        recordCount++;
+
+        const modeLabel = state.circuitMode === 'series' ? 'อนุกรม' : 'ขนาน';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${recordCount}</b></td>
+            <td>${modeLabel}</td>
+            <td>${state.measuredCount}</td>
+            <td>100.0</td>
+            <td><b>${state.rTotal.toFixed(1)}</b></td>
+            <td style="color:#d97706;"><b>${state.rTotal.toFixed(1)}</b></td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function clearTable() {
+        tableBody.innerHTML = '';
+        recordCount = 0;
+    }
+
+    function resetAll() {
+        setCircuitMode('series');
+        countSlider.value = 1;
+        clearTable();
+        updateVisuals();
+    }
+
+    // Event Listeners
+    countSlider.addEventListener('input', (e) => {
+        measuredCount = parseInt(e.target.value);
+        updateVisuals();
+    });
+
+    btnAdd.addEventListener('click', addRecord);
+    btnClear.addEventListener('click', clearTable);
+    btnResetAll.addEventListener('click', resetAll);
+
+    // Initial Render
+    updateVisuals();
+</script>
+
+</body>
+</html>

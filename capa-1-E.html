@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Measuring Capacitance with a Digital Multimeter</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-color: #2b6cb0;
+            --accent-color: #059669;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1250px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .title {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .title h1 {
+            font-size: 1.8rem;
+        }
+
+        .title p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        /* Lab Viewport */
+        .lab-viewport {
+            position: relative;
+            height: 520px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: linear-gradient(to bottom, #f8fafc, #edf2f7);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controls Panel */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.92rem;
+        }
+
+        .control-group label span {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent-color);
+            background-color: #ecfdf5;
+            color: var(--accent-color);
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e0;
+            outline: none;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-record {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-record:hover {
+            background-color: #047857;
+        }
+
+        .btn-clear-table {
+            background-color: #718096;
+            color: white;
+        }
+
+        .btn-clear-table:hover {
+            background-color: #4a5568;
+        }
+
+        .btn-reset-all {
+            background-color: #dd6b20;
+            color: white;
+        }
+
+        .btn-reset-all:hover {
+            background-color: #c05621;
+        }
+
+        /* Table Area */
+        .table-container {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .formula-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid var(--accent-color);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card title">
+        <h1>🔋 Virtual Lab: Measuring Capacitance with a Digital Multimeter</h1>
+        <p>Study series and parallel connections of 100 nF capacitors (1 - 10 units) and measure the total capacitance.</p>
+    </div>
+
+    <!-- Left side: Simulation View -->
+    <div class="card">
+        <h3>Capacitance Measurement Setup Diagram</h3>
+        <div class="lab-viewport">
+            <svg id="circuit-svg" viewBox="0 0 520 500">
+                <!-- Board Background -->
+                <rect x="15" y="15" width="490" height="470" fill="#f8fafc" rx="12" stroke="#cbd5e0" stroke-width="2"/>
+
+                <!-- Multimeter Wires -->
+                <g id="meter-wires-group"></g>
+
+                <!-- Capacitor Bank Container -->
+                <g id="capacitor-bank-group"></g>
+
+                <!-- Digital Multimeter (Capacitance Mode) -->
+                <g transform="translate(170, 30)">
+                    <!-- Outer Body -->
+                    <rect x="0" y="0" width="180" height="110" fill="#1e293b" rx="10" stroke="#0f172a" stroke-width="2"/>
+                    <!-- Screen Area -->
+                    <rect x="15" y="15" width="150" height="45" fill="#047857" rx="5"/>
+                    <text id="svg-meter-display" x="90" y="46" fill="#ffffff" font-size="22" font-family="monospace" font-weight="bold" text-anchor="middle">100.0 nF</text>
+                    <text x="90" y="80" fill="#cbd5e0" font-size="11" font-weight="bold" text-anchor="middle">CAPACITANCE METER (-||-)</text>
+                    
+                    <!-- Probe Terminals -->
+                    <circle cx="35" cy="95" r="6" fill="#ef4444"/>
+                    <text x="35" y="98" fill="white" font-size="8" font-weight="bold" text-anchor="middle">+</text>
+                    <circle cx="145" cy="95" r="6" fill="#1e293b" stroke="#ffffff" stroke-width="1.5"/>
+                    <text x="145" y="98" fill="white" font-size="8" font-weight="bold" text-anchor="middle">-</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right side: Controls & Live Data -->
+    <div class="card controls">
+        <h3>Control Panel</h3>
+
+        <!-- Circuit Connection Mode -->
+        <div class="control-group">
+            <label>Connection Configuration:</label>
+            <div class="mode-toggle">
+                <div class="mode-btn active" id="mode-series" onclick="setCircuitMode('series')">Series</div>
+                <div class="mode-btn" id="mode-parallel" onclick="setCircuitMode('parallel')">Parallel</div>
+            </div>
+        </div>
+
+        <!-- Capacitor Count Slider -->
+        <div class="control-group">
+            <label for="count-slider">
+                Number of Capacitors (N): <span id="count-val">1 unit</span>
+            </label>
+            <input type="range" id="count-slider" min="1" max="10" value="1" step="1">
+        </div>
+
+        <!-- Live Measurement Box -->
+        <div class="formula-box">
+            <b>Multimeter Measurement Summary:</b><br>
+            • Connection Type: <span id="calc-mode-text" style="font-weight:bold; color:#059669;">Series</span><br>
+            • Number of Capacitors: <span id="calc-count-text" style="font-weight:bold;">1</span> unit(s) (100 nF each)<br>
+            • Theoretical Value (C<sub>calc</sub>): <span id="c-theory-display" style="font-weight:bold;">100.0</span> nF<br>
+            • Measured Value (C<sub>measured</sub>): <span id="c-measured-display" style="font-weight:bold; color:#059669; font-size:1.1rem;">100.0 nF</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group">
+            <button class="btn-record" id="btn-add">Record Data</button>
+            <button class="btn-clear-table" id="btn-clear">Clear Table</button>
+            <button class="btn-reset-all" id="btn-reset-all">🔄 Reset All</button>
+        </div>
+    </div>
+
+    <!-- Bottom: Data Table -->
+    <div class="card table-container">
+        <h3>Capacitance Measurement Data Table</h3>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Trial No.</th>
+                    <th>Connection Mode</th>
+                    <th>Capacitor Count (N)</th>
+                    <th>Unit Capacitance C (nF)</th>
+                    <th>Theoretical Value (nF)</th>
+                    <th>Multimeter Measured Value</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Global State
+    let circuitMode = 'series'; // 'series' or 'parallel'
+    let measuredCount = 1;      // 1 to 10
+    let recordCount = 0;
+    const C_SINGLE = 100.0;     // 100 nF
+
+    // DOM Elements
+    const modeSeriesBtn = document.getElementById('mode-series');
+    const modeParallelBtn = document.getElementById('mode-parallel');
+    const countSlider = document.getElementById('count-slider');
+    const countVal = document.getElementById('count-val');
+
+    const calcModeText = document.getElementById('calc-mode-text');
+    const calcCountText = document.getElementById('calc-count-text');
+    const cTheoryDisplay = document.getElementById('c-theory-display');
+    const cMeasuredDisplay = document.getElementById('c-measured-display');
+
+    const meterWiresGroup = document.getElementById('meter-wires-group');
+    const capacitorBankGroup = document.getElementById('capacitor-bank-group');
+    const svgMeterDisplay = document.getElementById('svg-meter-display');
+
+    const btnAdd = document.getElementById('btn-add');
+    const btnClear = document.getElementById('btn-clear');
+    const btnResetAll = document.getElementById('btn-reset-all');
+    const tableBody = document.querySelector('#data-table tbody');
+
+    function setCircuitMode(mode) {
+        circuitMode = mode;
+        if (mode === 'series') {
+            modeSeriesBtn.classList.add('active');
+            modeParallelBtn.classList.remove('active');
+        } else {
+            modeParallelBtn.classList.add('active');
+            modeSeriesBtn.classList.remove('active');
+        }
+        updateVisuals();
+    }
+
+    function calculatePhysics() {
+        let cTotal = 0;
+        if (circuitMode === 'series') {
+            // Series Capacitors: 1/C_total = 1/C1 + 1/C2 + ... => C_total = 100 / N (nF)
+            cTotal = C_SINGLE / measuredCount;
+        } else {
+            // Parallel Capacitors: C_total = C1 + C2 + ... => C_total = N * 100 (nF)
+            cTotal = measuredCount * C_SINGLE;
+        }
+        return {
+            circuitMode,
+            measuredCount,
+            cTotal
+        };
+    }
+
+    function formatCapacitance(cInNf) {
+        if (cInNf >= 1000) {
+            return `${(cInNf / 1000).toFixed(2)} µF`;
+        } else {
+            return `${cInNf.toFixed(1)} nF`;
+        }
+    }
+
+    function drawCapacitorsAndWires(state) {
+        meterWiresGroup.innerHTML = '';
+        capacitorBankGroup.innerHTML = '';
+
+        const N = state.measuredCount;
+
+        if (state.circuitMode === 'series') {
+            // --- SERIES DRAWING ---
+            const startX = 45;
+            const endX = 475;
+            const y = 280;
+            const availableWidth = endX - startX;
+            const segmentWidth = availableWidth / N;
+
+            let capSVG = '';
+            for (let i = 0; i < N; i++) {
+                let rx = startX + i * segmentWidth;
+                let capWidth = 12; // Gap for parallel plates
+                let leadWidth = (segmentWidth - capWidth) / 2;
+                let labelText = N > 7 ? `C${i+1}` : `C${i+1} (100nF)`;
+
+                let p1X = rx + leadWidth;
+                let p2X = rx + leadWidth + capWidth;
+
+                capSVG += `
+                    <g>
+                        <!-- Wire Lead Left -->
+                        <line x1="${rx}" y1="${y}" x2="${p1X}" y2="${y}" stroke="#0284c7" stroke-width="3.5"/>
+                        <!-- Capacitor Parallel Plates -->
+                        <line x1="${p1X}" y1="${y-14}" x2="${p1X}" y2="${y+14}" stroke="#2563eb" stroke-width="4"/>
+                        <line x1="${p2X}" y1="${y-14}" x2="${p2X}" y2="${y+14}" stroke="#2563eb" stroke-width="4"/>
+                        <!-- Wire Lead Right -->
+                        <line x1="${p2X}" y1="${y}" x2="${rx + segmentWidth}" y2="${y}" stroke="#0284c7" stroke-width="3.5"/>
+                        
+                        <circle cx="${rx}" cy="${y}" r="3.5" fill="#1e293b"/>
+                        <text x="${rx + segmentWidth / 2}" y="${y + 28}" font-size="${N > 8 ? 9 : 11}" font-weight="bold" fill="#334155" text-anchor="middle">${labelText}</text>
+                    </g>
+                `;
+            }
+            capSVG += `<circle cx="${endX}" cy="${y}" r="3.5" fill="#1e293b"/>`;
+            capacitorBankGroup.innerHTML = capSVG;
+
+            // Multimeter Wires to Ends
+            const probeRedX = 205;
+            const probeBlackX = 315;
+            const probeY = 125;
+
+            let wires = `
+                <!-- Red Probe (+) -->
+                <path d="M ${probeRedX} ${probeY} L ${startX} ${probeY} L ${startX} ${y}" stroke="#ef4444" stroke-width="3" fill="none"/>
+                <!-- Black Probe (-) -->
+                <path d="M ${probeBlackX} ${probeY} L ${endX} ${probeY} L ${endX} ${y}" stroke="#1e293b" stroke-width="3" fill="none"/>
+                
+                <circle cx="${startX}" cy="${y}" r="5" fill="#ef4444"/>
+                <circle cx="${endX}" cy="${y}" r="5" fill="#1e293b"/>
+            `;
+            meterWiresGroup.innerHTML = wires;
+
+        } else {
+            // --- PARALLEL DRAWING ---
+            const topRailY = 210;
+            const bottomRailY = 380;
+            const startX = 100;
+            const endX = 420;
+            
+            const stepX = N > 1 ? (endX - startX) / (N - 1) : 0;
+            const activeEndX = N === 1 ? startX : endX;
+
+            // Main Rails
+            let capSVG = `
+                <line x1="${startX}" y1="${topRailY}" x2="${activeEndX}" y2="${topRailY}" stroke="#ef4444" stroke-width="4"/>
+                <line x1="${startX}" y1="${bottomRailY}" x2="${activeEndX}" y2="${bottomRailY}" stroke="#1e293b" stroke-width="4"/>
+            `;
+
+            for (let i = 0; i < N; i++) {
+                let rx = N === 1 ? startX : startX + i * stepX;
+                let midY = (topRailY + bottomRailY) / 2;
+                let p1Y = midY - 6;
+                let p2Y = midY + 6;
+
+                capSVG += `
+                    <g>
+                        <!-- Vertical Lead Top -->
+                        <line x1="${rx}" y1="${topRailY}" x2="${rx}" y2="${p1Y}" stroke="#0284c7" stroke-width="2.5"/>
+                        <!-- Horizontal Capacitor Plates -->
+                        <line x1="${rx-14}" y1="${p1Y}" x2="${rx+14}" y2="${p1Y}" stroke="#2563eb" stroke-width="4"/>
+                        <line x1="${rx-14}" y1="${p2Y}" x2="${rx+14}" y2="${p2Y}" stroke="#2563eb" stroke-width="4"/>
+                        <!-- Vertical Lead Bottom -->
+                        <line x1="${rx}" y1="${p2Y}" x2="${rx}" y2="${bottomRailY}" stroke="#0284c7" stroke-width="2.5"/>
+                        
+                        <circle cx="${rx}" cy="${topRailY}" r="4.5" fill="#ef4444"/>
+                        <circle cx="${rx}" cy="${bottomRailY}" r="4.5" fill="#1e293b"/>
+                        <text x="${rx + 18}" y="${midY + 4}" font-size="11" font-weight="bold" fill="#1e293b">C${i+1}</text>
+                    </g>
+                `;
+            }
+            capacitorBankGroup.innerHTML = capSVG;
+
+            // Multimeter Probes to Rails
+            const probeRedX = 205;
+            const probeBlackX = 315;
+            const probeY = 125;
+
+            let wires = `
+                <!-- Red Probe (+) to Top Rail -->
+                <path d="M ${probeRedX} ${probeY} L ${startX} ${probeY} L ${startX} ${topRailY}" stroke="#ef4444" stroke-width="3" fill="none"/>
+                <!-- Black Probe (-) to Bottom Rail -->
+                <path d="M ${probeBlackX} ${probeY} L 460 ${probeY} L 460 ${bottomRailY} L ${activeEndX} ${bottomRailY}" stroke="#1e293b" stroke-width="3" fill="none"/>
+                
+                <circle cx="${startX}" cy="${topRailY}" r="5" fill="#ef4444"/>
+                <circle cx="${activeEndX}" cy="${bottomRailY}" r="5" fill="#1e293b"/>
+            `;
+            meterWiresGroup.innerHTML = wires;
+        }
+    }
+
+    function updateVisuals() {
+        const state = calculatePhysics();
+
+        countVal.innerText = `${state.measuredCount} unit(s)`;
+        calcModeText.innerText = state.circuitMode === 'series' ? "Series" : "Parallel";
+        calcCountText.innerText = state.measuredCount;
+
+        cTheoryDisplay.innerText = state.cTotal.toFixed(1);
+        cMeasuredDisplay.innerText = formatCapacitance(state.cTotal);
+
+        // Display on Digital Multimeter Screen
+        svgMeterDisplay.textContent = formatCapacitance(state.cTotal);
+
+        drawCapacitorsAndWires(state);
+    }
+
+    function addRecord() {
+        const state = calculatePhysics();
+        recordCount++;
+
+        const modeLabel = state.circuitMode === 'series' ? 'Series' : 'Parallel';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${recordCount}</b></td>
+            <td>${modeLabel}</td>
+            <td>${state.measuredCount}</td>
+            <td>100.0</td>
+            <td><b>${state.cTotal.toFixed(1)}</b></td>
+            <td style="color:#059669;"><b>${formatCapacitance(state.cTotal)}</b></td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function clearTable() {
+        tableBody.innerHTML = '';
+        recordCount = 0;
+    }
+
+    function resetAll() {
+        setCircuitMode('series');
+        countSlider.value = 1;
+        clearTable();
+        updateVisuals();
+    }
+
+    // Event Listeners
+    countSlider.addEventListener('input', (e) => {
+        measuredCount = parseInt(e.target.value);
+        updateVisuals();
+    });
+
+    btnAdd.addEventListener('click', addRecord);
+    btnClear.addEventListener('click', clearTable);
+    btnResetAll.addEventListener('click', resetAll);
+
+    // Initial Render
+    updateVisuals();
+</script>
+
+</body>
+</html>

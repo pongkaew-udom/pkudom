@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบรายงานการทดลอง: การวัดความต้านทานด้วยวงจรไฟฟ้า</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --accent-color: #319795;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.75rem;
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>เรื่อง: การวัดความต้านทานด้วยวงจรไฟฟ้า</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">จุดประสงค์การทดลอง</h2>
+        <ul>
+            <li>เพื่อศึกษาการวัดค่าความต้านทานรวมของตัวต้านทาน แบบอนุกรมและต่อแบบขนาน ด้วยวงจรไฟฟ้า</li>
+        </ul>
+    </div>
+
+    <!-- Apparatus -->
+    <div class="section">
+        <h2 class="section-title">อุปกรณ์การทดลอง</h2>
+        <ul>
+            <li><strong>มัลติมิเตอร์แบบดิจิทัล</strong></li>
+            <li><strong>ตัวต้านทาน (Resistors):</strong> ขนาดความต้านทานตัวละ 100 โอห์ม จำนวน 10 ตัว</li>
+            <li><strong>สายเชื่อมต่อ:</strong> สำหรับต่อวงจรแบบอนุกรมและแบบขนาน</li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">ทฤษฎี (Theory)</h2>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">1. การต่อตัวต้านทานแบบอนุกรม (Series Circuit)</h3>
+        <p>เมื่อนำตัวต้านทาน N ตัว ที่มีความต้านทานเท่ากับ R มาต่ออนุกรมกัน ความต้านทานรวมทางทฤษฎี จะเท่ากับผลรวมของความต้านทานทุกตัว ตามสมการ:</p>
+        
+        <div class="formula-box">
+            <code>R_total = R1 + R2 + ... + RN = N × R</code>
+            <br><br>
+            <b>โดยที่:</b><br>
+            • R_total คือ ความต้านทานรวม มีหน่วยเป็น โอห์ม (Ω)<br>
+            • N คือ จำนวนตัวต้านทาน (ตัว)<br>
+            • R คือ ความต้านทานของตัวต้านทานแต่ละตัว มีหน่วยเป็น โอห์ม (Ω)
+        </div>
+
+        <h3 style="margin-top: 15px; color: var(--primary-color);">2. การต่อตัวต้านทานแบบขนาน (Parallel Circuit)</h3>
+        <p>เมื่อนำตัวต้านทาน N ตัว ที่มีความต้านทานเท่ากับ R มาต่อขนานกัน ค่าความต้านทานรวมทางทฤษฎี จะลดลง คำนวณได้จากสมการ:</p>
+        
+        <div class="formula-box">
+            <code>1 / R_total = 1 / R1 + 1 / R2 + ... + 1 / RN  ⇒  R_total = R / N</code>
+            <br><br>
+            <b>โดยที่:</b><br>
+            • R_total คือ ความต้านทานรวม มีหน่วยเป็น โอห์ม (Ω)<br>
+            • N คือ จำนวนตัวต้านทาน (ตัว)<br>
+            • R คือ ความต้านทานของตัวต้านทานแต่ละตัว มีหน่วยเป็น โอห์ม (Ω)
+        </div>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">วิธีการทดลอง</h2>
+        <ol>
+            <li><strong>เลือกรูปแบบการต่อวงจร:</strong> เลือกรูปแบบการต่อตัวต้านทานที่ต้องการทดสอบระหว่าง "ต่ออนุกรม (Series)" หรือ "ต่อขนาน (Parallel)"</li>
+            <li><strong>กำหนดจำนวนตัวต้านทาน:</strong> ปรับสไลเดอร์ "จำนวนตัวต้านทานที่ต่อใช้งาน" (N) ตั้งแต่ 1 ถึง 10 ตัว (โดยตัวต้านทานแต่ละตัวมีค่าความต้านทาน R = 100 โอห์ม)</li>
+            <li><strong>ปรับค่าความต่างศักย์ไฟฟ้า:</strong> ปรับสไลเดอร์ "ความต่างศักย์แหล่งจ่ายไฟ" เพื่อกำหนดแรงดันไฟฟ้าของแหล่งจ่ายไฟกระแสตรงในช่วง 1.0 V ถึง 30.0 V</li>
+            <li><strong>สังเกตและอ่านค่าการวัด:</strong>
+                <ul>
+                    <li>อ่านค่าความต่างศักย์ไฟฟ้าที่ตกคร่อมย่านตัวต้านทาน (V) จากหน้าจอโวลต์มิเตอร์ (Voltmeter)</li>
+                    <li>อ่านค่ากระแสไฟฟ้าที่ไหลในวงจร (I) จากหน้าจอแอมมิเตอร์ (Ammeter) ทั้งในหน่วยแอมแปร์ (A) และมิลลิแอมแปร์ (mA)</li>
+                </ul>
+            </li>
+            <li><strong>บันทึกข้อมูล:</strong> กดปุ่ม "บันทึกผลลงตาราง" เพื่อทำการจัดเก็บข้อมูลการทดลองลงในตารางบันทึกผล</li>
+            <li><strong>ทำการทดลองซ้ำ:</strong> เปลี่ยนแปลงค่าตัวแปร เช่น เปลี่ยนแรงดันไฟฟ้า, เปลี่ยนจำนวนตัวต้านทาน (N), หรือเปลี่ยนรูปแบบการต่อวงจร แล้วทำการทดลองซ้ำเพื่อเปรียบเทียบผล</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">ตารางบันทึกผลการทดลอง</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">ครั้งที่</th>
+                        <th style="width: 14%;">รูปแบบการต่อ</th>
+                        <th style="width: 12%;">จำนวนตัวต้านทาน<br>N (ตัว)</th>
+                        <th style="width: 13%;">ความต้านทาน<br>แต่ละตัว R (Ω)</th>
+                        <th style="width: 11%;">แรงดันแหล่งจ่าย<br>(V)</th>
+                        <th style="width: 12%;">ความต่างศักย์<br>ที่วัดได้ V (V)</th>
+                        <th style="width: 11%;">กระแสไฟฟ้า<br>ที่วัดได้ I (A)</th>
+                        <th style="width: 11%;">ความต้านทาน<br>จากการคำนวณ (Ω)</th>
+                        <th style="width: 10%;">ความต้านทาน<br>จากการวัด V/I (Ω)</th>
+                        <th style="width: 10%;">% ความคลาดเคลื่อน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

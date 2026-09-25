@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Report: Resistance Measurement using Electrical Circuits</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --accent-color: #319795;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.75rem;
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Topic: Resistance Measurement using Electrical Circuits</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">Objectives</h2>
+        <ul>
+            <li>To study the total resistance measurement of resistors connected in series and parallel configurations using electrical circuits.</li>
+        </ul>
+    </div>
+
+    <!-- Apparatus -->
+    <div class="section">
+        <h2 class="section-title">Apparatus</h2>
+        <ul>
+            <li><strong>Digital Multimeter</strong></li>
+            <li><strong>Resistors:</strong> 10 units of 100 Ohms resistors</li>
+            <li><strong>Connecting Wires:</strong> For constructing series and parallel circuits</li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">Theory</h2>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">1. Resistors in Series (Series Circuit)</h3>
+        <p>When N resistors of equal resistance R are connected in series, the theoretical total resistance is equal to the sum of all individual resistances, according to the equation:</p>
+        
+        <div class="formula-box">
+            <code>R_total = R1 + R2 + ... + RN = N × R</code>
+            <br><br>
+            <b>Where:</b><br>
+            • R_total is the total resistance in Ohms (Ω)<br>
+            • N is the number of resistors (units)<br>
+            • R is the resistance of each individual resistor in Ohms (Ω)
+        </div>
+
+        <h3 style="margin-top: 15px; color: var(--primary-color);">2. Resistors in Parallel (Parallel Circuit)</h3>
+        <p>When N resistors of equal resistance R are connected in parallel, the theoretical total resistance decreases, calculated using the equation:</p>
+        
+        <div class="formula-box">
+            <code>1 / R_total = 1 / R1 + 1 / R2 + ... + 1 / RN  ⇒  R_total = R / N</code>
+            <br><br>
+            <b>Where:</b><br>
+            • R_total is the total resistance in Ohms (Ω)<br>
+            • N is the number of resistors (units)<br>
+            • R is the resistance of each individual resistor in Ohms (Ω)
+        </div>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">Procedure</h2>
+        <ol>
+            <li><strong>Select Circuit Configuration:</strong> Choose the desired circuit configuration to test between "Series Connection" or "Parallel Connection".</li>
+            <li><strong>Set the Number of Resistors:</strong> Adjust the slider "Number of active resistors" (N) from 1 to 10 units (where each resistor has a resistance R = 100 Ohms).</li>
+            <li><strong>Adjust Supply Voltage:</strong> Adjust the slider "Power supply voltage" to set the DC power supply voltage in the range of 1.0 V to 30.0 V.</li>
+            <li><strong>Observe and Read Measurements:</strong>
+                <ul>
+                    <li>Read the potential difference across the resistor network (V) from the voltmeter display.</li>
+                    <li>Read the current flowing in the circuit (I) from the ammeter display in both amperes (A) and milliamperes (mA).</li>
+                </ul>
+            </li>
+            <li><strong>Record Data:</strong> Click the "Record Data" button to store the experimental values into the data table.</li>
+            <li><strong>Repeat Experiment:</strong> Change variable parameters such as power supply voltage, number of resistors (N), or circuit configuration, then repeat the experiment for comparison.</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">Experimental Data Table</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">No.</th>
+                        <th style="width: 14%;">Circuit Mode</th>
+                        <th style="width: 12%;">Number of Resistors<br>N (units)</th>
+                        <th style="width: 13%;">Individual Resistance<br>R (Ω)</th>
+                        <th style="width: 11%;">Supply Voltage<br>(V)</th>
+                        <th style="width: 12%;">Measured Voltage<br>V (V)</th>
+                        <th style="width: 11%;">Measured Current<br>I (A)</th>
+                        <th style="width: 11%;">Calculated Resistance<br>(Ω)</th>
+                        <th style="width: 10%;">Measured Resistance<br>V/I (Ω)</th>
+                        <th style="width: 10%;">Percentage Error (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

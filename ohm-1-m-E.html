@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Report: Ohm's Law Experiment for Electrical Conductors</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #0284c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.8rem;
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Topic: Ohm's Law Experiment for Electrical Conductors</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">Objectives</h2>
+        <ul>
+            <li>To study the relationship between potential difference (V) and electric current (I) flowing through a metallic conductor according to Ohm's Law.</li>
+            <li>To study the effects of conductor type, wire radius, and wire length on electrical resistance (R).</li>
+        </ul>
+    </div>
+
+    <!-- Apparatus -->
+    <div class="section">
+        <h2 class="section-title">Apparatus</h2>
+        <ul>
+            <li><strong>DC Power Supply:</strong> Adjustable voltage range from 1.0 to 24.0 V.</li>
+            <li><strong>Voltmeter:</strong> Used for measuring electrical potential difference.</li>
+            <li><strong>Ammeter:</strong> Used for measuring electric current in the circuit.</li>
+            <li><strong>Metallic Conductor Wire (Total Length: 10.0 m):</strong> 5 selectable metals:
+                <ul>
+                    <li>Silver (has specific resistivity)</li>
+                    <li>Copper (has specific resistivity)</li>
+                    <li>Gold (has specific resistivity)</li>
+                    <li>Aluminum (has specific resistivity)</li>
+                    <li>Nichrome (has specific resistivity)</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">Theory</h2>
+        <p>This experiment investigates fundamental electrical principles regarding the relationship among electric current, potential difference, and electrical resistance based on the following theories:</p>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">1. Ohm's Law</h3>
+        <p>States that <i>"When the temperature of an electrical conductor remains constant, the electric current (I) flowing through the conductor is directly proportional to the potential difference (V) across its ends."</i> It can be expressed mathematically as:</p>
+        
+        <div class="formula-box">
+            <code>V = I × R</code>
+            <br><br>
+            <b>Where:</b><br>
+            • V is Potential Difference (Voltage), measured in Volts (V)<br>
+            • I is Electric Current, measured in Amperes (A)<br>
+            • R is Electrical Resistance, measured in Ohms (Ω)
+        </div>
+
+        <h3 style="margin-top: 15px; color: var(--primary-color);">2. Resistance of a Conductor</h3>
+        <p>In the case of conductors like wire conductors, the electrical resistance (R) of a metal wire depends on its physical dimensions and material type, calculated using the formula:</p>
+        
+        <div class="formula-box">
+            <code>R = ρ × (L / A)</code>
+            <br><br>
+            <b>Where:</b><br>
+            • ρ (Rho) is Electrical Resistivity, a unique constant for each material, measured in Ohm-meters (Ω·m)<br>
+            • L is Conductor Length, measured in meters (m)<br>
+            • A is Cross-sectional Area of the conductor, measured in square meters (m²)
+        </div>
+        
+        <p>Therefore, the type of material directly affects the electrical resistance value. Good conductors, such as silver and copper, have low electrical resistivity, resulting in low resistance, whereas conductors with high resistivity (e.g., Nichrome) exhibit high electrical resistance.</p>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">Procedure</h2>
+        <ol>
+            <li>Select the type of metal wire conductor to be tested from the conductor selection menu.</li>
+            <li>Set the wire radius (r) using the slider (adjustable between 0.05 – 0.50 mm).</li>
+            <li>Set the power supply potential difference (Vsupply) by adjusting the voltage slider (1 – 24 V).</li>
+            <li>Adjust the length slider to set the measurement span (L) along the metal wire (1.0 – 10.0 m).</li>
+            <li>Read the electric current (I) from the ammeter and potential difference (V) from the voltmeter.</li>
+            <li>Click the <strong>"Record Data"</strong> button to save the variable values into the table.</li>
+            <li>Vary parameters, such as adjusting the supply voltage (V) or changing the length (L), to observe changes in current and resistance.</li>
+            <li>Conduct the test to measure potential difference and current at a fixed length by increasing the power supply voltage from low to high. Plot a graph of potential difference versus current, determine the slope to calculate resistance, compute resistivity, and compare it with the provided actual value.</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">Data Record Table</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">No.</th>
+                        <th style="width: 16%;">Conductor Type</th>
+                        <th style="width: 12%;">Radius r<br>(m)</th>
+                        <th style="width: 18%;">Supply Voltage<br>(V)</th>
+                        <th style="width: 14%;">Measured Length<br>L (m)</th>
+                        <th style="width: 12%;">Current<br>I (A)</th>
+                        <th style="width: 10%;">Measured Voltage<br>V (V)</th>
+                        <th style="width: 10%;">Resistance<br>R (Ω)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

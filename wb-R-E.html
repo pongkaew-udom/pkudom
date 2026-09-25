@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab: Determining Unknown Resistance using Wheatstone Bridge</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-color: #1e3a8a;
+            --accent-color: #d97706;
+            --success-color: #16a34a;
+            --text-color: #1f2937;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1250px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 980px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .title {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .title h1 {
+            font-size: 1.75rem;
+        }
+
+        .title p {
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        /* Lab Viewport */
+        .lab-viewport {
+            position: relative;
+            height: 520px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: linear-gradient(to bottom, #f8fafc, #edf2f7);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controls Panel */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .control-group label span {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #cbd5e0;
+            outline: none;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        /* Fine Tuning Buttons */
+        .fine-tune-btns {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .fine-tune-btns button {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background-color: #e2e8f0;
+            color: #334155;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .fine-tune-btns button:hover {
+            background-color: #cbd5e0;
+        }
+
+        .status-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .status-box.balanced {
+            background-color: #f0fdf4;
+            border-left-color: var(--success-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        button {
+            flex: 1;
+            min-width: 110px;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-auto {
+            background-color: #0284c7;
+            color: white;
+        }
+        .btn-auto:hover { background-color: #0369a1; }
+
+        .btn-random {
+            background-color: #8b5cf6;
+            color: white;
+        }
+        .btn-random:hover { background-color: #7c3aed; }
+
+        .btn-record {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .btn-record:hover { background-color: #15803d; }
+
+        .btn-clear {
+            background-color: #6b7280;
+            color: white;
+        }
+        .btn-clear:hover { background-color: #4b5563; }
+
+        /* Table Area */
+        .table-container {
+            grid-column: 1 / -1;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover { background-color: #f7fafc; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card title">
+        <h1>⚖️ Virtual Lab: Resistance Measurement using Wheatstone Bridge</h1>
+        <p>Adjust resistors R1, R2, and R3 until the galvanometric current (Ig) becomes zero (balanced) to determine the unknown resistance Rx.</p>
+    </div>
+
+    <!-- Left side: Simulation View -->
+    <div class="card">
+        <h3>Wheatstone Bridge Circuit & Current Measurement</h3>
+        <div class="lab-viewport">
+            <svg id="bridge-svg" viewBox="0 0 520 480">
+                <!-- Board Background -->
+                <rect x="10" y="10" width="500" height="460" fill="#f8fafc" rx="12" stroke="#cbd5e0" stroke-width="2"/>
+
+                <!-- Power Source (12V DC) -->
+                <g transform="translate(260, 435)">
+                    <rect x="-45" y="-18" width="90" height="36" fill="#334155" rx="5"/>
+                    <text x="-25" y="5" fill="#ef4444" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+                    <text x="25" y="5" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">-</text>
+                    <text x="0" y="-24" fill="#1e3a8a" font-size="13" font-weight="bold" text-anchor="middle">12V DC Power Supply</text>
+                </g>
+
+                <!-- Power Wires -->
+                <path d="M 215 435 L 90 435 L 90 240" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <path d="M 305 435 L 430 435 L 430 240" fill="none" stroke="#1e293b" stroke-width="3"/>
+
+                <!-- Diamond Arms Wires -->
+                <line x1="90" y1="240" x2="260" y2="40" stroke="#0284c7" stroke-width="3"/>
+                <line x1="90" y1="240" x2="260" y2="380" stroke="#0284c7" stroke-width="3"/>
+                <line x1="260" y1="40" x2="430" y2="240" stroke="#0284c7" stroke-width="3"/>
+                <line x1="260" y1="380" x2="430" y2="240" stroke="#0284c7" stroke-width="3"/>
+
+                <!-- Middle Branch (B to D) -->
+                <line x1="260" y1="40" x2="260" y2="150" stroke="#d97706" stroke-width="3"/>
+                <line x1="260" y1="270" x2="260" y2="380" stroke="#d97706" stroke-width="3"/>
+
+                <!-- Resistor 1 (R1) -->
+                <g transform="translate(175, 140)">
+                    <rect x="-30" y="-15" width="60" height="30" fill="#ffffff" stroke="#0284c7" stroke-width="2.5" rx="4"/>
+                    <text x="0" y="-20" fill="#0284c7" font-size="16" font-weight="bold" text-anchor="middle">R1</text>
+                    <text id="svg-r1-val" x="0" y="5" fill="#1e3a8a" font-size="13" font-weight="bold" text-anchor="middle">100 Ω</text>
+                </g>
+
+                <!-- Resistor 2 (R2) -->
+                <g transform="translate(345, 140)">
+                    <rect x="-30" y="-15" width="60" height="30" fill="#ffffff" stroke="#0284c7" stroke-width="2.5" rx="4"/>
+                    <text x="0" y="-20" fill="#0284c7" font-size="16" font-weight="bold" text-anchor="middle">R2</text>
+                    <text id="svg-r2-val" x="0" y="5" fill="#1e3a8a" font-size="13" font-weight="bold" text-anchor="middle">200 Ω</text>
+                </g>
+
+                <!-- Resistor 3 (R3 Adjustable) -->
+                <g transform="translate(175, 310)">
+                    <rect x="-35" y="-15" width="70" height="30" fill="#fef3c7" stroke="#d97706" stroke-width="2.5" rx="4"/>
+                    <text x="0" y="32" fill="#d97706" font-size="16" font-weight="bold" text-anchor="middle">R3 (Adjustable)</text>
+                    <text id="svg-r3-val" x="0" y="5" fill="#b45309" font-size="13" font-weight="bold" text-anchor="middle">150 Ω</text>
+                </g>
+
+                <!-- Resistor Unknown (Rx) -->
+                <g transform="translate(345, 310)">
+                    <rect x="-30" y="-15" width="60" height="30" fill="#fce7f3" stroke="#db2777" stroke-width="2.5" rx="4"/>
+                    <text x="0" y="32" fill="#db2777" font-size="16" font-weight="bold" text-anchor="middle">Rx (?)</text>
+                    <text x="0" y="5" fill="#9d174d" font-size="14" font-weight="bold" text-anchor="middle">?</text>
+                </g>
+
+                <!-- Galvanometer Unit -->
+                <g transform="translate(260, 210)">
+                    <circle cx="0" cy="0" r="52" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+                    <circle cx="0" cy="0" r="44" fill="#ffffff"/>
+                    <text x="0" y="-22" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">GALVANOMETER</text>
+                    <text id="svg-ig-text" x="0" y="26" fill="#d97706" font-size="13" font-family="monospace" font-weight="bold" text-anchor="middle">Ig = 0.00 mA</text>
+                    
+                    <!-- Gauge Arc Marks -->
+                    <path d="M -25 -5 A 30 30 0 0 1 25 -5" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="2 4"/>
+                    <line x1="0" y1="-5" x2="0" y2="-12" stroke="#1e293b" stroke-width="2"/>
+
+                    <!-- Needle -->
+                    <line id="svg-needle" x1="0" y1="10" x2="0" y2="-32" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="0" cy="10" r="4" fill="#0f172a"/>
+                </g>
+
+                <!-- Junction Nodes A, B, C, D -->
+                <circle cx="90" cy="240" r="7" fill="#ef4444"/>
+                <text x="65" y="245" font-size="15" font-weight="bold" fill="#ef4444">A (+)</text>
+
+                <circle cx="260" cy="40" r="7" fill="#1e293b"/>
+                <text x="260" y="22" font-size="15" font-weight="bold" text-anchor="middle">B</text>
+
+                <circle cx="430" cy="240" r="7" fill="#1e293b"/>
+                <text x="445" y="245" font-size="15" font-weight="bold" fill="#1e293b">C (-)</text>
+
+                <circle cx="260" cy="380" r="7" fill="#1e293b"/>
+                <text x="260" y="405" font-size="15" font-weight="bold" text-anchor="middle">D</text>
+
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right side: Controls & Parameters -->
+    <div class="card controls">
+        <h3>Bridge Control Panel</h3>
+
+        <!-- R1 Control -->
+        <div class="control-group">
+            <label for="r1-slider">
+                Resistance R1: <span id="r1-val">100 Ω</span>
+            </label>
+            <input type="range" id="r1-slider" min="10" max="1000" value="100" step="10">
+        </div>
+
+        <!-- R2 Control -->
+        <div class="control-group">
+            <label for="r2-slider">
+                Resistance R2: <span id="r2-val">200 Ω</span>
+            </label>
+            <input type="range" id="r2-slider" min="10" max="1000" value="200" step="10">
+        </div>
+
+        <!-- R3 Control (Fine Tuning Variable Resistor) -->
+        <div class="control-group" style="background:#fffbebfb; border: 1.5px solid #fcd34d;">
+            <label for="r3-slider" style="color:#b45309;">
+                🎛️ Adjust Resistance R3: <span id="r3-val">150 Ω</span>
+            </label>
+            <input type="range" id="r3-slider" min="1" max="2000" value="150" step="1">
+            <!-- Fine tune buttons -->
+            <div class="fine-tune-btns">
+                <button onclick="adjustR3(-10)">-10</button>
+                <button onclick="adjustR3(-1)">-1</button>
+                <button onclick="adjustR3(1)">+1</button>
+                <button onclick="adjustR3(10)">+10</button>
+            </div>
+        </div>
+
+        <!-- Live Status Box -->
+        <div id="status-box" class="status-box">
+            <b>Circuit Status:</b> <span id="balance-status" style="font-weight:bold; color:#d97706;">Circuit is NOT balanced</span><br>
+            • Galvanometer Current (Ig): <span id="ig-val" style="font-weight:bold; color:#d97706;">0.00 mA</span><br>
+            • Node VB Voltage: <span id="vb-val">0.00</span> V | Node VD Voltage: <span id="vd-val">0.00</span> V<br>
+            • Calculated Rx (Rx = R2 × R3 / R1): <span id="rx-calc-val" style="font-weight:bold; font-size:1.1rem; color:#1e3a8a;">--- Ω</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group">
+            <button class="btn-auto" id="btn-auto-tune">🎯 Auto Balance</button>
+            <button class="btn-random" id="btn-random-rx">🎲 New Random Rx</button>
+        </div>
+        <div class="btn-group">
+            <button class="btn-record" id="btn-add">Record Data</button>
+            <button class="btn-clear" id="btn-clear">Clear Table</button>
+        </div>
+    </div>
+
+    <!-- Bottom: Data Table -->
+    <div class="card table-container">
+        <h3>Wheatstone Bridge Experimental Data Table</h3>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Trial No.</th>
+                    <th>Supply Voltage V (V)</th>
+                    <th>R1 (Ω)</th>
+                    <th>R2 (Ω)</th>
+                    <th>R3 at Balance Ig=0 (Ω)</th>
+                    <th>Calculated Rx (Ω)</th>
+                    <th>Balance Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // State
+    const V_SUPPLY = 12.0; // 12 Volt Fixed Supply
+    let R1 = 100;
+    let R2 = 200;
+    let R3 = 150;
+    let Rx_secret = 300; // Secret Rx value
+    let recordCount = 0;
+
+    // DOM Elements
+    const r1Slider = document.getElementById('r1-slider');
+    const r2Slider = document.getElementById('r2-slider');
+    const r3Slider = document.getElementById('r3-slider');
+
+    const r1ValText = document.getElementById('r1-val');
+    const r2ValText = document.getElementById('r2-val');
+    const r3ValText = document.getElementById('r3-val');
+
+    const svgR1Val = document.getElementById('svg-r1-val');
+    const svgR2Val = document.getElementById('svg-r2-val');
+    const svgR3Val = document.getElementById('svg-r3-val');
+
+    const statusBox = document.getElementById('status-box');
+    const balanceStatusText = document.getElementById('balance-status');
+    const igValText = document.getElementById('ig-val');
+    const vbValText = document.getElementById('vb-val');
+    const vdValText = document.getElementById('vd-val');
+    const rxCalcValText = document.getElementById('rx-calc-val');
+
+    const svgNeedle = document.getElementById('svg-needle');
+    const svgIgText = document.getElementById('svg-ig-text');
+
+    const btnAutoTune = document.getElementById('btn-auto-tune');
+    const btnRandomRx = document.getElementById('btn-random-rx');
+    const btnAdd = document.getElementById('btn-add');
+    const btnClear = document.getElementById('btn-clear');
+    const tableBody = document.querySelector('#data-table tbody');
+
+    function generateRandomRx() {
+        // Random Rx between 50 and 1000 Ohms
+        Rx_secret = Math.floor(Math.random() * 95) * 10 + 50;
+        
+        // Reset R3 to a mismatched value so user can adjust
+        r3Slider.value = Math.max(1, Math.floor(Rx_secret * 0.6));
+        updatePhysics();
+    }
+
+    function adjustR3(delta) {
+        let current = parseInt(r3Slider.value);
+        let updated = current + delta;
+        if (updated < 1) updated = 1;
+        if (updated > 2000) updated = 2000;
+        r3Slider.value = updated;
+        updatePhysics();
+    }
+
+    function autoTuneBalance() {
+        // Ideal balance condition: R1 / R2 = R3 / Rx => R3 = (R1 * Rx) / R2
+        let idealR3 = Math.round((R1 * Rx_secret) / R2);
+        if (idealR3 < 1) idealR3 = 1;
+        if (idealR3 > 2000) idealR3 = 2000;
+
+        r3Slider.value = idealR3;
+        updatePhysics();
+    }
+
+    function calculateBridge() {
+        // Node Voltages V_B (between R1 and R2) and V_D (between R3 and Rx)
+        const Vb = V_SUPPLY * (R2 / (R1 + R2));
+        const Vd = V_SUPPLY * (Rx_secret / (R3 + Rx_secret));
+
+        // Galvanometer internal resistance (Rg = 50 Ohms)
+        const Rg = 50.0; 
+        const Vth = Vb - Vd;
+        const Rth = ((R1 * R2) / (R1 + R2)) + ((R3 * Rx_secret) / (R3 + Rx_secret));
+        
+        // Current Ig from B to D
+        let Ig_amp = Vth / (Rth + Rg);
+        let Ig_mA = Ig_amp * 1000.0;
+
+        // Theoretical Rx calculated when balanced
+        const Rx_calculated = (R2 * R3) / R1;
+
+        // Balance Check Condition
+        const isBalanced = Math.abs(R1 * Rx_secret - R2 * R3) < 2 || Math.abs(Ig_mA) < 0.02;
+
+        if (isBalanced) {
+            Ig_mA = 0.0; // Clean zero display when balanced
+        }
+
+        return {
+            Vb,
+            Vd,
+            Ig_mA,
+            Rx_calculated,
+            isBalanced
+        };
+    }
+
+    function updatePhysics() {
+        R1 = parseFloat(r1Slider.value);
+        R2 = parseFloat(r2Slider.value);
+        R3 = parseFloat(r3Slider.value);
+
+        // Update Text Labels
+        r1ValText.innerText = `${R1} Ω`;
+        r2ValText.innerText = `${R2} Ω`;
+        r3ValText.innerText = `${R3} Ω`;
+
+        svgR1Val.textContent = `${R1} Ω`;
+        svgR2Val.textContent = `${R2} Ω`;
+        svgR3Val.textContent = `${R3} Ω`;
+
+        const bridge = calculateBridge();
+
+        vbValText.innerText = bridge.Vb.toFixed(2);
+        vdValText.innerText = bridge.Vd.toFixed(2);
+        igValText.innerText = `${bridge.Ig_mA.toFixed(2)} mA`;
+        rxCalcValText.innerText = `${bridge.Rx_calculated.toFixed(1)} Ω`;
+
+        svgIgText.textContent = `Ig = ${bridge.Ig_mA.toFixed(2)} mA`;
+
+        // Update Needle Angle (-45 deg to +45 deg)
+        let needleAngle = bridge.Ig_mA * 12.0; 
+        if (needleAngle > 45) needleAngle = 45;
+        if (needleAngle < -45) needleAngle = -45;
+        svgNeedle.setAttribute('transform', `rotate(${needleAngle}, 0, 10)`);
+
+        // UI Balance Status Update
+        if (bridge.isBalanced) {
+            statusBox.className = "status-box balanced";
+            balanceStatusText.innerHTML = "<span style='color:#16a34a;'>✅ Circuit is Balanced (Ig = 0.00 mA)</span>";
+            svgIgText.setAttribute('fill', '#16a34a');
+        } else {
+            statusBox.className = "status-box";
+            balanceStatusText.innerHTML = "<span style='color:#d97706;'>⏳ Circuit is NOT Balanced (Use + / - buttons or Auto Balance)</span>";
+            svgIgText.setAttribute('fill', '#d97706');
+        }
+    }
+
+    function addRecord() {
+        const bridge = calculateBridge();
+        recordCount++;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${recordCount}</b></td>
+            <td>12.0</td>
+            <td>${R1}</td>
+            <td>${R2}</td>
+            <td>${R3}</td>
+            <td style="color:#1e3a8a;"><b>${bridge.Rx_calculated.toFixed(1)}</b></td>
+            <td>${bridge.isBalanced ? '<span style="color:#16a34a; font-weight:bold;">Balanced</span>' : '<span style="color:#d97706;">Unbalanced</span>'}</td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function clearTable() {
+        tableBody.innerHTML = '';
+        recordCount = 0;
+    }
+
+    // Event Listeners
+    r1Slider.addEventListener('input', updatePhysics);
+    r2Slider.addEventListener('input', updatePhysics);
+    r3Slider.addEventListener('input', updatePhysics);
+
+    btnAutoTune.addEventListener('click', autoTuneBalance);
+    btnRandomRx.addEventListener('click', generateRandomRx);
+    btnAdd.addEventListener('click', addRecord);
+    btnClear.addEventListener('click', clearTable);
+
+    // Initial setup
+    generateRandomRx();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบรายงานการทดลอง: วงจรบริดจ์ของวีตสโตน (Wheatstone Bridge Circuit)</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #d97706;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.75rem;
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>เรื่อง: การวัดหาค่าความต้านทานด้วยวงจรบริดจ์ของวีตสโตน<br>(Wheatstone Bridge Circuit)</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">จุดประสงค์การทดลอง</h2>
+        <ul>
+            <li>เพื่อศึกษาหลักการทำงานของวงจรบริดจ์ของวีตสโตน (Wheatstone Bridge)</li>
+            <li>เพื่อฝึกทักษะการปรับสมดุลของวงจรบริดจ์โดยวัดกระแสไฟฟ้าในแกลแวนอมิเตอร์ จนเป็นศูนย์</li>
+            <li>เพื่อหาค่าความต้านทานที่ไม่ทราบค่า (Rx) จากเงื่อนไขสมดุลของวงจรบริดจ์</li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">ทฤษฎี (Theory)</h2>
+        <p>วงจรบริดจ์ของวีตสโตนประกอบด้วยตัวต้านทาน 4 ตัว (R1, R2, R3 และ Rx) ต่อกันเป็นรูปสี่เหลี่ยมขนมเปียกปูน โดยมีแหล่งจ่ายไฟ DC (V) ต่อเข้าที่โหนด A และ C และมีแกลแวนอมิเตอร์ (Galvanometer) ต่ออยู่ตรงกลางระหว่างโหนด B และ D เพื่อตรวจวัดกระแสไฟฟ้า (Ig)</p>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">ภาวะสมดุลของวงจรบริดจ์ (Balanced Bridge Condition):</h3>
+        <p>เมื่อทำการปรับค่าความต้านทาน R3 จนกระทั่งศักย์ไฟฟ้าที่โหนด B และ D เท่ากัน (VB = VD) จะทำให้ไม่มีกระแสไฟฟ้าไหลผ่านแกลแวนอมิเตอร์ นั่นคือ:</p>
+        
+        <div class="formula-box">
+            <code>Ig = 0</code>
+            <br><br>
+            เมื่อวงจรอยู่ในภาวะสมดุล จะได้ความสัมพันธ์ของอัตราส่วนความต้านทาน ตามสมการ:
+            <br><br>
+            <code>R1 / R2 = R3 / Rx</code>
+            <br><br>
+            ดังนั้น สามารถคำนวณหาค่าความต้านทานที่ไม่ทราบค่า (Rx) ได้จากสมการ:
+            <br><br>
+            <code>Rx = (R2 × R3) / R1</code>
+        </div>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">วิธีการทดลอง</h2>
+        <ol>
+            <li><strong>เริ่มต้นการทดลอง:</strong> กดปุ่ม "สุ่มค่า Rx ใหม่" เพื่อให้ระบบสุ่มค่าความต้านทานที่ไม่ทราบค่า</li>
+            <li><strong>ตั้งค่า R1 และ R2:</strong> ปรับค่าความต้านทาน R1 และ R2 บนแถบสไลเดอร์ตามความเหมาะสม</li>
+            <li><strong>ปรับสมดุลวงจร (R3):</strong>
+                <ul>
+                    <li>ปรับสไลเดอร์ R3 หรือใช้ปุ่มละเอียด (+1, -1, +10, -10) จนกระทั่งเข็มของแกลแวนอมิเตอร์ชี้ที่เลข 0</li>
+                    <li>หรือกดปุ่ม "ปรับสมดุลอัตโนมัติ" เพื่อหาจุดสมดุลทันที</li>
+                </ul>
+            </li>
+            <li><strong>คำนวณค่า Rx:</strong> นำค่า R1, R2 และ R3 ที่ได้ในภาวะสมดุลไปคำนวณหาค่า Rx ตามสูตร</li>
+            <li><strong>บันทึกผล:</strong> กดปุ่ม "บันทึกผลลงตาราง" เพื่อจัดเก็บข้อมูลลงในตารางบันทึกผล</li>
+            <li><strong>ทำซ้ำ:</strong> กดปุ่ม "สุ่มค่า Rx ใหม่" หรือเปลี่ยนอัตราส่วน R1/R2 แล้วทำการทดลองซ้ำเพื่อเปรียบเทียบผล</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">ตารางบันทึกผลการทดลอง</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">ครั้งที่</th>
+                        <th style="width: 20%;">แรงดันแหล่งจ่าย V (V)</th>
+                        <th style="width: 18%;">R1 (Ω)</th>
+                        <th style="width: 18%;">R2 (Ω)</th>
+                        <th style="width: 18%;">R3 (Ω)</th>
+                        <th style="width: 16%;">Rx (Ω)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

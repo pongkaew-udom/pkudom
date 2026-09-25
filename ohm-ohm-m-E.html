@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Report: Resistance Measurement using an Ohmmeter</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --accent-color: #d97706;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #fffaf0;
+            border: 1px solid #feebc8;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.8rem;
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Topic: Resistance Measurement using an Ohmmeter</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">Objectives</h2>
+        <ul>
+            <li>To study the total resistance measurement of resistors connected in series and parallel configurations using an ohmmeter.</li>
+        </ul>
+    </div>
+
+    <!-- Apparatus -->
+    <div class="section">
+        <h2 class="section-title">Apparatus</h2>
+        <ul>
+            <li><strong>Digital Ohmmeter</strong></li>
+            <li><strong>Resistors:</strong> 10 units of 100 Ohms resistors</li>
+            <li><strong>Connecting Wires:</strong> For constructing series and parallel circuits</li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">Theory</h2>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">1. Resistors in Series (Series Circuit)</h3>
+        <p>When N resistors of equal resistance R are connected in series, the theoretical total resistance is equal to the sum of all individual resistances, according to the equation:</p>
+        
+        <div class="formula-box">
+            <code>R_total = R1 + R2 + ... + RN = N × R</code>
+            <br><br>
+            <b>Where:</b><br>
+            • R_total is the total resistance in Ohms (Ω)<br>
+            • N is the number of resistors (units)<br>
+            • R is the resistance of each individual resistor in Ohms (Ω)
+        </div>
+
+        <h3 style="margin-top: 15px; color: var(--primary-color);">2. Resistors in Parallel (Parallel Circuit)</h3>
+        <p>When N resistors of equal resistance R are connected in parallel, the theoretical total resistance decreases, calculated using the equation:</p>
+        
+        <div class="formula-box">
+            <code>1 / R_total = 1 / R1 + 1 / R2 + ... + 1 / RN  ⇒  R_total = R / N</code>
+            <br><br>
+            <b>Where:</b><br>
+            • R_total is the total resistance in Ohms (Ω)<br>
+            • N is the number of resistors (units)<br>
+            • R is the resistance of each individual resistor in Ohms (Ω)
+        </div>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">Procedure</h2>
+        <ol>
+            <li>Select the desired circuit configuration to test: <strong>"Series Connection"</strong> or <strong>"Parallel Connection"</strong>.</li>
+            <li>Adjust the slider to choose the number of resistors (N) to measure, ranging from 1 to 10 units.</li>
+            <li>Observe the circuit diagram and read the total resistance displayed on the ohmmeter screen.</li>
+            <li>Click the <strong>"Record Data"</strong> button to save the theoretical and measured resistance values into the table.</li>
+            <li>Change the number of resistors (N) or switch the connection mode, then repeat the experiment until completed.</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">Experimental Data Table</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">No.</th>
+                        <th style="width: 20%;">Connection Mode</th>
+                        <th style="width: 18%;">Number of Resistors<br>N (units)</th>
+                        <th style="width: 18%;">Individual Resistance<br>R (Ω)</th>
+                        <th style="width: 18%;">Calculated Resistance<br>(Ω)</th>
+                        <th style="width: 18%;">Measured Resistance<br>(Ω)</th>
+                        <th style="width: 15%;">Percentage Error (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

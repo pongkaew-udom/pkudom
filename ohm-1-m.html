@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่อง: การทดลองกฎของโอห์มของตัวนำไฟฟ้า</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #0284c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        ul, ol {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .formula-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 1rem;
+        }
+
+        .formula-box code {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .empty-row {
+            height: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            th, td {
+                font-size: 0.8rem;
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>เรื่อง: การทดลองกฎของโอห์มของตัวนำไฟฟ้า</h1>
+    </div>
+
+    <!-- Objectives -->
+    <div class="section">
+        <h2 class="section-title">จุดประสงค์การทดลอง</h2>
+        <ul>
+            <li>เพื่อศึกษาความสัมพันธ์ระหว่างความต่างศักย์ไฟฟ้า และกระแสไฟฟ้า ที่ไหลผ่านตัวนำโลหะตามกฎของโอห์ม</li>
+            <li>เพื่อศึกษาผลของชนิดตัวนำ, ขนาดรัศมีของสายไฟและความยาวของสายไฟ ที่มีต่อความต้านทานไฟฟ้า</li>
+        </ul>
+    </div>
+
+    <!-- Apparatus -->
+    <div class="section">
+        <h2 class="section-title">อุปกรณ์การทดลอง</h2>
+        <ul>
+            <li><strong>แหล่งจ่ายไฟฟ้ากระแสตรง (DC Power Supply):</strong> ปรับแรงดันได้ช่วง 1.0 – 24.0 V</li>
+            <li><strong>โวลต์มิเตอร์ (Voltmeter):</strong> สำหรับวัดความต่างศักย์ไฟฟ้า</li>
+            <li><strong>แอมมิเตอร์ (Ammeter):</strong> สำหรับวัดกระแสไฟฟ้าในวงจร</li>
+            <li><strong>ลวดตัวนำโลหะความยาวรวม 10.0 เมตร:</strong> สามารถเลือกชนิดโลหะได้ 5 ชนิด ได้แก่:
+                <ul>
+                    <li>เงิน (Silver) มีสภาพต้านทานไฟฟ้า</li>
+                    <li>ทองแดง (Copper) มีสภาพต้านทานไฟฟ้า</li>
+                    <li>ทองคำ (Gold) มีสภาพต้านทานไฟฟ้า</li>
+                    <li>อะลูมิเนียม (Aluminum) มีสภาพต้านทานไฟฟ้า</li>
+                    <li>นิโครม (Nichrome) มีสภาพต้านทานไฟฟ้า</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Theory -->
+    <div class="section">
+        <h2 class="section-title">ทฤษฎี (Theory)</h2>
+        <p>การทดลองนี้ศึกษาหลักการพื้นฐานทางไฟฟ้าเกี่ยวกับความสัมพันธ์ระหว่างกระแสไฟฟ้า ความต่างศักย์ไฟฟ้า และความต้านทานไฟฟ้า โดยมีทฤษฎีที่เกี่ยวข้องดังนี้</p>
+        
+        <h3 style="margin-top: 15px; color: var(--primary-color);">1. กฎของโอห์ม (Ohm's Law)</h3>
+        <p>กฎของโอห์มกล่าวไว้ว่า <i>"เมื่ออุณหภูมิของตัวนำไฟฟ้ามีค่าคงตัว กระแสไฟฟ้า (I) ที่ไหลผ่านตัวนำจะแปรผันตรงกับความต่างศักย์ไฟฟ้า (V) ระหว่างปลายทั้งสองของตัวนำนั้น"</i> เขียนเป็นความสัมพันธ์ทางคณิตศาสตร์ได้ดังนี้:</p>
+        
+        <div class="formula-box">
+            <code>V = I × R</code>
+            <br><br>
+            <b>โดยที่:</b><br>
+            • V คือ ความต่างศักย์ไฟฟ้า (Voltage) มีหน่วยเป็น โวลต์ (V)<br>
+            • I คือ กระแสไฟฟ้า (Current) มีหน่วยเป็น แอมแปร์ (A)<br>
+            • R คือ ความต้านทานไฟฟ้า (Resistance) มีหน่วยเป็น โอห์ม (Ω)
+        </div>
+
+        <h3 style="margin-top: 15px; color: var(--primary-color);">2. ความต้านทานไฟฟ้าของตัวนำ</h3>
+        <p>ในกรณีของตัวนำไฟฟ้า เช่น เส้นลวดตัวนำ ความต้านทานไฟฟ้า (R) ของเส้นลวดตัวนำโลหะขึ้นอยู่กับลักษณะและชนิดของวัสดุ ซึ่งคำนวณได้จากสูตร:</p>
+        
+        <div class="formula-box">
+            <code>R = ρ × (L / A)</code>
+            <br><br>
+            <b>โดยที่:</b><br>
+            • ρ (สภาพต้านทานไฟฟ้า: Resistivity) เป็นค่าคงตัวเฉพาะตัวของวัสดุแต่ละชนิด มีหน่วยเป็น โอห์ม-เมตร (Ω·m)<br>
+            • L คือ ความยาวของตัวนำ มีหน่วยเป็น เมตร (m)<br>
+            • A คือ พื้นที่หน้าตัดของตัวนำ มีหน่วยเป็น ตารางเมตร (m²)
+        </div>
+        
+        <p>โดยชนิดของวัสดุ จึงมีผลต่อค่าความต้านทานไฟฟ้า ตัวนำไฟฟ้าที่ดี เช่น เงิน, ทองแดง จะมีค่าสภาพต้านทานไฟฟ้าต่ำ ทำให้มีความต้านทานน้อย ในขณะที่ตัวนำที่มีสภาพต้านทานสูง (เช่น นิโครม) จะมีความต้านทานไฟฟ้ามาก</p>
+    </div>
+
+    <!-- Procedure -->
+    <div class="section">
+        <h2 class="section-title">วิธีการทดลอง</h2>
+        <ol>
+            <li>เลือกชนิดของลวดตัวนำโลหะที่ต้องการทดสอบจากเมนูเลือกชนิดตัวนำ</li>
+            <li>กำหนดขนาดรัศมีของสายไฟ (r) โดยใช้สไลเดอร์ (ปรับได้ระหว่าง 0.05 – 0.50 mm)</li>
+            <li>กำหนดค่าความต่างศักย์ของแหล่งจ่ายไฟ (Vsupply) โดยปรับสไลเดอร์แรงดัน (1 – 24 V)</li>
+            <li>เลื่อนสไลเดอร์ปรับความยาวช่วงที่ต้องการวัดความต่างศักย์ (L) บนลวดโลหะ (1.0 – 10.0 m)</li>
+            <li>อ่านค่ากระแสไฟฟ้า (I) จากแอมมิเตอร์ และอ่านค่าความต่างศักย์ (V) จากโวลต์มิเตอร์</li>
+            <li>กดปุ่ม <strong>"บันทึกผลลงตาราง"</strong> เพื่อทำการจัดเก็บข้อมูลตัวแปรต่าง ๆ</li>
+            <li>ทดลองเปลี่ยนตัวแปร เช่น ปรับแรงดันไฟฟ้า (V) หรือปรับเปลี่ยนความยาว (L) เพื่อสังเกตการเปลี่ยนแปลงของกระแสไฟฟ้าและความต้านทาน</li>
+            <li>ทำการทดลองหาค่า ความต่างศักย์ และกระแสไฟฟ้าที่ไหล เมื่อความยาวคงตัว โดยปรับแหล่งจ่ายไฟที่มีค่าน้อยไปหามาก แล้วเขียนกราฟระหว่าความต่างศักย์และกระแสไฟฟ้าที่ได้ หาความชัน คำนวณหาค่าความต้านทาน คำนวณสภาพต้านทานไฟฟ้า เปรียบเทียบกับค่าจริงที่ให้</li>
+        </ol>
+    </div>
+
+    <!-- Data Table -->
+    <div class="section">
+        <h2 class="section-title">ตารางบันทึกผลการทดลอง</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">ครั้งที่</th>
+                        <th style="width: 16%;">ชนิดตัวนำ</th>
+                        <th style="width: 12%;">รัศมี r<br>(m)</th>
+                        <th style="width: 18%;">ความต่างศักย์<br>แหล่งจ่าย (V)</th>
+                        <th style="width: 14%;">ความยาว<br>ที่วัด L (m)</th>
+                        <th style="width: 12%;">กระแสไฟฟ้า<br>I (A)</th>
+                        <th style="width: 10%;">ความต่างศักย์<br>ที่วัดได้ V (V)</th>
+                        <th style="width: 10%;">ความต้านทาน<br>R (Ω)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="empty-row">
+                        <td>1</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>2</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>3</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>4</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="empty-row">
+                        <td>5</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
