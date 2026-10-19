@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรแกรมแยกตัวประกอบเฉพาะ (Prime Factorization Calculator)</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border-color: #e2e8f0;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --success-text: #166534;
+            --error-bg: #fef2f2;
+            --error-text: #991b1b;
+        }
+
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.6rem;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result-box {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+        }
+
+        .result-box.error {
+            background-color: var(--error-bg);
+            border-color: #fecaca;
+            color: var(--error-text);
+        }
+
+        .result-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+        }
+
+        .steps {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #475569;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>โปรแกรมแยกตัวประกอบเฉพาะ</h1>
+    
+    <div class="input-group">
+        <input type="number" id="numberInput" placeholder="กรอกตัวเลขจำนวนเต็ม (เช่น 8051)" min="2" onkeypress="handleKeyPress(event)">
+        <button onclick="calculateFactorization()">คำนวณ</button>
+    </div>
+
+    <div id="resultBox" class="result-box">
+        <div class="result-title" id="resultTitle">ผลลัพธ์:</div>
+        <div class="result-value" id="resultValue"></div>
+        <div class="steps" id="resultSteps"></div>
+    </div>
+</div>
+
+<script>
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            calculateFactorization();
+        }
+    }
+
+    function getPrimeFactors(n) {
+        let factors = [];
+        let d = 2;
+        while (n >= 2) {
+            if (n % d === 0) {
+                factors.push(d);
+                n = n / d;
+            } else {
+                d++;
+                if (d * d > n) {
+                    if (n > 1) {
+                        factors.push(n);
+                        break;
+                    }
+                }
+            }
+        }
+        return factors;
+    }
+
+    function calculateFactorization() {
+        const input = document.getElementById('numberInput').value;
+        const resultBox = document.getElementById('resultBox');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultValue = document.getElementById('resultValue');
+        const resultSteps = document.getElementById('resultSteps');
+
+        const num = parseInt(input);
+
+        if (isNaN(num) || num < 2) {
+            resultBox.style.display = 'block';
+            resultBox.className = 'result-box error';
+            resultTitle.innerText = 'ข้อผิดพลาด:';
+            resultValue.innerText = 'กรุณากรอกตัวเลขจำนวนเต็มที่มากกว่าหรือเท่ากับ 2';
+            resultSteps.innerText = '';
+            return;
+        }
+
+        const factors = getPrimeFactors(num);
+
+        // คำนวณรูปแบบยกกำลัง (Exponential notation)
+        const counts = {};
+        factors.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
+        
+        const expFormat = Object.keys(counts).map(prime => {
+            return counts[prime] > 1 ? `${prime}^${counts[prime]}` : `${prime}`;
+        }).join(' × ');
+
+        resultBox.style.display = 'block';
+        resultBox.className = 'result-box';
+        resultTitle.innerText = `ผลการแยกตัวประกอบเฉพาะของ ${num}:`;
+        resultValue.innerText = `${num} = ${factors.join(' × ')}`;
+        
+        if (factors.length === 1) {
+            resultSteps.innerText = `หมายเหตุ: ${num} เป็นจำนวนเฉพาะ (Prime Number)`;
+        } else {
+            resultSteps.innerText = `รูปแบบเลขยกกำลัง: ${num} = ${expFormat}`;
+        }
+    }
+</script>
+
+</body>
+</html>
