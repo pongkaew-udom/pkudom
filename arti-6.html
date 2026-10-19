@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่อง ซีทีสแกนกับภาพกะโหลก</title>
+    <!-- MathJax for rendering LaTeX expressions -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0284c7;
+            --primary-dark: #0369a1;
+            --accent-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 20px 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        h1 {
+            font-family: 'Prompt', sans-serif;
+            color: var(--primary-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .story-body {
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+
+        p {
+            margin-bottom: 18px;
+            text-indent: 2em;
+        }
+
+        .dialogue {
+            text-indent: 0;
+            padding-left: 15px;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .dialogue strong {
+            color: var(--primary-dark);
+            font-family: 'Prompt', sans-serif;
+            font-weight: 600;
+        }
+
+        .siren-box {
+            background-color: #fef2f2;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+            font-weight: bold;
+            color: #991b1b;
+            text-align: center;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .sci-note {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin: 15px 0;
+            font-size: 1.05rem;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .story-body {
+                font-size: 1rem;
+            }
+
+            p {
+                text-indent: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>เรื่อง ซีทีสแกนกับภาพกะโหลก</h1>
+        <div class="subtitle">เรื่องสั้นความรู้ฟิสิกส์น่ารู้</div>
+    </header>
+
+    <article class="story-body">
+        <p>
+            วันนี้ถึงวันตรวจสุขภาพประจำปีของพ่อกับต้นกล้าแล้ว พ่อกับต้นกล้าจึงพากันมาตรวจสุขภาพที่โรงพยาบาลด้วยเครื่อง CT scan ภายในแผนกรังสีวิทยาของโรงพยาบาลที่เต็มไปด้วยกลิ่นยาและแอลกอฮอล์อบอวลไปทั่ว ต้นกล้ายืนมองเครื่องซีทีสแกนทรงอุโมงค์ยักษ์ราคาหลายล้านบาทด้วยสายตาเบิกกว้าง พ่อยืนอยู่ข้างๆ ด้วยชุดแบบลำลอง ส่วนหมอเก่งเดินออกมาจากห้องควบคุมพร้อมแผ่นเอกซเรย์ในมือ
+        </p>
+
+        <p class="dialogue">
+            "พ่อ..." ต้นกล้าใช้นิ้วจิ้มเครื่องซีทีสแกน "เครื่องยักษ์นี่ คือ เครื่องไทม์แมชชีน หรือโดนัทข้ามมิติกันแน่?"
+        </p>
+
+        <p class="dialogue">
+            "อย่าเอานิ้วไปจิ้มมั่วสิ..ไอ้ลูกชาย!" พ่อดึงมือต้นกล้าออก
+        </p>
+
+        <p class="dialogue">
+            "นั่นคือ เครื่องเอกซเรย์คอมพิวเตอร์ (CT Scan) ต่างหาก! หลักการทำงานก็เหมือนการตัดขนมปังแถวเป็นแผ่นๆ ด้วยรังสีเอกซ์ โดยหลอดรังสีเอกซ์จะหมุนรอบคนด้วยมุม 360 องศา พร้อมกับยิงรังสีเอกซ์ที่เป็นคลื่นแม่เหล็กไฟฟ้าพลังงานสูงผ่านร่างกายของคน แล้วเอาภาพถ่ายแบบ 2 มิติจำนวนมากมาประมวลผลด้วยคณิตศาสตร์ฟูเรียร์แล้วสร้างเป็นภาพตัดขวาง 3 มิติ!"
+        </p>
+
+        <p>
+            พ่ออธิบายจบพร้อมกับหมอเก่งได้ยกแผ่นฟิล์มเอกซเรย์กะโหลกศีรษะขึ้นส่องกับกล่องแสง พร้อมพูดว่า
+        </p>
+
+        <p class="dialogue">
+            "ถูกต้อง... การเอกซ์เรย์ร่างกายคนต้องอาศัย ฟิสิกส์อะตอม โดยเมื่ออิเล็กตรอนความเร็วสูงชนกับเป้าโลหะทังสเตน จะปล่อยพลังงานออกมาในรูปของโฟตอนรังสีเอกซ์ รังสีจะทะลุผ่านเนื้อเยื่อได้ดี แต่จะถูกดักจับไว้ด้วยอวัยวะที่มีความหนาแน่นไม่เท่ากัน อย่างกระดูกที่มีความหนาแน่นสูง! ภาพที่ได้จึงไม่เท่ากัน"
+        </p>
+
+        <p>
+            หมอเก่งหันฟิล์มเอกซเรย์กะโหลกศีรษะของต้นกล้าให้พ่อดู "ดูนี่สิอาจารย์... ช่องว่างตรงกลางกะโหลกลูกอาจารย์สว่างใสแจ๋วเลยนะ"
+        </p>
+
+        <p>
+            พ่อถือโอกาสแซวทันที "นั่นไง! พ่อว่าแล้ว! ความหนาแน่น $(D=m/V)$ ในกะโหลกต่ำเกินไป! มวลสารสมองสูญหายไปไหนหมด...ต้นกล้า?!"
+        </p>
+
+        <p class="dialogue">
+            "โธ่พ่อ! นั่นนี่คือ ช่องโพรงจมูก (Sinus) ไม่ใช่เหรอ!" ต้นกล้าโวยวายเสียงดัง พร้อมเบี่ยงเบนประเด็น ด้วยการถามต่อว่า
+        </p>
+
+        <p class="dialogue">
+            "แล้วนวัตกรรมอันโน้นล่ะครับ..หมอเก่ง?" ต้นกล้าชี้ไปที่เครื่องเลเซอร์ผ่าตัดตาตรงมุมห้อง
+        </p>
+
+        <p class="dialogue">
+            "นั่นคือ เลเซอร์ (LASER) ผ่าตัดตา" หมอเก่งอธิบาย "คำว่า Laser ย่อมาจาก Light Amplification by Stimulated Emission of Radiation ซึ่งก็คือ แสงความถี่เดียวที่มีเฟสตรงกันเป๊ะ (Coherent Light) มีพลังงานสูงมากจนใช้ตัดเนื้อเยื่อ ผ่าตัดกระจกตา หรือสลายนิ่วได้อย่างแม่นยำระดับไมครอน"
+        </p>
+
+        <p class="dialogue">
+            "อ๋อ... เหมือนเลเซอร์พอยเตอร์สีแดงที่พ่อเอาไปยิงหลอกแมวข้างบ้านจนวิ่งชนสิ่งของมั่วไปหมดเมื่อวานใช่มั้ยครับ?" ต้นกล้าได้ทีรีบฟ้องหมอเก่ง
+        </p>
+
+        <p class="dialogue">
+            หมอเก่งหันไปมองหน้าพ่อทันที "อาจารย์ครับ... คุณเอาเลเซอร์กำลังสูงไปเล่นกับแมวอีกแล้วเหรอ?! ครับ"
+        </p>
+
+        <p class="dialogue">
+            "เฮ้ย! อันนั้นไม่ใช่เลเซอร์กำลังสูงนะ แต่เป็น เลเซอร์ไดโอดกำลังต่ำไม่เกิน 5 มิลลิวัตต์! ไม่ได้ทำลายจอตาแมวสักหน่อย!" พ่อรีบแก้ตัว ก่อนจะเลี่ยงไปถามประเด็นอื่นแทน ด้วยการหันไปทางผนังห้อง ที่มีเครื่องควบคุมดูซับซ้อนน่าเกรงขาม
+        </p>
+
+        <p class="dialogue">
+            "ดูนี่สิ! เครื่องควบคุมพวกนี้ใช้ระบบวงจรความปลอดภัยขั้นสูง....มากเลย"
+        </p>
+
+        <p>
+            ด้วยความซนของคุณพ่อ พูดไม่ทันขาดคำ มือพ่อก็ยื่นไปกดปุ่มแดงใหญ่บนผนัง เป๊าะ!
+        </p>
+
+        <div class="siren-box">
+            🚨 หวอออออ! หวอออออ! 🚨
+        </div>
+
+        <p>
+            เสียงสัญญาณไซเรนฉุกเฉินของแผนกรังสีวิทยาดังกระหึ่มก้องไปทั่วทั้งชั้น! ไฟสีแดงหมุนวนวาบๆ เจ้าหน้าที่รังสีและพยาบาลนับสิบนายวิ่งพรวดพราดเข้ามาในห้องด้วยความตกใจ
+        </p>
+
+        <p class="dialogue">
+            "เกิดอะไรขึ้น?! มีรังสีรั่วไหล หรือ คอมเพรสเซอร์เครื่อง CT-scan ระเบิด?!" พยาบาลหัวหน้าเวรร้องตะโกนเสียงดังลั่น
+        </p>
+
+        <p class="dialogue">
+            พ่อถือปุ่มค้างไว้ในมือ ตาค้างด้วยความตกใจ "เอ่อ... ผมแค่นึกว่ามันเป็นสวิตช์เปิดไฟส่องสแกน..."
+        </p>
+
+        <p class="dialogue">
+            ต้นกล้าที่ยืนอยู่ข้างเครื่องซีทีสแกน ถอนหายใจยาวเหยียด แล้วพูดเสียงดังว่า "พี่พยาบาลครับ... ช่วยเอาพ่อผมไปสแกนสมองด่วนเลยครับ! ผลเอกซเรย์กะโหลกผมเมื่อกี้ปกติทุกอย่าง แต่ของพ่อของผมนะน่าจะมีค่าความต้านทานไฟฟ้าสถิตในสมองต่ำเกินไปแล้วครับ!"
+        </p>
+
+        <p class="dialogue">
+            ท่ามกลางม่านหมอกสีแดงของไฟฉุกเฉิน หมอเก่งได้แต่เอามือกุมขมับพลางพูดว่า "อาจารย์ครับ... คิดว่าวันหลังพวกนายไม่ต้องมาตรวจสุขภาพที่โรงพยาบาลนี้อีกแล้วนะ... ฟิสิกส์ของนายนี่กำลังทำลายระบบการทำงานของแพทย์หมดแล้ว!"
+        </p>
+    </article>
+
+    <footer>
+        &copy; เรื่องสั้นส่งเสริมความรู้ทางฟิสิกส์และการแพทย์
+    </footer>
+</div>
+
+</body>
+</html>

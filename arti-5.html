@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่อง ไฟดับกับแว่นส่องทะลวงความมืด</title>
+    <!-- MathJax for rendering equations -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,400;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --amber-glow: #f59e0b;
+            --amber-bright: #fbbf24;
+            --accent-red: #ef4444;
+            --border-color: #334155;
+            --highlight-bg: #292524;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.85;
+            padding: 30px 15px;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-family: 'Prompt', sans-serif;
+            color: var(--amber-bright);
+            font-size: 2.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .story-body {
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+
+        p {
+            margin-bottom: 20px;
+            text-indent: 2.2em;
+        }
+
+        .dialogue {
+            text-indent: 0;
+            padding-left: 18px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--amber-glow);
+            background: rgba(245, 158, 11, 0.03);
+            padding-top: 6px;
+            padding-bottom: 6px;
+            padding-right: 12px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .sound-fx {
+            text-indent: 0;
+            text-align: center;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--amber-bright);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border: 1px dashed var(--amber-glow);
+            padding: 12px 20px;
+            margin: 25px 0;
+            border-radius: 12px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sound-fx.crash {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.15);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .physics-badge {
+            background-color: rgba(245, 158, 11, 0.12);
+            color: var(--amber-bright);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        footer {
+            margin-top: 45px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .container {
+                padding: 25px 20px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .story-body {
+                font-size: 1rem;
+            }
+
+            p {
+                text-indent: 1.5em;
+            }
+
+            .dialogue {
+                padding-left: 12px;
+            }
+
+            .sound-fx {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>เรื่อง ไฟดับกับแว่นส่องทะลวงความมืด</h1>
+        <div class="subtitle">เรื่องสั้นส่งเสริมความรู้ฟิสิกส์และทัศนูปกรณ์</div>
+    </header>
+
+    <article class="story-body">
+        <p>
+            ค่ำวันหนึ่ง หมอเก่งได้แวะมาเยี่ยมบ้านเพื่อสอบถามอาการของต้นกล้าด้วยความเป็นห่วง แต่เมื่อเดินมาถึงประตูหน้าบ้าน ก็พบว่าภายในบ้านเกิดเสียงดัง
+        </p>
+
+        <div class="sound-fx">
+            ⚡ พรึบ! ⚡
+        </div>
+
+        <p>
+            เมื่อเสียงตัดของสวิตช์ไฟฟ้าของเบรกเกอร์ดังขึ้น พร้อมกับความมืดมิดที่เข้าปกคลุมทั่วทั้งบ้านในทันที
+        </p>
+
+        <p class="dialogue">
+            "กรี๊ด! ไฟดับ!" เสียงแม่ตะโกนลั่นมาจากห้องครัว
+        </p>
+
+        <p class="dialogue">
+            "พ่อๆ ! ต้นกล้าๆ! ไปหาไฟฉายสำรองในห้องเก็บของให้ด้วย แล้วรีบเดินไปเปิดเบรกเกอร์ให้อย่างเร็วเลยนะ! เดี๋ยวอาหารในตู้เย็นจะละลาย !"
+        </p>
+
+        <p>
+            วันนี้เป็นคืนเดือนมืดเสียด้วย บรรยากาศภายในบ้านยิ่งมืดสนิท ต้นกล้าที่อยู่ใกล้ห้องเก็บของที่สุด ได้อาศัยความกล้า คลำทางฝ่าความมืดจนมายืนอยู่หน้าประตูห้องเก็บของได้แล้ว
+        </p>
+
+        <p class="dialogue">
+            "พ่อๆ...แม่ๆ ห้องนี้มืดมาก แถมมีของเก่าเก็บอยู่มาก ขวางทางเดินเต็มไปหมด ผมมองไม่เห็นอะไรเลย ถ้าเดินเข้าไปสะดุด แล้วล้มหมอนรองกระดูกทับเส้นประสาทขึ้นมา จะทำไง?"
+        </p>
+
+        <p>
+            "อย่าขี้กลัวไปหน่อยเลยไอ้เสือ!" พ่อพูดโพล่งขึ้นมาในความมืด ที่ไหนสักแห่งในบ้าน และตอนนี้พ่อเจอเทียนไขแล้ว เขาเลยจุดเทียนไขขึ้นเพื่อไล่ความมืดออกไปได้บางส่วน หลังจากนั้นเดินไปตามเสียงของต้นกล้า พร้อมกับเอ่ยปากออกเสียงดังเพื่อลดความกลัวของลูกชาย หลังจากนั้นก็เริ่มบรรยายหลักการให้ลูกชายฟัง
+        </p>
+
+        <p class="dialogue">
+            "ไฟฟ้าดับเพราะเกิด <span class="physics-badge">การลัดวงจร (Short Circuit)</span> ความต้านทาน $R$ ลดลงใกล้ศูนย์ ทำให้กระแส $I = V/R$ พุ่งสูงปรี๊ดจนเบรกเกอร์ตัดวงจรเพื่อความปลอดภัยตามกฎของโอห์มและบ้าน ต่างหาก!"
+        </p>
+
+        <p>
+            ทางด้านหมอเก่งที่ตอนแรกอยู่หน้าบ้าน พอได้ยินเสียงพ่อลูกคุยกัน จึงได้เปิดประตูแล้วเดินตามเสียง ฝ่าความมืดเข้ามาในบ้าน ด้วยความคุ้นเคย และตอนนี้ทั้งพ่อ หมอเก่ง ได้มายืนในห้องเก็บของเรียบร้อยแล้ว
+        </p>
+
+        <p class="dialogue">
+            หมอเก่งพูดเสียงดังกับพ่อ "อาจารย์ๆ..." หมอเก่งตะโกนเรียก แล้วพูดต่อว่า “ห้องเก็บของอาจารย์มืดขนาดนี้ ไฟฉายธรรมดากระจายแสงไม่พอหรอก ต้องใช้หลักการของ <span class="physics-badge">โอโตสโคป (Otoscope)</span> ที่หมอใช้ส่องตรวจหูและคอ!"
+        </p>
+
+        <p class="dialogue">
+            "ถูกต้องหมอเก่ง!" พ่อตาเป็นประกาย "เราต้องสร้างระบบทัศนูปกรณ์รวมแสง!! โดยด่วน"
+        </p>
+
+        <p>
+            ด้วยแสงไฟจากเทียนไขดวงเล็กๆ พ่อเหลือบไปเห็นแว่นสายตายาวของย่ากับแว่นสายตาสั้นอันเก่าที่วางอยู่บนโต๊ะในห้องเก็บของ พร้อมมีไฟฉายเก่าเล็กๆ วางอยู่ใกล้ๆ พ่อกับหมอเก่งจึงช่วยกันนำไฟฉายเก่าๆ มาต่อประกอบเข้ากับเลนส์นูนของแว่นสายตายาว
+        </p>
+
+        <p class="dialogue">
+            "ดูนี่นะ!" พ่ออธิบายขณะประกอบอุปกรณ์สุดพิสดาร "เลนส์นูนมีสมบัติในการ <span class="physics-badge">รวมแสง (Converging Lens)</span> เมื่อลำแสงขนานจากไฟฉายผ่านเลนส์นูน แสงจะถูกหักเหไปตัดกันที่จุดโฟกัส ($F$) ทำให้ความเข้มแสงต่อพื้นที่พุ่งสูงขึ้นเป็นสิบเท่า! และถ้าใส่เลนส์เว้าเข้าไปแล้วปรับระยะ จะเกิดเป็นลำแสงสปอตไลท์ ลำแคบที่เจาะทะลุความมืดได้เหมือนอุปกรณ์ทางแพทย์!"
+        </p>
+
+        <p>
+            หมอเก่งช่วยเอาเทปกาวพันอุปกรณ์ติดเข้ากับไฟฉาย แล้วเอาไปติดกับหมวกกันน็อกของเล่นของต้นกล้า ทำให้เกิดอุปกรณ์ใหม่ล่าสุด
+        </p>
+
+        <p class="dialogue">
+            "นี่ คือแว่นส่องขยายทางการแพทย์" พ่อกับหมอเก่งจึงได้นำเอาหมวกไฟฉายนี้ส่งให้ต้นกล้าสวมไว้
+        </p>
+
+        <p>
+            ตอนนี้จึงมีทัศนูปกรณ์ที่โฟกัสลำแสงได้แม่นยำยิ่งกว่าไฟฉายของหมอผ่าตัดติดบนหัวของต้นกล้าแล้ว! ต้นกล้ารู้สึกเหมือนตัวเองเป็นยอดมนุษย์ส่องไฟฉายแบบมนุษย์ค้างคาวเลยทีเดียว จึงพูดว่า
+        </p>
+
+        <p class="dialogue">
+            "โหย... พ่อ! หมอเก่ง! ลำแสงสว่างจ้า และพุ่งเป็นเส้นตรง ได้ตรงเป๊ะเลย!"
+        </p>
+
+        <p class="dialogue">
+            "เอาล่ะ! ส่องเข้าไปในห้องเก็บของ แล้วมองหาไฟฉายอันใหญ่ ไปให้แม่ก่อน!" พ่อสั่งด้วยความภาคภูมิใจ
+        </p>
+
+        <p>
+            ตอนนี้ต้นกล้าได้ก้าวขาเดินในห้องเก็บของมืดๆ อย่างมั่นใจ พลางหันหัวส่องลำแสงที่เข้มข้นสูงไปรอบๆ... แต่ทันใดนั้น ลำแสงความเข้มสูงปรี๊ดจากเลนส์นูนก็ไปตกกระทบเข้ากับ กระจกเงาเก่าแผ่นใหญ่ ที่ตั้งพิงผนังอยู่พอดีเป๊ะ!
+        </p>
+
+        <p>
+            ตามกฎการสะท้อนของแสง ที่ว่า <span class="physics-badge">มุมตกกระทบเท่ากับมุมสะท้อน!</span> ลำแสงโฟกัสความเข้มสูงสะท้อนออกจากกระจกเงาอย่างแม่นยำ แล้วพุ่งสวนกลับออกมาจากประตูห้องเก็บของ... เข้าสู่ดวงตาของพ่อกับของหมอเก่งที่ยืนอยู่ไม่ห่าง เข้าอย่างเต็มๆ!
+        </p>
+
+        <p class="dialogue">
+            "อ๊ากกกก! ตาฉัน! รังสีแสงโฟกัสเข้าตาเต็มๆ!" พ่อร้องโวยวายพลางเอามือกุมตา
+        </p>
+
+        <p class="dialogue">
+            "มองไม่เห็นอะไรเลย! ตาพร่ามัวเป็นจุดดับ (Scotoma) แล้ว!" หมอเก่งโอดครวญพลางเดินชนเสาบ้านดัง โครม!
+        </p>
+
+        <p>
+            แต่ว่าต้นกล้ากลับเดินถือไฟฉายอันใหญ่ออกมาจากห้องเก็บของแบบชิลๆ
+        </p>
+
+        <p class="dialogue">
+            "เอ่อ... พ่อครับ หมอเก่งครับ กฎการสะท้อนของแสงเมื่อกี้... ทัศนูปกรณ์ของพ่อกับหมอเก่งทำงานดีเกินไปหน่อยนะครับ!"
+        </p>
+    </article>
+
+    <footer>
+        &copy; เรื่องสั้นส่งเสริมความรู้ทางฟิสิกส์และการแพทย์
+    </footer>
+</div>
+
+</body>
+</html>
