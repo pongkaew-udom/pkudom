@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องปฏิบัติการเสมือนจริง: การสร้างกล้องจุลทรรศน์</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #0d9488;
+            --secondary-accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 22px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 370px 1fr;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 22px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .control-group label span.value {
+            color: var(--primary-accent);
+            font-weight: 700;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--primary-accent);
+        }
+
+        .specimen-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .spec-btn {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 0.82rem;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .spec-btn.active {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+            font-weight: 600;
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        button.action-btn {
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-reset {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-reset:hover { background: #cbd5e1; }
+
+        .btn-auto {
+            background: #e0f2fe;
+            color: #0369a1;
+            grid-column: span 2;
+        }
+
+        .btn-auto:hover { background: #bae6fd; }
+
+        .btn-log {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-log:hover { opacity: 0.92; }
+
+        .lab-space {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 16px;
+            min-height: 560px;
+            border: 1px solid var(--border);
+            padding: 18px;
+        }
+
+        .viewfinder-section {
+            width: 100%;
+            height: 205px;
+            background: #0f172a;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 4px solid #334155;
+        }
+
+        .view-box {
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+
+        .view-box h4 {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .circle-preview {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 3px solid #64748b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.3);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .circle-preview.dark-field {
+            background: #020617;
+            border-color: #ef4444;
+        }
+
+        .target-object {
+            font-size: 0.65rem;
+            transition: transform 0.1s ease-out, filter 0.1s ease-out, opacity 0.15s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .no-light-warning {
+            position: absolute;
+            color: #f87171;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px;
+            line-height: 1.3;
+            pointer-events: none;
+            display: none;
+        }
+
+        .optical-bench {
+            width: 100%;
+            height: 290px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            position: relative;
+            border: 2px dashed #cbd5e1;
+            margin-top: auto;
+            overflow: hidden;
+        }
+
+        .ruler-scale {
+            position: absolute;
+            bottom: 8px;
+            left: 5%;
+            width: 90%;
+            height: 20px;
+            border-top: 2px solid #64748b;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #64748b;
+            padding-top: 4px;
+            z-index: 4;
+        }
+
+        .optic-axis {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            border-top: 2px dashed #94a3b8;
+            z-index: 1;
+        }
+
+        .lens-mount {
+            position: absolute;
+            top: 0;
+            width: 60px;
+            height: 100%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 30px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .lens-holder {
+            width: 4px;
+            background: #475569;
+            position: absolute;
+            bottom: 30px;
+            left: calc(50% - 2px);
+            height: calc(50% - 30px); 
+            z-index: 4;
+        }
+
+        .glass-lens {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(45, 212, 191, 0.32);
+            border: 2px solid #0d9488;
+            border-radius: 50% / 16%;
+            box-shadow: 0 0 10px rgba(13, 148, 136, 0.4);
+            z-index: 6;
+            transition: width 0.15s;
+        }
+
+        .glass-lens.eyepiece {
+            background: rgba(96, 165, 250, 0.32);
+            border-color: #2563eb;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+        }
+
+        .mount-base {
+            width: 74px;
+            height: 18px;
+            background: #1e293b;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.62rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            position: absolute;
+            bottom: 28px;
+            z-index: 7;
+        }
+
+        .ray-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .focus-status-badge {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.25s;
+        }
+
+        .legend-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-line {
+            width: 18px;
+            height: 3px;
+            display: inline-block;
+        }
+
+        .bottom-container {
+            max-width: 1400px;
+            margin: 24px auto 0 auto;
+            width: 100%;
+        }
+
+        .table-responsive {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 14px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ห้องปฏิบัติการเสมือนจริง: การสร้างกล้องจุลทรรศน์ (Compound Microscope Lab)</h1>
+        <p>จำลองการหักเหของรังสีแสงผ่านเลนส์ใกล้วัตถุ (fo) และเลนส์ใกล้ตา (fe) ตรวจสอบขอบเขตการรับแสงและตำแหน่งการเกิดภาพจริงอย่างสมจริง</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Column: Controls -->
+        <div class="card">
+            <div class="card-title">⚙️ ตั้งค่าเลนส์และปรับระยะโฟกัส</div>
+
+            <div class="control-group" style="margin-bottom: 10px;">
+                <label>เลือกตัวอย่างสไลด์ (Specimen)</label>
+                <div class="specimen-selector">
+                    <button id="btn-spec-default" class="spec-btn active" onclick="setSpecimen('🦠', this)">🦠 จุลินทรีย์</button>
+                    <button class="spec-btn" onclick="setSpecimen('🧬', this)">🧬 โครงสร้างเซลล์</button>
+                    <button class="spec-btn" onclick="setSpecimen('🐜', this)">🐜 มดขนาดเล็ก</button>
+                </div>
+            </div>
+
+            <!-- Focal Length Objective -->
+            <div class="control-group">
+                <label>โฟกัสเลนส์ใกล้วัตถุ (fo : ยิ่งสั้นกำลังขยายยิ่งสูง)
+                    <span class="value" id="val-fo">1.2 cm</span>
+                </label>
+                <input type="range" id="param-fo" min="0.8" max="2.5" step="0.1" value="1.2">
+            </div>
+
+            <!-- Focal Length Eyepiece -->
+            <div class="control-group">
+                <label>โฟกัสเลนส์ใกล้ตา (fe : ยิ่งสั้นกำลังขยายยิ่งสูง)
+                    <span class="value" id="val-fe">2.5 cm</span>
+                </label>
+                <input type="range" id="param-fe" min="1.5" max="5.0" step="0.5" value="2.5">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 14px;">
+
+            <!-- Object Distance (Fine/Coarse Focus) -->
+            <div class="control-group">
+                <label>ระยะวัตถุหน้าเลนส์ใกล้วัตถุ (so) [ปุ่มปรับโฟกัส]
+                    <span class="value" id="val-so">1.30 cm</span>
+                </label>
+                <input type="range" id="param-so" min="0.60" max="3.50" step="0.01" value="1.30">
+            </div>
+
+            <!-- Tube Length L -->
+            <div class="control-group">
+                <label>ระยะห่างระหว่างเลนส์ / ความยาวลำกล้อง (L)
+                    <span class="value" id="val-L">18.0 cm</span>
+                </label>
+                <input type="range" id="param-L" min="10.0" max="24.0" step="0.5" value="18.0">
+            </div>
+
+            <!-- Readout metrics -->
+            <div class="control-group" style="background: var(--bg-main); padding: 12px; border-radius: 8px; font-size: 0.84rem; line-height: 1.65;">
+                <div>• ระยะภาพจริงจากเลนส์ใกล้วัตถุ (s'o): <span id="lbl-si" style="font-weight:bold; color:var(--primary-accent);">15.60 cm</span></div>
+                <div>• ตำแหน่งโฟกัสชัดเจน (L - fe): <span id="lbl-ideal-si" style="font-weight:bold;">15.50 cm</span></div>
+                <div>• สถานะรังสีแสงผ่านเลนส์ใกล้ตา: <span id="lbl-ray-status" style="font-weight:bold; color:var(--success);">แสงผ่านเข้าเลนส์ครบถ้วน</span></div>
+                <div>• กำลังขยายรวม (M = mo × me): <span id="lbl-mag" style="font-weight:bold; color:var(--secondary-accent);">120.0 เท่า</span></div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-container">
+                <button class="action-btn btn-auto" onclick="autoFocus()">🎯 ปรับระยะวัตถุ (so) ให้โฟกัสชัดอัตโนมัติ</button>
+                <button class="action-btn btn-reset" onclick="resetLab()">🔄 รีเซ็ต</button>
+                <button class="action-btn btn-log" onclick="logData()">📥 บันทึกผลการทดลอง</button>
+            </div>
+        </div>
+
+        <!-- Right Column: Visualizer Space -->
+        <div class="card" style="padding: 20px;">
+            <div class="card-title" style="position: relative;">
+                🔬 ระบบจำลองทางทัศนศาสตร์ (Optical Bench Visualizer)
+                <div id="focus-badge" class="focus-status-badge">ชัดเจนสมบูรณ์</div>
+            </div>
+            
+            <div class="lab-space">
+                <!-- ส่วนบน: ช่องมองภาพจำลองตัวอย่าง -->
+                <div class="viewfinder-section">
+                    <div class="view-box">
+                        <h4>ตัวอย่างบนแผ่นสไลด์ (มองด้วยตาเปล่า)</h4>
+                        <div class="circle-preview">
+                            <div id="naked-eye-object" class="target-object" style="transform: scale(1);">🦠</div>
+                        </div>
+                    </div>
+                    
+                    <div class="view-box">
+                        <h4>ภาพที่มองผ่านกล้องจุลทรรศน์ (Microscope View)</h4>
+                        <div class="circle-preview" id="microscope-circle" style="border-color: var(--primary-accent); border-width: 4px;">
+                            <div id="microscope-image" class="target-object">🦠</div>
+                            <div id="no-light-msg" class="no-light-warning">แสงไม่ตกกระทบเลนส์ใกล้ตา<br>(มองไม่เห็นภาพ)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนล่าง: รางออปติกพร้อมเลนส์และ SVG ลากเส้นแสง -->
+                <div class="optical-bench" id="bench-area">
+                    <div class="optic-axis"></div>
+                    
+                    <svg class="ray-svg-layer" id="ray-svg">
+                        <!-- เส้นประแนวตั้งผ่ากลางเลนส์ -->
+                        <line id="center-line-obj" x1="0" y1="0" x2="0" y2="100%" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.65" />
+                        <line id="center-line-eye" x1="0" y1="0" x2="0" y2="100%" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.65" />
+                        
+                        <!-- จุดโฟกัส fo และ fe -->
+                        <circle id="dot-fo-left" cx="0" cy="0" r="3.5" fill="#0d9488" />
+                        <text id="txt-fo-left" x="0" y="0" font-size="10" fill="#0f766e" font-weight="bold">fo</text>
+                        <circle id="dot-fo-right" cx="0" cy="0" r="3.5" fill="#0d9488" />
+                        <text id="txt-fo-right" x="0" y="0" font-size="10" fill="#0f766e" font-weight="bold">fo</text>
+
+                        <circle id="dot-fe-left" cx="0" cy="0" r="3.5" fill="#2563eb" />
+                        <text id="txt-fe-left" x="0" y="0" font-size="10" fill="#1d4ed8" font-weight="bold">fe</text>
+
+                        <!-- ลูกศรวัตถุจริง (สีเขียวเข้ม) -->
+                        <line id="obj-arrow" x1="0" y1="0" x2="0" y2="0" stroke="#0f172a" stroke-width="3" />
+                        <polygon id="obj-arrow-head" points="" fill="#0f172a" />
+
+                        <!-- ลูกศรภาพจริงที่เกิดจากเลนส์ใกล้วัตถุ (สีส้มทอง) -->
+                        <line id="real-image-arrow" x1="0" y1="0" x2="0" y2="0" stroke="#d97706" stroke-width="3" />
+                        <polygon id="real-image-head" points="" fill="#d97706" />
+
+                        <!-- เส้นประรังสีเสมือนย้อนกลับ (เมื่อภาพสุดท้ายเป็นภาพเสมือน) -->
+                        <line id="virtual-ray-1" x1="0" y1="0" x2="0" y2="0" stroke="#6366f1" stroke-width="1.3" stroke-dasharray="3,3" opacity="0" />
+                        <line id="virtual-ray-2" x1="0" y1="0" x2="0" y2="0" stroke="#6366f1" stroke-width="1.3" stroke-dasharray="3,3" opacity="0" />
+
+                        <!-- รังสีแสงจริง 2 เส้นจากยอดวัตถุ -->
+                        <path id="ray-1-path" d="" fill="none" stroke="rgba(239, 68, 68, 0.92)" stroke-width="2.2"/>
+                        <path id="ray-2-path" d="" fill="none" stroke="rgba(220, 38, 38, 0.85)" stroke-width="2.2"/>
+                    </svg>
+
+                    <!-- แผ่นสไลด์วัตถุ (Specimen) -->
+                    <div class="lens-mount" id="mount-spec">
+                        <div class="lens-holder"></div>
+                        <div class="mount-base" style="background: #475569;">สไลด์วัตถุ</div>
+                    </div>
+
+                    <!-- เลนส์ใกล้วัตถุ (Objective Lens) -->
+                    <div class="lens-mount" id="mount-obj">
+                        <div class="lens-holder"></div>
+                        <div class="glass-lens" id="glass-obj" style="width: 18px; height: 90px;"></div>
+                        <div class="mount-base" style="background: #0f766e;">ใกล้วัตถุ (fo)</div>
+                    </div>
+
+                    <!-- เลนส์ใกล้ตา (Eyepiece Lens) -->
+                    <div class="lens-mount" id="mount-eye">
+                        <div class="lens-holder"></div>
+                        <div class="glass-lens eyepiece" id="glass-eye" style="width: 22px; height: 130px;"></div>
+                        <div class="mount-base" style="background: #1d4ed8;">ใกล้ตา (fe)</div>
+                    </div>
+
+                    <!-- ไม้บรรทัดวัดระยะบนราง -4 cm ถึง 24 cm -->
+                    <div class="ruler-scale">
+                        <span>-4 cm</span>
+                        <span>0 cm</span>
+                        <span>4 cm</span>
+                        <span>8 cm</span>
+                        <span>12 cm</span>
+                        <span>16 cm</span>
+                        <span>20 cm</span>
+                        <span>24 cm</span>
+                    </div>
+                </div>
+
+                <div class="legend-bar">
+                    <div class="legend-item"><span class="legend-line" style="background:#0f172a;"></span> วัตถุบนสไลด์</div>
+                    <div class="legend-item"><span class="legend-line" style="background:#d97706;"></span> ภาพจริงจากเลนส์ใกล้วัตถุ (s'o)</div>
+                    <div class="legend-item"><span class="legend-line" style="background:#ef4444;"></span> ทางเดินรังสีแสงจริง</div>
+                    <div class="legend-item"><span class="legend-line" style="border-top: 2px dashed #6366f1;"></span> แนวรังสีเสมือนเข้าสู่ตา</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Container: Table Log -->
+    <div class="bottom-container">
+        <div class="card">
+            <div class="card-title">📊 ตารางบันทึกผลการทดลอง: การปรับโฟกัสและคำนวณกำลังขยายของกล้องจุลทรรศน์</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ครั้งที่</th>
+                            <th>โฟกัสใกล้วัตถุ fo (cm)</th>
+                            <th>โฟกัสใกล้ตา fe (cm)</th>
+                            <th>ระยะวัตถุ so (cm)</th>
+                            <th>ความยาวลำกล้อง L (cm)</th>
+                            <th>กำลังขยายรวม (M)</th>
+                            <th>สถานะภาพและลักษณะที่สังเกตได้</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let experimentCount = 0;
+        let currentSpecimen = '🦠';
+
+        const OBJ_HALF_HEIGHT = 45;
+        const EYE_HALF_HEIGHT = 65;
+
+        const paramFo = document.getElementById('param-fo');
+        const paramFe = document.getElementById('param-fe');
+        const paramSo = document.getElementById('param-so');
+        const paramL = document.getElementById('param-L');
+
+        const valFo = document.getElementById('val-fo');
+        const valFe = document.getElementById('val-fe');
+        const valSo = document.getElementById('val-so');
+        const valL = document.getElementById('val-L');
+
+        const lblSi = document.getElementById('lbl-si');
+        const lblIdealSi = document.getElementById('lbl-ideal-si');
+        const lblRayStatus = document.getElementById('lbl-ray-status');
+        const lblMag = document.getElementById('lbl-mag');
+
+        const mountSpec = document.getElementById('mount-spec');
+        const mountObj = document.getElementById('mount-obj');
+        const mountEye = document.getElementById('mount-eye');
+        const glassObj = document.getElementById('glass-obj');
+        const glassEye = document.getElementById('glass-eye');
+
+        const nakedEyeObject = document.getElementById('naked-eye-object');
+        const microscopeImage = document.getElementById('microscope-image');
+        const microscopeCircle = document.getElementById('microscope-circle');
+        const noLightMsg = document.getElementById('no-light-msg');
+        const focusBadge = document.getElementById('focus-badge');
+
+        const benchArea = document.getElementById('bench-area');
+
+        function setSpecimen(emoji, btn) {
+            currentSpecimen = emoji;
+            nakedEyeObject.innerText = emoji;
+            microscopeImage.innerText = emoji;
+            document.querySelectorAll('.spec-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        function autoFocus() {
+            const fo = parseFloat(paramFo.value);
+            const fe = parseFloat(paramFe.value);
+            const L = parseFloat(paramL.value);
+            const targetSi = Math.max(fo + 0.5, L - fe);
+            const idealSo = (targetSi * fo) / (targetSi - fo);
+            paramSo.value = Math.min(3.50, Math.max(0.60, idealSo)).toFixed(2);
+            updateMicroscopeSystem();
+        }
+
+        function updateMicroscopeSystem() {
+            const fo = parseFloat(paramFo.value);
+            const fe = parseFloat(paramFe.value);
+            const so = parseFloat(paramSo.value);
+            const L = parseFloat(paramL.value);
+
+            valFo.innerText = fo.toFixed(1) + " cm";
+            valFe.innerText = fe.toFixed(1) + " cm";
+            valSo.innerText = so.toFixed(2) + " cm";
+            valL.innerText = L.toFixed(1) + " cm";
+
+            glassObj.style.width = Math.max(10, 26 - fo * 6) + "px";
+            glassEye.style.width = Math.max(12, 30 - fe * 3.5) + "px";
+
+            let si = 0;
+            let isRealImage = false;
+            if (so > fo + 0.005) {
+                si = (so * fo) / (so - fo);
+                isRealImage = true;
+            } else {
+                si = Infinity;
+            }
+
+            const idealSi = L - fe;
+            lblSi.innerText = isRealImage ? si.toFixed(2) + " cm" : "ไม่เกิดภาพจริง (so ≤ fo)";
+            lblIdealSi.innerText = idealSi.toFixed(2) + " cm";
+
+            const mo = isRealImage ? (si / so) : (L / fo);
+            const me = 25 / fe;
+            const totalMag = Math.abs(mo * me);
+            lblMag.innerText = totalMag.toFixed(1) + " เท่า";
+
+            const minScale = -4;
+            const maxScale = 24;
+            const scaleSpan = maxScale - minScale;
+            const startPct = 5;
+            const endPct = 95;
+            const benchRangePct = endPct - startPct;
+
+            const posToPct = (cm) => startPct + ((cm - minScale) / scaleSpan) * benchRangePct;
+
+            const objPct = posToPct(0);
+            const specPct = posToPct(-so);
+            const eyePct = posToPct(L);
+
+            mountObj.style.left = `calc(${objPct}% - 30px)`;
+            mountSpec.style.left = `calc(${specPct}% - 30px)`;
+            mountEye.style.left = `calc(${eyePct}% - 30px)`;
+
+            const rayInfo = drawRayTracing(specPct, objPct, eyePct, fo, fe, so, si, L, isRealImage);
+
+            let blurAmount = 0;
+            let isVisible = true;
+            let imageOpacity = 1;
+
+            if (!isRealImage) {
+                isVisible = false;
+                focusBadge.innerText = "ไม่เกิดภาพจริง (so ≤ fo)";
+                focusBadge.style.backgroundColor = "#fee2e2";
+                focusBadge.style.color = "var(--danger)";
+                lblRayStatus.innerText = "รังสีบานออก ไม่รวมภาพ";
+                lblRayStatus.style.color = "var(--danger)";
+            } else if (!rayInfo.hitsEyepiece) {
+                isVisible = false;
+                focusBadge.innerText = "มองไม่เห็น (แสงตกนอกเลนส์ใกล้ตา)";
+                focusBadge.style.backgroundColor = "#fee2e2";
+                focusBadge.style.color = "var(--danger)";
+                lblRayStatus.innerText = "แสงหลุดขอบเลนส์ใกล้ตา!";
+                lblRayStatus.style.color = "var(--danger)";
+            } else if (si > L) {
+                const overshoot = si - L;
+                blurAmount = Math.min(18, 4 + overshoot * 2.5);
+                imageOpacity = Math.max(0.25, 1 - overshoot * 0.12);
+                focusBadge.innerText = "ภาพเลยตำแหน่งเลนส์ใกล้ตา (เบลอจัด)";
+                focusBadge.style.backgroundColor = "#ffedd5";
+                focusBadge.style.color = "#c2410c";
+                lblRayStatus.innerText = "แสงตัดกันหลังเลนส์ใกล้ตา";
+                lblRayStatus.style.color = "#d97706";
+            } else {
+                const soEye = L - si;
+                const nearPointSoEye = (25 * fe) / (25 + fe);
+
+                if (soEye >= nearPointSoEye - 0.15 && soEye <= fe + 0.35) {
+                    const distFromInfinity = Math.abs(soEye - fe);
+                    blurAmount = distFromInfinity < 0.2 ? 0 : distFromInfinity * 0.8;
+                    focusBadge.innerText = distFromInfinity < 0.2 ? "ชัดเจนสมบูรณ์ (ภาพที่อนันต์)" : "ชัดเจน (ระยะปรับโฟกัสสายตา)";
+                    focusBadge.style.backgroundColor = "var(--success)";
+                    focusBadge.style.color = "white";
+                } else if (soEye > fe + 0.35) {
+                    const err = soEye - fe;
+                    blurAmount = Math.min(18, err * 2.2);
+                    focusBadge.innerText = err < 1.8 ? "ใกล้เคียง (เบลอเล็กน้อย)" : "ภาพเบลอหลุดโฟกัส";
+                    focusBadge.style.backgroundColor = err < 1.8 ? "#fef08a" : "#fee2e2";
+                    focusBadge.style.color = err < 1.8 ? "#a16207" : "var(--danger)";
+                } else {
+                    const err = nearPointSoEye - soEye;
+                    blurAmount = Math.min(16, err * 4.5);
+                    focusBadge.innerText = "ภาพใกล้ตาเกินระยะชัด (เบลอ)";
+                    focusBadge.style.backgroundColor = "#fef08a";
+                    focusBadge.style.color = "#a16207";
+                }
+
+                if (rayInfo.partialClip) {
+                    imageOpacity = 0.55;
+                    lblRayStatus.innerText = "แสงผ่านบางส่วน (ขอบภาพมืด)";
+                    lblRayStatus.style.color = "#d97706";
+                } else {
+                    imageOpacity = 1;
+                    lblRayStatus.innerText = "แสงผ่านเข้าเลนส์ครบถ้วน";
+                    lblRayStatus.style.color = "var(--success)";
+                }
+            }
+
+            if (!isVisible) {
+                microscopeCircle.classList.add('dark-field');
+                microscopeImage.style.opacity = '0';
+                noLightMsg.style.display = 'block';
+            } else {
+                microscopeCircle.classList.remove('dark-field');
+                noLightMsg.style.display = 'none';
+                microscopeImage.style.opacity = imageOpacity.toString();
+
+                const visualScale = Math.min(9.5, Math.max(1.2, totalMag / 20));
+                microscopeImage.style.filter = `blur(${blurAmount.toFixed(1)}px)`;
+                microscopeImage.style.transform = `scale(${-visualScale})`;
+            }
+        }
+
+        function drawRayTracing(specPct, objPct, eyePct, fo, fe, so, si, L, isRealImage) {
+            const w = benchArea.clientWidth;
+            const h = benchArea.clientHeight;
+            const midY = h / 2;
+
+            const xSpec = (specPct / 100) * w;
+            const xObj = (objPct / 100) * w;
+            const xEye = (eyePct / 100) * w;
+
+            const pxPerCm = (0.90 * w) / 28;
+
+            document.getElementById('center-line-obj').setAttribute('x1', xObj);
+            document.getElementById('center-line-obj').setAttribute('x2', xObj);
+            document.getElementById('center-line-eye').setAttribute('x1', xEye);
+            document.getElementById('center-line-eye').setAttribute('x2', xEye);
+
+            const xFoLeft = xObj - fo * pxPerCm;
+            const xFoRight = xObj + fo * pxPerCm;
+            const xFeLeft = xEye - fe * pxPerCm;
+
+            setPoint('dot-fo-left', 'txt-fo-left', xFoLeft, midY, 'fo');
+            setPoint('dot-fo-right', 'txt-fo-right', xFoRight, midY, 'fo');
+            setPoint('dot-fe-left', 'txt-fe-left', xFeLeft, midY, 'fe');
+
+            const hObj = 8;
+            const yObjTip = midY - hObj;
+
+            const objArrow = document.getElementById('obj-arrow');
+            const objHead = document.getElementById('obj-arrow-head');
+            objArrow.setAttribute('x1', xSpec);
+            objArrow.setAttribute('y1', midY);
+            objArrow.setAttribute('x2', xSpec);
+            objArrow.setAttribute('y2', yObjTip);
+            objHead.setAttribute('points', `${xSpec},${yObjTip - 4} ${xSpec - 3.5},${yObjTip + 2} ${xSpec + 3.5},${yObjTip + 2}`);
+
+            const realImgArrow = document.getElementById('real-image-arrow');
+            const realImgHead = document.getElementById('real-image-head');
+            const ray1Path = document.getElementById('ray-1-path');
+            const ray2Path = document.getElementById('ray-2-path');
+            const vRay1 = document.getElementById('virtual-ray-1');
+            const vRay2 = document.getElementById('virtual-ray-2');
+            vRay1.setAttribute('opacity', '0');
+            vRay2.setAttribute('opacity', '0');
+
+            if (!isRealImage) {
+                realImgArrow.setAttribute('opacity', '0');
+                realImgHead.setAttribute('opacity', '0');
+
+                const slope1 = hObj / (fo * pxPerCm);
+                const slope2 = hObj / (so * pxPerCm);
+
+                ray1Path.setAttribute('d', `M ${xSpec},${yObjTip} L ${xObj},${yObjTip} L ${w},${(midY - hObj) + slope1 * (w - xObj)}`);
+                ray2Path.setAttribute('d', `M ${xSpec},${yObjTip} L ${w},${midY + slope2 * (w - xObj)}`);
+
+                return { hitsEyepiece: false, partialClip: false };
+            }
+
+            const xImg = xObj + si * pxPerCm;
+            const hImg = hObj * (si / so);
+            const yImgTip = midY + hImg;
+
+            if (xImg <= w - 10 && Math.abs(hImg) < h * 0.48) {
+                realImgArrow.setAttribute('opacity', '1');
+                realImgHead.setAttribute('opacity', '1');
+                realImgArrow.setAttribute('x1', xImg);
+                realImgArrow.setAttribute('y1', midY);
+                realImgArrow.setAttribute('x2', xImg);
+                realImgArrow.setAttribute('y2', yImgTip);
+                realImgHead.setAttribute('points', `${xImg},${yImgTip + 4} ${xImg - 4},${yImgTip - 3} ${xImg + 4},${yImgTip - 3}`);
+            } else {
+                realImgArrow.setAttribute('opacity', '0');
+                realImgHead.setAttribute('opacity', '0');
+            }
+
+            const slope1 = (yImgTip - (midY - hObj)) / (xImg - xObj);
+            const y1AtEye = (midY - hObj) + slope1 * (xEye - xObj);
+
+            const slope2 = (yImgTip - midY) / (xImg - xObj);
+            const y2AtEye = midY + slope2 * (xEye - xObj);
+
+            const dy1 = Math.abs(y1AtEye - midY);
+            const dy2 = Math.abs(y2AtEye - midY);
+
+            const ray1Hits = dy1 <= EYE_HALF_HEIGHT;
+            const ray2Hits = dy2 <= EYE_HALF_HEIGHT;
+
+            const hitsEyepiece = ray1Hits || ray2Hits;
+            const partialClip = (ray1Hits !== ray2Hits);
+
+            const fePx = fe * pxPerCm;
+
+            let d1 = `M ${xSpec},${yObjTip} L ${xObj},${yObjTip}`;
+            if (ray1Hits) {
+                const outSlope1 = slope1 - ((y1AtEye - midY) / fePx);
+                const y1End = y1AtEye + outSlope1 * (w - xEye);
+                d1 += ` L ${xEye},${y1AtEye} L ${w},${y1End}`;
+
+                if (si < L && (L - si) < fe) {
+                    vRay1.setAttribute('opacity', '0.6');
+                    vRay1.setAttribute('x1', xEye);
+                    vRay1.setAttribute('y1', y1AtEye);
+                    vRay1.setAttribute('x2', Math.max(0, xEye - 180));
+                    vRay1.setAttribute('y2', y1AtEye - outSlope1 * Math.min(xEye, 180));
+                }
+            } else {
+                const y1End = (midY - hObj) + slope1 * (w - xObj);
+                d1 += ` L ${w},${y1End}`;
+            }
+
+            let d2 = `M ${xSpec},${yObjTip} L ${xObj},${midY}`;
+            if (ray2Hits) {
+                const outSlope2 = slope2 - ((y2AtEye - midY) / fePx);
+                const y2End = y2AtEye + outSlope2 * (w - xEye);
+                d2 += ` L ${xEye},${y2AtEye} L ${w},${y2End}`;
+
+                if (si < L && (L - si) < fe) {
+                    vRay2.setAttribute('opacity', '0.6');
+                    vRay2.setAttribute('x1', xEye);
+                    vRay2.setAttribute('y1', y2AtEye);
+                    vRay2.setAttribute('x2', Math.max(0, xEye - 180));
+                    vRay2.setAttribute('y2', y2AtEye - outSlope2 * Math.min(xEye, 180));
+                }
+            } else {
+                const y2End = midY + slope2 * (w - xObj);
+                d2 += ` L ${w},${y2End}`;
+            }
+
+            ray1Path.setAttribute('d', d1);
+            ray2Path.setAttribute('d', d2);
+
+            return { hitsEyepiece, partialClip };
+        }
+
+        function setPoint(dotId, txtId, x, midY, label) {
+            const dot = document.getElementById(dotId);
+            const txt = document.getElementById(txtId);
+            dot.setAttribute('cx', x);
+            dot.setAttribute('cy', midY);
+            txt.setAttribute('x', x - 4);
+            txt.setAttribute('y', midY - 8);
+            txt.textContent = label;
+        }
+
+        function logData() {
+            experimentCount++;
+            const fo = parseFloat(paramFo.value);
+            const fe = parseFloat(paramFe.value);
+            const so = parseFloat(paramSo.value);
+            const L = parseFloat(paramL.value);
+
+            const mo = (so > fo) ? ((so * fo) / (so - fo)) / so : (L / fo);
+            const me = 25 / fe;
+            const totalMag = Math.abs(mo * me).toFixed(1);
+            const currentStatus = focusBadge.innerText;
+
+            const tbody = document.getElementById('log-table-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${experimentCount}</b></td>
+                <td>${fo.toFixed(1)}</td>
+                <td>${fe.toFixed(1)}</td>
+                <td style="font-family: monospace; font-weight: bold; color: var(--primary-accent);">${so.toFixed(2)}</td>
+                <td>${L.toFixed(1)}</td>
+                <td style="font-family: monospace; font-weight: bold; color: var(--secondary-accent);">${totalMag} x</td>
+                <td>${currentStatus}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function resetLab() {
+            // 1. รีเซ็ตค่าตัวเลื่อน (Sliders) กลับสู่ค่าเริ่มต้นทั้งหมด
+            paramFo.value = "1.2";
+            paramFe.value = "2.5";
+            paramSo.value = "1.30";
+            paramL.value = "18.0";
+
+            // 2. รีเซ็ตตัวอย่างสไลด์กลับเป็นค่าเริ่มต้น (จุลินทรีย์)
+            const defaultSpecBtn = document.getElementById('btn-spec-default');
+            setSpecimen('🦠', defaultSpecBtn);
+
+            // 3. ล้างข้อมูลทั้งหมดในตารางบันทึกผล และรีเซ็ตตัวนับครั้งที่ทดลอง
+            document.getElementById('log-table-body').innerHTML = "";
+            experimentCount = 0;
+
+            // 4. อัปเดตการแสดงผลทางทัศนศาสตร์และช่องมองภาพให้กลับสู่สถานะเริ่มต้น
+            updateMicroscopeSystem();
+        }
+
+        paramFo.addEventListener('input', updateMicroscopeSystem);
+        paramFe.addEventListener('input', updateMicroscopeSystem);
+        paramSo.addEventListener('input', updateMicroscopeSystem);
+        paramL.addEventListener('input', updateMicroscopeSystem);
+
+        window.addEventListener('resize', updateMicroscopeSystem);
+        setTimeout(updateMicroscopeSystem, 150);
+    </script>
+</body>
+</html>
