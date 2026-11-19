@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แหล่งรวมความรู้อื่นๆ ในเครือของเรา</title>
+    <!-- นำเข้าฟอนต์ Prompt และ Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-gradient: radial-gradient(circle at top right, #1e293b 0%, #0f172a 50%, #090d16 100%);
+            --card-surface: rgba(255, 255, 255, 0.98);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* แสงตกแต่งพื้นหลัง */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -10%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.16) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ส่วนหัว (Hero Header) */
+        .hero-header {
+            text-align: center;
+            margin-bottom: 42px;
+            color: #ffffff;
+        }
+
+        .hub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #93c5fd;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-header h1 {
+            font-family: 'Prompt', sans-serif;
+            font-size: 2.35rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 14px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-header p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+
+        /* ตารางการ์ดเว็บไซต์ 2x2 */
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .site-card {
+            background: var(--card-surface);
+            border-radius: 24px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .site-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            transition: height 0.3s ease;
+        }
+
+        .site-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 50px -12px rgba(0, 0, 0, 0.55);
+        }
+
+        .site-card:hover::before {
+            height: 7px;
+        }
+
+        /* สีประจำแต่ละการ์ด */
+        .card-blue::before { background: linear-gradient(90deg, #2563eb, #38bdf8); }
+        .card-purple::before { background: linear-gradient(90deg, #7c3aed, #c084fc); }
+        .card-emerald::before { background: linear-gradient(90deg, #059669, #34d399); }
+        .card-indigo::before { background: linear-gradient(90deg, #4338ca, #818cf8); }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .icon-box {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-blue .icon-box { background: #eff6ff; color: #2563eb; }
+        .card-purple .icon-box { background: #f5f3ff; color: #7c3aed; }
+        .card-emerald .icon-box { background: #ecfdf5; color: #059669; }
+        .card-indigo .icon-box { background: #eef2ff; color: #4338ca; }
+
+        .category-tag {
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 50px;
+        }
+
+        .card-blue .category-tag { background: #dbeafe; color: #1d4ed8; }
+        .card-purple .category-tag { background: #ede9fe; color: #6d28d9; }
+        .card-emerald .category-tag { background: #d1fae5; color: #047857; }
+        .card-indigo .category-tag { background: #e0e7ff; color: #3730a3; }
+
+        .site-title {
+            font-family: 'Prompt', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .site-desc {
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 22px;
+        }
+
+        .card-footer-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+
+        .url-text {
+            color: #64748b;
+            font-weight: 500;
+            font-family: monospace;
+            font-size: 0.88rem;
+        }
+
+        .visit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+
+        .card-blue .visit-btn { color: #2563eb; }
+        .card-purple .visit-btn { color: #7c3aed; }
+        .card-emerald .visit-btn { color: #059669; }
+        .card-indigo .visit-btn { color: #4338ca; }
+
+        .site-card:hover .visit-btn {
+            transform: translateX(4px);
+        }
+
+        /* Footer */
+        .page-footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.88rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-header h1 {
+                font-size: 1.85rem;
+            }
+            .sites-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .site-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- ส่วนหัวแสดงชื่อหมวดหมู่หลัก -->
+        <header class="hero-header">
+            <div class="hub-badge">🌐 Knowledge Network Hub</div>
+            <h1>แหล่งรวมความรู้อื่นๆ ในเครือของเรา</h1>
+            <p>
+                คลังสื่อการเรียนรู้ วิทยาศาสตร์ และห้องปฏิบัติการเสมือนจริง ที่รวบรวมเนื้อหาสาระและนวัตกรรมการศึกษาไว้ในที่เดียว เพื่อการเรียนรู้ที่ไร้ขีดจำกัด
+            </p>
+        </header>
+
+        <!-- รายการเว็บไซต์ในเครือทั้ง 4 แห่ง -->
+        <main class="sites-grid">
+            <!-- เว็บที่ 1 -->
+            <a href="https://pkudom.netlify.app/" target="_blank" rel="noopener noreferrer" class="site-card card-blue">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">📚</div>
+                        <span class="category-tag">คลังความรู้ & สื่อการสอน</span>
+                    </div>
+                    <h2 class="site-title">PK Udom</h2>
+                    <p class="site-desc">
+                        ศูนย์รวมบทความทางวิชาการ เอกสารประกอบการเรียนรู้ และแหล่งข้อมูลที่เป็นประโยชน์สำหรับนักเรียน นักศึกษา และผู้สนใจทั่วไป
+                    </p>
+                </div>
+                <div class="card-footer-action">
+                    <span class="url-text">pkudom.netlify.app</span>
+                    <span class="visit-btn">เข้าชมเว็บไซต์ ↗</span>
+                </div>
+            </a>
+
+            <!-- เว็บที่ 2 -->
+            <a href="https://physics-vir-lab.netlify.app/" target="_blank" rel="noopener noreferrer" class="site-card card-purple">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">⚛️</div>
+                        <span class="category-tag">ห้องปฏิบัติการเสมือน</span>
+                    </div>
+                    <h2 class="site-title">Physics Virtual Lab</h2>
+                    <p class="site-desc">
+                        ห้องทดลองฟิสิกส์เสมือนจริงแบบอินเทอร์แอคทีฟ ช่วยให้ผู้เรียนสามารถจำลองการทดลอง สังเกตผลลัพธ์ และเข้าใจหลักการทางฟิสิกส์ได้อย่างเห็นภาพ
+                    </p>
+                </div>
+                <div class="card-footer-action">
+                    <span class="url-text">physics-vir-lab.netlify.app</span>
+                    <span class="visit-btn">เข้าชมเว็บไซต์ ↗</span>
+                </div>
+            </a>
+
+            <!-- เว็บที่ 3 -->
+            <a href="https://chatcharawan.netlify.app/" target="_blank" rel="noopener noreferrer" class="site-card card-emerald">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">🎓</div>
+                        <span class="category-tag">สาระการเรียนรู้ & บทความ</span>
+                    </div>
+                    <h2 class="site-title">Chatcharawan</h2>
+                    <p class="site-desc">
+                        พื้นที่แบ่งปันองค์ความรู้ สื่อสร้างสรรค์เพื่อการศึกษา และเกร็ดความรู้หลากหลายแง่มุมที่ออกแบบมาให้อ่านเข้าใจง่ายและนำไปต่อยอดได้จริง
+                    </p>
+                </div>
+                <div class="card-footer-action">
+                    <span class="url-text">chatcharawan.netlify.app</span>
+                    <span class="visit-btn">เข้าชมเว็บไซต์ ↗</span>
+                </div>
+            </a>
+
+            <!-- เว็บที่ 4 -->
+            <a href="https://secrets-of-universe.netlify.app/" target="_blank" rel="noopener noreferrer" class="site-card card-indigo">
+                <div>
+                    <div class="card-top">
+                        <div class="icon-box">🌌</div>
+                        <span class="category-tag">ดาราศาสตร์ & จักรวาลวิทยา</span>
+                    </div>
+                    <h2 class="site-title">Secrets of Universe</h2>
+                    <p class="site-desc">
+                        เปิดโลกแห่งดาราศาสตร์และอวกาศ ชวนค้นหาความลับของเอกภพ ดวงดาว กาแล็กซี และปรากฏการณ์ทางธรรมชาติที่น่าอัศจรรย์
+                    </p>
+                </div>
+                <div class="card-footer-action">
+                    <span class="url-text">secrets-of-universe.netlify.app</span>
+                    <span class="visit-btn">เข้าชมเว็บไซต์ ↗</span>
+                </div>
+            </a>
+        </main>
+
+        <footer class="page-footer">
+            © 2026 Knowledge Network Hub • แหล่งรวมความรู้อื่นๆ ในเครือของเรา
+        </footer>
+    </div>
+
+</body>
+</html>
